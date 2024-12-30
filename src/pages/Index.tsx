@@ -1,11 +1,35 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Hero } from '../components/Hero';
+import { CategoryRow } from '../components/CategoryRow';
+
+const MOCK_MOVIES = {
+  trending: Array.from({ length: 10 }, (_, i) => ({
+    id: i,
+    title: `Trending Movie ${i + 1}`,
+    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475',
+    category: 'Trending'
+  })),
+  action: Array.from({ length: 10 }, (_, i) => ({
+    id: i + 10,
+    title: `Action Movie ${i + 1}`,
+    image: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d',
+    category: 'Action'
+  })),
+  comedy: Array.from({ length: 10 }, (_, i) => ({
+    id: i + 20,
+    title: `Comedy Movie ${i + 1}`,
+    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158',
+    category: 'Comedy'
+  }))
+};
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <div className="min-h-screen">
+      <Hero />
+      <div className="pb-8">
+        <CategoryRow title="Trending Now" movies={MOCK_MOVIES.trending} />
+        <CategoryRow title="Action" movies={MOCK_MOVIES.action} />
+        <CategoryRow title="Comedy" movies={MOCK_MOVIES.comedy} />
       </div>
     </div>
   );
