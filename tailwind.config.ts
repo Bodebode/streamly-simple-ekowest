@@ -22,7 +22,7 @@ export default {
         koya: {
           background: "#141414",
           card: "#181818",
-          accent: "#E50914",
+          accent: "#22C55E", // Changed from #E50914 (red) to #22C55E (green)
           text: "#FFFFFF",
           subtext: "#E5E5E5",
         },
