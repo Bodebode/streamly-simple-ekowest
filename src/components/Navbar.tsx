@@ -1,4 +1,4 @@
-import { Home, Globe, Star, Calendar, Film } from 'lucide-react';
+import { Home, Globe, Star, Calendar, Film, Drum } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const Navbar = () => {
@@ -7,7 +7,8 @@ export const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-8">
-            <Link to="/" className="text-2xl font-bold text-koya-accent">
+            <Link to="/" className="flex items-center gap-2 text-2xl font-bold text-koya-accent">
+              <Drum size={28} className="text-koya-accent" />
               Ekowest TV
             </Link>
             
