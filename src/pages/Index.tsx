@@ -1,5 +1,6 @@
 import { Hero } from '../components/Hero';
 import { CategoryRow } from '../components/CategoryRow';
+import { Navbar } from '../components/Navbar';
 
 const MOCK_MOVIES = {
   trending: Array.from({ length: 10 }, (_, i) => ({
@@ -25,11 +26,14 @@ const MOCK_MOVIES = {
 const Index = () => {
   return (
     <div className="min-h-screen">
-      <Hero />
-      <div className="pb-8">
-        <CategoryRow title="Trending Now" movies={MOCK_MOVIES.trending} />
-        <CategoryRow title="Action" movies={MOCK_MOVIES.action} />
-        <CategoryRow title="Comedy" movies={MOCK_MOVIES.comedy} />
+      <Navbar />
+      <div className="pt-16">
+        <Hero />
+        <div className="pb-8">
+          <CategoryRow title="Trending Now" movies={MOCK_MOVIES.trending} />
+          <CategoryRow title="Action" movies={MOCK_MOVIES.action} />
+          <CategoryRow title="Comedy" movies={MOCK_MOVIES.comedy} />
+        </div>
       </div>
     </div>
   );
