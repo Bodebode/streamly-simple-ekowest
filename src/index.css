@@ -6,6 +6,21 @@
   body {
     @apply bg-koya-background text-koya-text;
   }
+  
+  body.dimmed {
+    @apply bg-black;
+  }
+  
+  body.dimmed .movie-card,
+  body.dimmed .navbar,
+  body.dimmed h2 {
+    opacity: 0.3;
+    transition: opacity 0.3s ease;
+  }
+  
+  body.dimmed #video-container {
+    opacity: 1;
+  }
 }
 
 .movie-card {

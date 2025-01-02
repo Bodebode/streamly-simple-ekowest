@@ -6,14 +6,15 @@ interface MovieCardProps {
   image: string;
   category: string;
   videoId?: string;
+  onMovieSelect: (videoId: string) => void;
 }
 
-export const MovieCard = ({ title, image, category, videoId }: MovieCardProps) => {
+export const MovieCard = ({ title, image, category, videoId, onMovieSelect }: MovieCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const handleClick = () => {
     if (videoId) {
-      window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+      onMovieSelect(videoId);
     }
   };
 
