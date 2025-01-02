@@ -3,12 +3,50 @@ import { CategoryRow } from '../components/CategoryRow';
 import { Navbar } from '../components/Navbar';
 
 const MOCK_MOVIES = {
-  trending: Array.from({ length: 10 }, (_, i) => ({
-    id: i,
-    title: `Trending Movie ${i + 1}`,
-    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475',
-    category: 'Trending'
-  })),
+  trending: [
+    {
+      id: 1,
+      title: "I Don Japa",
+      image: `https://img.youtube.com/vi/CpnhWKrIrwE/maxresdefault.jpg`,
+      category: 'Trending',
+      videoId: 'CpnhWKrIrwE'
+    },
+    {
+      id: 2,
+      title: "Lakatabu",
+      image: `https://img.youtube.com/vi/qPtSyS1DKkA/maxresdefault.jpg`,
+      category: 'Trending',
+      videoId: 'qPtSyS1DKkA'
+    },
+    {
+      id: 3,
+      title: "Love Unplanned",
+      image: `https://img.youtube.com/vi/GfF4Dz_e3P4/maxresdefault.jpg`,
+      category: 'Trending',
+      videoId: 'GfF4Dz_e3P4'
+    },
+    {
+      id: 4,
+      title: "Love me again",
+      image: `https://img.youtube.com/vi/pY4L5IXFXPA/maxresdefault.jpg`,
+      category: 'Trending',
+      videoId: 'pY4L5IXFXPA'
+    },
+    {
+      id: 5,
+      title: "Black Ashes",
+      image: `https://img.youtube.com/vi/grDl2G_3WuY/maxresdefault.jpg`,
+      category: 'Trending',
+      videoId: 'grDl2G_3WuY'
+    },
+    {
+      id: 6,
+      title: "The Estate Cleaner",
+      image: `https://img.youtube.com/vi/yPnj3pjdf64/maxresdefault.jpg`,
+      category: 'Trending',
+      videoId: 'yPnj3pjdf64'
+    }
+  ],
   action: Array.from({ length: 10 }, (_, i) => ({
     id: i + 10,
     title: `Action Movie ${i + 1}`,
