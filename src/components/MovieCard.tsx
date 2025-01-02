@@ -64,7 +64,7 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect, isVi
       if (videoId) {
         hoverTimerRef.current = setTimeout(() => {
           setShowPreview(true);
-        }, 2000);
+        }, 1400);
       }
     }
   };
