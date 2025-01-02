@@ -110,7 +110,7 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect, isVi
             <iframe
               ref={previewPlayerRef}
               className="w-full h-full rounded-lg"
-              src={`https://www.youtube.com/embed/${videoId}?start=85&end=115&autoplay=1&controls=0&modestbranding=1&disablekb=1`}
+              src={`https://www.youtube.com/embed/${videoId}?start=85&end=115&autoplay=1&controls=0&modestbranding=1&disablekb=1&mute=1`}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             />
           </div>
