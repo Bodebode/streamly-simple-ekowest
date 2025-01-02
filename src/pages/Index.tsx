@@ -54,13 +54,13 @@ const MOCK_MOVIES = {
       videoId: 'UPzXAvL36Ag'
     }
   ],
-  action: Array.from({ length: 10 }, (_, i) => ({
+  action: Array.from({ length: 7 }, (_, i) => ({
     id: i + 10,
     title: `Action Movie ${i + 1}`,
     image: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d',
     category: 'Action'
   })),
-  comedy: Array.from({ length: 10 }, (_, i) => ({
+  comedy: Array.from({ length: 7 }, (_, i) => ({
     id: i + 20,
     title: `Comedy Movie ${i + 1}`,
     image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158',
