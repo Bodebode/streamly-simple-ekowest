@@ -6,7 +6,7 @@ const MOCK_MOVIES = {
   trending: [
     {
       id: 1,
-      title: "Mami Wata",
+      title: "Do you Wanna Japa",
       image: `https://img.youtube.com/vi/Yg9z8lv1k_4/maxresdefault.jpg`,
       category: 'Trending',
       videoId: 'Yg9z8lv1k_4'

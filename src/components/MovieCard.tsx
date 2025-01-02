@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Play } from 'lucide-react';
 
 interface MovieCardProps {
@@ -11,6 +11,35 @@ interface MovieCardProps {
 
 export const MovieCard = ({ title, image, category, videoId, onMovieSelect }: MovieCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const previewPlayerRef = useRef<HTMLIFrameElement | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (hoverTimerRef.current) {
+        clearTimeout(hoverTimerRef.current);
+      }
+    };
+  }, []);
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    if (videoId) {
+      hoverTimerRef.current = setTimeout(() => {
+        setShowPreview(true);
+      }, 2500);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setShowPreview(false);
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+  };
 
   const handleClick = () => {
     if (videoId) {
@@ -21,15 +50,24 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect }: Mo
   return (
     <div
       className="relative movie-card w-[200px] h-[300px] rounded-lg cursor-pointer"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       onClick={handleClick}
     >
-      <img
-        src={image}
-        alt={title}
-        className="w-full h-full object-cover rounded-lg"
-      />
+      {showPreview && videoId ? (
+        <iframe
+          ref={previewPlayerRef}
+          className="w-full h-full rounded-lg"
+          src={`https://www.youtube.com/embed/${videoId}?start=85&end=115&autoplay=1&mute=1&controls=0&modestbranding=1`}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        />
+      ) : (
+        <img
+          src={image}
+          alt={title}
+          className="w-full h-full object-cover rounded-lg"
+        />
+      )}
       {isHovered && (
         <div className="absolute inset-0 bg-black bg-opacity-75 p-4 flex flex-col justify-end rounded-lg">
           <h3 className="text-lg font-bold">{title}</h3>
