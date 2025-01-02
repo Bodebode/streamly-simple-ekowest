@@ -13,8 +13,8 @@ interface CategoryRowProps {
 export const CategoryRow = ({ title, movies }: CategoryRowProps) => {
   return (
     <div className="mb-8">
-      <h2 className="text-2xl font-bold mb-4 px-4">{title}</h2>
-      <div className="category-row flex space-x-4">
+      <h2 className="text-2xl font-bold mb-4 px-8">{title}</h2>
+      <div className="category-row flex space-x-4 pl-8">
         {movies.map((movie) => (
           <MovieCard
             key={movie.id}

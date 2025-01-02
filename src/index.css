@@ -17,9 +17,10 @@
 }
 
 .category-row {
-  @apply -mx-4 px-4;
+  @apply -mx-8 px-8;
   overflow-x: auto;
   scrollbar-width: none;
+  width: calc(100% + 4rem);
 }
 
 .category-row::-webkit-scrollbar {
