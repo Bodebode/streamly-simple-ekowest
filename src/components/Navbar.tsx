@@ -28,11 +28,6 @@ export const Navbar = () => {
                 <span>My Favourites</span>
               </Link>
               
-              <Link to="/upcoming" className="flex items-center space-x-2 text-koya-text hover:text-koya-accent transition-colors">
-                <Calendar size={20} />
-                <span>Upcoming</span>
-              </Link>
-              
               <Link to="/new" className="flex items-center space-x-2 text-koya-text hover:text-koya-accent transition-colors">
                 <Film size={20} />
                 <span>New Release</span>
