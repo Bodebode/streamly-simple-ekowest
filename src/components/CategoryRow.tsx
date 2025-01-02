@@ -16,6 +16,10 @@ interface CategoryRowProps {
 export const CategoryRow = ({ title, movies }: CategoryRowProps) => {
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
 
+  const handleCloseVideo = () => {
+    setSelectedVideoId(null);
+  };
+
   return (
     <div className="mb-8">
       <h2 className="text-2xl font-bold mb-4 text-center">{title}</h2>
@@ -31,7 +35,7 @@ export const CategoryRow = ({ title, movies }: CategoryRowProps) => {
           />
         ))}
       </div>
-      <VideoPlayer videoId={selectedVideoId} />
+      <VideoPlayer videoId={selectedVideoId} onClose={handleCloseVideo} />
     </div>
   );
 };

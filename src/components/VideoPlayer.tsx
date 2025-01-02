@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { SunDim, Maximize2 } from 'lucide-react';
+import { SunDim, Maximize2, X } from 'lucide-react';
 
 interface VideoPlayerProps {
   videoId: string | null;
+  onClose?: () => void;
 }
 
-export const VideoPlayer = ({ videoId }: VideoPlayerProps) => {
+export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
   const [isDimmed, setIsDimmed] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -29,23 +30,39 @@ export const VideoPlayer = ({ videoId }: VideoPlayerProps) => {
     }
   };
 
+  const handleClose = () => {
+    if (isDimmed) {
+      document.body.classList.remove('dimmed');
+    }
+    onClose?.();
+  };
+
   return (
-    <div className={`mt-8 transition-all duration-300 ${isDimmed ? 'bg-black' : ''}`}>
-      <div className="flex justify-end gap-4 mb-4">
+    <div className="video-player-enter mt-8 transition-all duration-300 max-w-4xl mx-auto">
+      <div className="flex justify-between items-center mb-4">
         <button
-          onClick={toggleDim}
+          onClick={handleClose}
           className="p-2 rounded-full hover:bg-gray-700 transition-colors"
-          title="Dim lights"
+          title="Close"
         >
-          <SunDim className="w-6 h-6" />
+          <X className="w-6 h-6" />
         </button>
-        <button
-          onClick={toggleFullscreen}
-          className="p-2 rounded-full hover:bg-gray-700 transition-colors"
-          title="Fullscreen"
-        >
-          <Maximize2 className="w-6 h-6" />
-        </button>
+        <div className="flex gap-4">
+          <button
+            onClick={toggleDim}
+            className="p-2 rounded-full hover:bg-gray-700 transition-colors"
+            title="Dim lights"
+          >
+            <SunDim className="w-6 h-6" />
+          </button>
+          <button
+            onClick={toggleFullscreen}
+            className="p-2 rounded-full hover:bg-gray-700 transition-colors"
+            title="Fullscreen"
+          >
+            <Maximize2 className="w-6 h-6" />
+          </button>
+        </div>
       </div>
       <div id="video-container" className="relative w-full aspect-video">
         <iframe

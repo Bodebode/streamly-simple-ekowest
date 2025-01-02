@@ -41,3 +41,7 @@
 .category-row::-webkit-scrollbar {
   display: none;
 }
+
+.video-player-enter {
+  @apply animate-scale-up;
+}
