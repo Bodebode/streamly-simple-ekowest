@@ -17,10 +17,10 @@
 }
 
 .category-row {
-  @apply -mx-8 px-8;
+  @apply -mx-12 px-12;
   overflow-x: auto;
   scrollbar-width: none;
-  width: calc(100% + 4rem);
+  width: calc(100% + 6rem);
 }
 
 .category-row::-webkit-scrollbar {
