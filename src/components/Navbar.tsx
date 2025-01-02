@@ -1,4 +1,4 @@
-import { Home, Globe, Star, Calendar, Film, Drum } from 'lucide-react';
+import { Home, Globe, Star, Calendar, Film, Drum, Search, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const Navbar = () => {
@@ -38,6 +38,15 @@ export const Navbar = () => {
                 <span>New Release</span>
               </Link>
             </div>
+          </div>
+
+          <div className="flex items-center space-x-4">
+            <button className="text-koya-text hover:text-koya-accent transition-colors">
+              <Search size={24} />
+            </button>
+            <button className="text-koya-text hover:text-koya-accent transition-colors">
+              <Mail size={24} />
+            </button>
           </div>
         </div>
       </div>
