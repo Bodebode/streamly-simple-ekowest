@@ -12,13 +12,6 @@ const MOCK_MOVIES = {
       videoId: 'CpnhWKrIrwE'
     },
     {
-      id: 2,
-      title: "Lakatabu",
-      image: `https://img.youtube.com/vi/qPtSyS1DKkA/maxresdefault.jpg`,
-      category: 'Trending',
-      videoId: 'qPtSyS1DKkA'
-    },
-    {
       id: 3,
       title: "Love Unplanned",
       image: `https://img.youtube.com/vi/GfF4Dz_e3P4/maxresdefault.jpg`,
@@ -66,13 +59,6 @@ const MOCK_MOVIES = {
       image: `https://img.youtube.com/vi/UPzXAvL36Ag/maxresdefault.jpg`,
       category: 'Trending',
       videoId: 'UPzXAvL36Ag'
-    },
-    {
-      id: 10,
-      title: "Wheel of Fate",
-      image: `https://img.youtube.com/vi/ds7hqx316YM/maxresdefault.jpg`,
-      category: 'Trending',
-      videoId: 'ds7hqx316YM'
     }
   ],
   action: Array.from({ length: 10 }, (_, i) => ({
