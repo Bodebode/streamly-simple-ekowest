@@ -14,7 +14,7 @@
   body.dimmed .movie-card,
   body.dimmed .navbar,
   body.dimmed h2 {
-    opacity: 0.3;
+    opacity: 0.1;
     transition: opacity 0.3s ease;
   }
   
@@ -44,4 +44,8 @@
 
 .video-player-enter {
   @apply animate-scale-up;
+}
+
+.video-player-exit {
+  @apply animate-scale-down;
 }

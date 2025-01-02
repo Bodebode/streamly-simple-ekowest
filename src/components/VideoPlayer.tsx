@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SunDim, Maximize2, X } from 'lucide-react';
 
 interface VideoPlayerProps {
@@ -9,6 +9,7 @@ interface VideoPlayerProps {
 export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
   const [isDimmed, setIsDimmed] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
 
   if (!videoId) return null;
 
@@ -31,14 +32,18 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
   };
 
   const handleClose = () => {
+    setIsExiting(true);
     if (isDimmed) {
       document.body.classList.remove('dimmed');
     }
-    onClose?.();
+    setTimeout(() => {
+      setIsExiting(false);
+      onClose?.();
+    }, 400); // Match the animation duration
   };
 
   return (
-    <div className="video-player-enter mt-8 transition-all duration-300 max-w-4xl mx-auto">
+    <div className={`mt-8 transition-all duration-300 max-w-4xl mx-auto ${isExiting ? 'video-player-exit' : 'video-player-enter'}`}>
       <div className="flex justify-between items-center mb-4">
         <button
           onClick={handleClose}

@@ -6,10 +6,10 @@ const MOCK_MOVIES = {
   trending: [
     {
       id: 1,
-      title: "I Don Japa",
-      image: `https://img.youtube.com/vi/CpnhWKrIrwE/maxresdefault.jpg`,
+      title: "Mami Wata",
+      image: `https://img.youtube.com/vi/Yg9z8lv1k_4/maxresdefault.jpg`,
       category: 'Trending',
-      videoId: 'CpnhWKrIrwE'
+      videoId: 'Yg9z8lv1k_4'
     },
     {
       id: 3,

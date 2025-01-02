@@ -22,19 +22,24 @@ export default {
         koya: {
           background: "#141414",
           card: "#181818",
-          accent: "#22C55E", // Changed from #E50914 (red) to #22C55E (green)
+          accent: "#22C55E",
           text: "#FFFFFF",
           subtext: "#E5E5E5",
         },
       },
       animation: {
-        "scale-up": "scale-up 0.2s ease-out",
+        "scale-up": "scale-up 0.4s ease-out",
+        "scale-down": "scale-down 0.4s ease-out",
       },
       keyframes: {
         "scale-up": {
-          "0%": { transform: "scale(1)" },
-          "100%": { transform: "scale(1.05)" },
+          "0%": { transform: "scale(0.95)", opacity: "0" },
+          "100%": { transform: "scale(1)", opacity: "1" }
         },
+        "scale-down": {
+          "0%": { transform: "scale(1)", opacity: "1" },
+          "100%": { transform: "scale(0.95)", opacity: "0" }
+        }
       },
     },
   },
