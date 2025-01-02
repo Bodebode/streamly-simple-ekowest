@@ -4,7 +4,7 @@ export const Hero = () => {
   return (
     <div className="relative h-[80vh] mb-8">
       <img
-        src="https://images.unsplash.com/photo-1608889825103-eb5ed706fc64"
+        src="https://i.ytimg.com/vi/KDHhiwoP5Ng/maxresdefault.jpg"
         alt="African Cinema"
         className="w-full h-full object-cover"
       />
