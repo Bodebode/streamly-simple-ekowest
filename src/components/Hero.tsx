@@ -4,8 +4,8 @@ export const Hero = () => {
   return (
     <div className="relative h-[80vh] mb-8">
       <img
-        src="https://images.unsplash.com/photo-1578022761797-b8636ac1773c"
-        alt="Featured Content"
+        src="https://images.unsplash.com/photo-1608889825103-eb5ed706fc64"
+        alt="African Cinema"
         className="w-full h-full object-cover"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-koya-background via-transparent to-transparent" />
