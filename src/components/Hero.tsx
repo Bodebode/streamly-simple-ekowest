@@ -6,7 +6,7 @@ export const Hero = () => {
       <img
         src="https://i.ytimg.com/vi/KDHhiwoP5Ng/maxresdefault.jpg"
         alt="African Cinema"
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover object-[center_25%]"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-koya-background via-transparent to-transparent" />
       <div className="absolute bottom-0 left-0 p-8 w-full">
