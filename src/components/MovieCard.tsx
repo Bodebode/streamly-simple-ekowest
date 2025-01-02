@@ -28,7 +28,7 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect }: Mo
     if (videoId) {
       hoverTimerRef.current = setTimeout(() => {
         setShowPreview(true);
-      }, 2500);
+      }, 2000); // Changed from 2500 to 2000 milliseconds
     }
   };
 
@@ -58,7 +58,7 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect }: Mo
         <iframe
           ref={previewPlayerRef}
           className="w-full h-full rounded-lg"
-          src={`https://www.youtube.com/embed/${videoId}?start=85&end=115&autoplay=1&mute=1&controls=0&modestbranding=1`}
+          src={`https://www.youtube.com/embed/${videoId}?start=85&end=115&autoplay=1&controls=0&modestbranding=1`} // Removed mute=1
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         />
       ) : (
