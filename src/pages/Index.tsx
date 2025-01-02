@@ -45,6 +45,34 @@ const MOCK_MOVIES = {
       image: `https://img.youtube.com/vi/yPnj3pjdf64/maxresdefault.jpg`,
       category: 'Trending',
       videoId: 'yPnj3pjdf64'
+    },
+    {
+      id: 7,
+      title: "Mercy",
+      image: `https://img.youtube.com/vi/mjUH1mE3l9U/maxresdefault.jpg`,
+      category: 'Trending',
+      videoId: 'mjUH1mE3l9U'
+    },
+    {
+      id: 8,
+      title: "Lagos Big Girls",
+      image: `https://img.youtube.com/vi/6l7CKSO9sEc/maxresdefault.jpg`,
+      category: 'Trending',
+      videoId: '6l7CKSO9sEc'
+    },
+    {
+      id: 9,
+      title: "When Love Spins",
+      image: `https://img.youtube.com/vi/UPzXAvL36Ag/maxresdefault.jpg`,
+      category: 'Trending',
+      videoId: 'UPzXAvL36Ag'
+    },
+    {
+      id: 10,
+      title: "Wheel of Fate",
+      image: `https://img.youtube.com/vi/ds7hqx316YM/maxresdefault.jpg`,
+      category: 'Trending',
+      videoId: 'ds7hqx316YM'
     }
   ],
   action: Array.from({ length: 10 }, (_, i) => ({
