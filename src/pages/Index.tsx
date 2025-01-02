@@ -1,6 +1,7 @@
 import { Hero } from '../components/Hero';
 import { CategoryRow } from '../components/CategoryRow';
 import { Navbar } from '../components/Navbar';
+import { EmailPopup } from '../components/EmailPopup';
 
 const MOCK_MOVIES = {
   trending: [
@@ -72,6 +73,7 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
+      <EmailPopup />
       <div className="pt-16">
         <Hero />
         <div className="pb-8">
