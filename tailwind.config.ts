@@ -30,6 +30,7 @@ export default {
       animation: {
         "scale-up": "scale-up 0.4s ease-out",
         "scale-down": "scale-down 0.4s ease-out",
+        "scroll": "scroll 30s linear infinite",
       },
       keyframes: {
         "scale-up": {
@@ -39,6 +40,10 @@ export default {
         "scale-down": {
           "0%": { transform: "scale(1)", opacity: "1" },
           "100%": { transform: "scale(0.95)", opacity: "0" }
+        },
+        "scroll": {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-100%)" }
         }
       },
     },
