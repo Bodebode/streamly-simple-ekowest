@@ -47,13 +47,6 @@ const MOCK_MOVIES = {
       videoId: 'mjUH1mE3l9U'
     },
     {
-      id: 8,
-      title: "Lagos Big Girls",
-      image: `https://img.youtube.com/vi/6l7CKSO9sEc/maxresdefault.jpg`,
-      category: 'Trending',
-      videoId: '6l7CKSO9sEc'
-    },
-    {
       id: 9,
       title: "When Love Spins",
       image: `https://img.youtube.com/vi/UPzXAvL36Ag/maxresdefault.jpg`,
