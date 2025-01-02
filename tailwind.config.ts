@@ -30,6 +30,7 @@ export default {
       animation: {
         "scale-up": "scale-up 0.4s ease-out",
         "scale-down": "scale-down 0.4s ease-out",
+        "fade-out-title": "fade-out-title 4s ease-out forwards",
       },
       keyframes: {
         "scale-up": {
@@ -39,6 +40,10 @@ export default {
         "scale-down": {
           "0%": { transform: "scale(1)", opacity: "1" },
           "100%": { transform: "scale(0.95)", opacity: "0" }
+        },
+        "fade-out-title": {
+          "0%, 50%": { opacity: "1" },
+          "100%": { opacity: "0" }
         }
       },
     },

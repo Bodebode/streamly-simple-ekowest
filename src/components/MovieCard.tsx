@@ -13,7 +13,9 @@ interface MovieCardProps {
 export const MovieCard = ({ title, image, category, videoId, onMovieSelect, isVideoPlaying }: MovieCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [showTitle, setShowTitle] = useState(true);
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const titleTimerRef = useRef<NodeJS.Timeout | null>(null);
   const previewPlayerRef = useRef<HTMLIFrameElement | null>(null);
 
   useEffect(() => {
@@ -21,18 +23,40 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect, isVi
       if (hoverTimerRef.current) {
         clearTimeout(hoverTimerRef.current);
       }
+      if (titleTimerRef.current) {
+        clearTimeout(titleTimerRef.current);
+      }
     };
   }, []);
 
   useEffect(() => {
-    // If a video is playing, disable any active previews
     if (isVideoPlaying) {
       setShowPreview(false);
+      setShowTitle(true);
       if (hoverTimerRef.current) {
         clearTimeout(hoverTimerRef.current);
       }
+      if (titleTimerRef.current) {
+        clearTimeout(titleTimerRef.current);
+      }
     }
   }, [isVideoPlaying]);
+
+  useEffect(() => {
+    if (showPreview) {
+      titleTimerRef.current = setTimeout(() => {
+        setShowTitle(false);
+      }, 2000);
+    } else {
+      setShowTitle(true);
+    }
+
+    return () => {
+      if (titleTimerRef.current) {
+        clearTimeout(titleTimerRef.current);
+      }
+    };
+  }, [showPreview]);
 
   const handleMouseEnter = () => {
     if (!isVideoPlaying) {
@@ -48,9 +72,14 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect, isVi
   const handleMouseLeave = () => {
     setIsHovered(false);
     setShowPreview(false);
+    setShowTitle(true);
     if (hoverTimerRef.current) {
       clearTimeout(hoverTimerRef.current);
       hoverTimerRef.current = null;
+    }
+    if (titleTimerRef.current) {
+      clearTimeout(titleTimerRef.current);
+      titleTimerRef.current = null;
     }
   };
 
@@ -58,8 +87,12 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect, isVi
     if (videoId) {
       onMovieSelect(videoId);
       setShowPreview(false);
+      setShowTitle(true);
       if (hoverTimerRef.current) {
         clearTimeout(hoverTimerRef.current);
+      }
+      if (titleTimerRef.current) {
+        clearTimeout(titleTimerRef.current);
       }
     }
   };
@@ -81,7 +114,9 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect, isVi
           />
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute inset-x-0 bottom-0 p-4 flex flex-col justify-end">
-              <h3 className="text-lg font-bold">{title}</h3>
+              {showTitle && (
+                <h3 className="text-lg font-bold animate-fade-out-title">{title}</h3>
+              )}
               <p className="text-sm text-koya-subtext mb-2">{category}</p>
               <button className="bg-koya-accent hover:bg-opacity-80 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors pointer-events-auto">
                 <Play className="w-4 h-4" />
