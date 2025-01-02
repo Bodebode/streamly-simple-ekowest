@@ -7,9 +7,10 @@ interface MovieCardProps {
   category: string;
   videoId?: string;
   onMovieSelect: (videoId: string) => void;
+  isVideoPlaying: boolean;
 }
 
-export const MovieCard = ({ title, image, category, videoId, onMovieSelect }: MovieCardProps) => {
+export const MovieCard = ({ title, image, category, videoId, onMovieSelect, isVideoPlaying }: MovieCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -23,12 +24,24 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect }: Mo
     };
   }, []);
 
+  useEffect(() => {
+    // If a video is playing, disable any active previews
+    if (isVideoPlaying) {
+      setShowPreview(false);
+      if (hoverTimerRef.current) {
+        clearTimeout(hoverTimerRef.current);
+      }
+    }
+  }, [isVideoPlaying]);
+
   const handleMouseEnter = () => {
-    setIsHovered(true);
-    if (videoId) {
-      hoverTimerRef.current = setTimeout(() => {
-        setShowPreview(true);
-      }, 2000); // Changed from 2500 to 2000 milliseconds
+    if (!isVideoPlaying) {
+      setIsHovered(true);
+      if (videoId) {
+        hoverTimerRef.current = setTimeout(() => {
+          setShowPreview(true);
+        }, 2000);
+      }
     }
   };
 
@@ -44,21 +57,25 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect }: Mo
   const handleClick = () => {
     if (videoId) {
       onMovieSelect(videoId);
+      setShowPreview(false);
+      if (hoverTimerRef.current) {
+        clearTimeout(hoverTimerRef.current);
+      }
     }
   };
 
   return (
     <div
-      className="relative movie-card w-[200px] h-[300px] rounded-lg cursor-pointer"
+      className={`relative movie-card w-[200px] h-[300px] rounded-lg cursor-pointer ${isVideoPlaying ? 'pointer-events-none opacity-50' : ''}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
     >
-      {showPreview && videoId ? (
+      {showPreview && videoId && !isVideoPlaying ? (
         <iframe
           ref={previewPlayerRef}
           className="w-full h-full rounded-lg"
-          src={`https://www.youtube.com/embed/${videoId}?start=85&end=115&autoplay=1&controls=0&modestbranding=1`} // Removed mute=1
+          src={`https://www.youtube.com/embed/${videoId}?start=85&end=115&autoplay=1&controls=0&modestbranding=1`}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         />
       ) : (
@@ -68,7 +85,7 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect }: Mo
           className="w-full h-full object-cover rounded-lg"
         />
       )}
-      {isHovered && (
+      {isHovered && !isVideoPlaying && (
         <div className="absolute inset-0 bg-black bg-opacity-75 p-4 flex flex-col justify-end rounded-lg">
           <h3 className="text-lg font-bold">{title}</h3>
           <p className="text-sm text-koya-subtext mb-2">{category}</p>

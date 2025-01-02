@@ -32,6 +32,7 @@ export const CategoryRow = ({ title, movies }: CategoryRowProps) => {
             category={movie.category}
             videoId={movie.videoId}
             onMovieSelect={setSelectedVideoId}
+            isVideoPlaying={selectedVideoId !== null}
           />
         ))}
       </div>
