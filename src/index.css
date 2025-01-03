@@ -59,7 +59,3 @@
 .video-player-exit {
   @apply animate-scale-down;
 }
-
-#video-container {
-  transition: all 0.3s ease-in-out;
-}

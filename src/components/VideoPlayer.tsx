@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { SunDim, Maximize2, X, Minimize2 } from 'lucide-react';
+import { SunDim, Maximize2, X } from 'lucide-react';
 
 interface VideoPlayerProps {
   videoId: string | null;
@@ -9,29 +9,7 @@ interface VideoPlayerProps {
 export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
   const [isDimmed, setIsDimmed] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (videoId && !isFullscreen && window.scrollY > 400) {
-        setIsMinimized(true);
-      } else {
-        setIsMinimized(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [videoId, isFullscreen]);
-
-  useEffect(() => {
-    return () => {
-      if (isDimmed) {
-        document.body.classList.remove('dimmed');
-      }
-    };
-  }, [isDimmed]);
 
   if (!videoId) return null;
 
@@ -47,7 +25,6 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
     if (!document.fullscreenElement) {
       videoContainer.requestFullscreen();
       setIsFullscreen(true);
-      setIsMinimized(false);
     } else {
       document.exitFullscreen();
       setIsFullscreen(false);
@@ -62,21 +39,11 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
     setTimeout(() => {
       setIsExiting(false);
       onClose?.();
-    }, 400);
+    }, 400); // Match the animation duration
   };
-
-  const toggleMinimize = () => {
-    setIsMinimized(!isMinimized);
-  };
-
-  const containerClasses = `
-    transition-all duration-300 
-    ${isMinimized ? 'fixed bottom-4 right-4 w-80 z-50' : 'mt-8 max-w-4xl mx-auto'}
-    ${isExiting ? 'video-player-exit' : 'video-player-enter'}
-  `;
 
   return (
-    <div className={containerClasses}>
+    <div className={`mt-8 transition-all duration-300 max-w-4xl mx-auto ${isExiting ? 'video-player-exit' : 'video-player-enter'}`}>
       <div className="flex justify-between items-center mb-4">
         <button
           onClick={handleClose}
@@ -86,15 +53,6 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
           <X className="w-6 h-6" />
         </button>
         <div className="flex gap-4">
-          {!isFullscreen && (
-            <button
-              onClick={toggleMinimize}
-              className="p-2 rounded-full hover:bg-gray-700 transition-colors"
-              title={isMinimized ? "Maximize" : "Minimize"}
-            >
-              {isMinimized ? <Maximize2 className="w-6 h-6" /> : <Minimize2 className="w-6 h-6" />}
-            </button>
-          )}
           <button
             onClick={toggleDim}
             className="p-2 rounded-full hover:bg-gray-700 transition-colors"
