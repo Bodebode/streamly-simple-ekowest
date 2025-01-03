@@ -73,24 +73,6 @@ export const AuthUI = () => {
         showLinks={true}
         providers={['google', 'twitter']}
         redirectTo={window.location.origin}
-        onError={(error) => {
-          console.error('Auth error:', error);
-          let errorMessage = "Failed to authenticate. Please try again.";
-          
-          if (error.message.includes('Invalid login credentials')) {
-            errorMessage = "Incorrect email or password. Please try again.";
-          } else if (error.message.includes('Email not confirmed')) {
-            errorMessage = "Please verify your email address before signing in.";
-          } else if (error.message.includes('Password should be')) {
-            errorMessage = "Password must be at least 6 characters long.";
-          }
-          
-          toast({
-            variant: "destructive",
-            title: "Authentication Error",
-            description: errorMessage,
-          });
-        }}
       />
       <div className="mt-6 text-center">
         <div className="relative">

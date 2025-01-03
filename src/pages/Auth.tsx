@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { AuthUI } from '@/components/AuthUI';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -24,7 +24,39 @@ const Auth = () => {
       console.log('Auth event:', event);
       if (event === 'SIGNED_IN' && session) {
         navigate('/');
+      } else if (event === 'USER_DELETED' || event === 'SIGNED_OUT') {
+        navigate('/auth');
+      } else if (event === 'PASSWORD_RECOVERY') {
+        toast({
+          title: "Password Recovery",
+          description: "Please check your email for password reset instructions.",
+        });
+      } else if (event === 'USER_UPDATED') {
+        toast({
+          title: "Profile Updated",
+          description: "Your profile has been successfully updated.",
+        });
       }
+    });
+
+    // Set up error handling for auth events
+    supabase.auth.onError((error) => {
+      console.error('Auth error:', error);
+      let errorMessage = "Failed to authenticate. Please try again.";
+      
+      if (error.message.includes('Invalid login credentials')) {
+        errorMessage = "Incorrect email or password. Please try again.";
+      } else if (error.message.includes('Email not confirmed')) {
+        errorMessage = "Please verify your email address before signing in.";
+      } else if (error.message.includes('Password should be')) {
+        errorMessage = "Password must be at least 6 characters long.";
+      }
+      
+      toast({
+        variant: "destructive",
+        title: "Authentication Error",
+        description: errorMessage,
+      });
     });
 
     return () => subscription.unsubscribe();
