@@ -58,24 +58,145 @@ const MOCK_MOVIES = {
       videoId: 'UPzXAvL36Ag'
     }
   ],
-  highlyRated: Array.from({ length: 7 }, (_, i) => ({
-    id: i + 30,
-    title: `Highly Rated Movie ${i + 1}`,
-    image: 'https://images.unsplash.com/photo-1542204165-65bf26472b9b',  // Movie clapper
-    category: 'Highly Rated'
-  })),
-  action: Array.from({ length: 7 }, (_, i) => ({
-    id: i + 10,
-    title: `Action Movie ${i + 1}`,
-    image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728',  // Movie theater
-    category: 'Action'
-  })),
-  comedy: Array.from({ length: 7 }, (_, i) => ({
-    id: i + 20,
-    title: `Comedy Movie ${i + 1}`,
-    image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba',  // Cinema reels
-    category: 'Comedy'
-  }))
+  highlyRated: [
+    {
+      id: 30,
+      title: "Brotherhood",
+      image: `https://img.youtube.com/vi/vTB0HL8vxB4/maxresdefault.jpg`,
+      category: 'Highly Rated',
+      videoId: 'vTB0HL8vxB4'
+    },
+    {
+      id: 31,
+      title: "Battle on Buka Street",
+      image: `https://img.youtube.com/vi/jFoQ4RLPXQs/maxresdefault.jpg`,
+      category: 'Highly Rated',
+      videoId: 'jFoQ4RLPXQs'
+    },
+    {
+      id: 32,
+      title: "King of Thieves",
+      image: `https://img.youtube.com/vi/mVtN4nUBhx4/maxresdefault.jpg`,
+      category: 'Highly Rated',
+      videoId: 'mVtN4nUBhx4'
+    },
+    {
+      id: 33,
+      title: "Gangs of Lagos",
+      image: `https://img.youtube.com/vi/SMtT8MJEXtE/maxresdefault.jpg`,
+      category: 'Highly Rated',
+      videoId: 'SMtT8MJEXtE'
+    },
+    {
+      id: 34,
+      title: "Blood Sisters",
+      image: `https://img.youtube.com/vi/QF6qmuqywXk/maxresdefault.jpg`,
+      category: 'Highly Rated',
+      videoId: 'QF6qmuqywXk'
+    },
+    {
+      id: 35,
+      title: "Anikulapo",
+      image: `https://img.youtube.com/vi/RGVXBlyNZXo/maxresdefault.jpg`,
+      category: 'Highly Rated',
+      videoId: 'RGVXBlyNZXo'
+    },
+    {
+      id: 36,
+      title: "The Black Book",
+      image: `https://img.youtube.com/vi/gKR3J0lFZVw/maxresdefault.jpg`,
+      category: 'Highly Rated',
+      videoId: 'gKR3J0lFZVw'
+    }
+  ],
+  action: [
+    {
+      id: 10,
+      title: `Action Movie 1`,
+      image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728',  // Movie theater
+      category: 'Action'
+    },
+    {
+      id: 11,
+      title: `Action Movie 2`,
+      image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728',  // Movie theater
+      category: 'Action'
+    },
+    {
+      id: 12,
+      title: `Action Movie 3`,
+      image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728',  // Movie theater
+      category: 'Action'
+    },
+    {
+      id: 13,
+      title: `Action Movie 4`,
+      image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728',  // Movie theater
+      category: 'Action'
+    },
+    {
+      id: 14,
+      title: `Action Movie 5`,
+      image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728',  // Movie theater
+      category: 'Action'
+    },
+    {
+      id: 15,
+      title: `Action Movie 6`,
+      image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728',  // Movie theater
+      category: 'Action'
+    },
+    {
+      id: 16,
+      title: `Action Movie 7`,
+      image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728',  // Movie theater
+      category: 'Action'
+    }
+  ],
+  comedy: [
+    {
+      id: 20,
+      title: `Comedy Movie 1`,
+      image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba',  // Cinema reels
+      category: 'Comedy'
+    },
+    {
+      id: 21,
+      title: `Comedy Movie 2`,
+      image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba',  // Cinema reels
+      category: 'Comedy'
+    },
+    {
+      id: 22,
+      title: `Comedy Movie 3`,
+      image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba',  // Cinema reels
+      category: 'Comedy'
+    },
+    {
+      id: 23,
+      title: `Comedy Movie 4`,
+      image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba',  // Cinema reels
+      category: 'Comedy'
+    },
+    {
+      id: 24,
+      title: `Comedy Movie 5`,
+      image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba',  // Cinema reels
+      category: 'Comedy'
+    },
+    {
+      id: 25,
+      title: `Comedy Movie 6`,
+      image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba',  // Cinema reels
+      category: 'Comedy'
+    },
+    {
+      id: 26,
+      title: `Comedy Movie 7`,
+      image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba',  // Cinema reels
+      category: 'Comedy'
+    }
+  ]
 };
 
 const Index = () => {
