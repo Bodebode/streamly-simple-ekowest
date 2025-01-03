@@ -11,22 +11,7 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
 
-  // Cleanup function to ensure dimmed state is removed
-  useEffect(() => {
-    return () => {
-      document.body.classList.remove('dimmed');
-    };
-  }, []);
-
-  // Effect to handle cleanup when component unmounts or videoId changes
-  useEffect(() => {
-    return () => {
-      if (isDimmed) {
-        document.body.classList.remove('dimmed');
-        setIsDimmed(false);
-      }
-    };
-  }, [isDimmed]);
+  if (!videoId) return null;
 
   const toggleDim = () => {
     setIsDimmed(!isDimmed);
@@ -50,16 +35,12 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
     setIsExiting(true);
     if (isDimmed) {
       document.body.classList.remove('dimmed');
-      setIsDimmed(false);
     }
     setTimeout(() => {
       setIsExiting(false);
       onClose?.();
-    }, 400);
+    }, 400); // Match the animation duration
   };
-
-  // Return null after all hooks are declared
-  if (!videoId) return null;
 
   return (
     <div className={`mt-8 transition-all duration-300 max-w-4xl mx-auto ${isExiting ? 'video-player-exit' : 'video-player-enter'}`}>
