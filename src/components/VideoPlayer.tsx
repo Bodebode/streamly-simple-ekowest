@@ -11,6 +11,7 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
 
+  // Return null early if no videoId is provided
   if (!videoId) return null;
 
   // Cleanup function to ensure dimmed state is removed
@@ -19,6 +20,16 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
       document.body.classList.remove('dimmed');
     };
   }, []);
+
+  // Effect to handle cleanup when component unmounts or videoId changes
+  useEffect(() => {
+    return () => {
+      if (isDimmed) {
+        document.body.classList.remove('dimmed');
+        setIsDimmed(false);
+      }
+    };
+  }, [isDimmed]);
 
   const toggleDim = () => {
     setIsDimmed(!isDimmed);
