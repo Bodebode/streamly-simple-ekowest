@@ -58,13 +58,17 @@ const MOCK_MOVIES = {
   action: Array.from({ length: 7 }, (_, i) => ({
     id: i + 10,
     title: `Action Movie ${i + 1}`,
-    image: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d',
+    image: i % 2 === 0 
+      ? 'https://images.unsplash.com/photo-1485846234645-a62644f84728'  // Movie theater
+      : 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1',  // Film equipment
     category: 'Action'
   })),
   comedy: Array.from({ length: 7 }, (_, i) => ({
     id: i + 20,
     title: `Comedy Movie ${i + 1}`,
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158',
+    image: i % 2 === 0
+      ? 'https://images.unsplash.com/photo-1542204165-65bf26472b9b'  // Movie clapper
+      : 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba',  // Cinema reels
     category: 'Comedy'
   }))
 };
