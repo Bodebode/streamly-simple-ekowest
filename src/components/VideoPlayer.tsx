@@ -13,6 +13,13 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
 
   if (!videoId) return null;
 
+  // Cleanup function to ensure dimmed state is removed
+  useEffect(() => {
+    return () => {
+      document.body.classList.remove('dimmed');
+    };
+  }, []);
+
   const toggleDim = () => {
     setIsDimmed(!isDimmed);
     document.body.classList.toggle('dimmed');
@@ -35,11 +42,12 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
     setIsExiting(true);
     if (isDimmed) {
       document.body.classList.remove('dimmed');
+      setIsDimmed(false);
     }
     setTimeout(() => {
       setIsExiting(false);
       onClose?.();
-    }, 400); // Match the animation duration
+    }, 400);
   };
 
   return (
