@@ -1,7 +1,18 @@
-import { Home, Globe, Star, Calendar, Film, Drum, Search, Mail } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Home, Globe, Star, Calendar, Film, Drum, Search, Mail, LogOut } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from './AuthProvider';
+import { Button } from './ui/button';
 
 export const Navbar = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/auth');
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-koya-background to-transparent">
       <div className="container mx-auto px-4">
@@ -42,6 +53,16 @@ export const Navbar = () => {
             <button className="text-koya-text hover:text-koya-accent transition-colors">
               <Mail size={24} />
             </button>
+            {user && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleLogout}
+                className="text-koya-text hover:text-koya-accent transition-colors"
+              >
+                <LogOut size={24} />
+              </Button>
+            )}
           </div>
         </div>
       </div>
