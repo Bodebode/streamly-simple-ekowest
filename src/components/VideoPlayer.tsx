@@ -11,9 +11,6 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
 
-  // Return null early if no videoId is provided
-  if (!videoId) return null;
-
   // Cleanup function to ensure dimmed state is removed
   useEffect(() => {
     return () => {
@@ -60,6 +57,9 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
       onClose?.();
     }, 400);
   };
+
+  // Return null after all hooks are declared
+  if (!videoId) return null;
 
   return (
     <div className={`mt-8 transition-all duration-300 max-w-4xl mx-auto ${isExiting ? 'video-player-exit' : 'video-player-enter'}`}>
