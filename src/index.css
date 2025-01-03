@@ -3,8 +3,18 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+  }
+
   body {
-    @apply bg-koya-background text-koya-text;
+    @apply bg-white text-gray-900 dark:bg-koya-background dark:text-koya-text;
   }
   
   body.dimmed {
@@ -24,7 +34,7 @@
 }
 
 .movie-card {
-  @apply relative overflow-hidden transition-transform duration-200 ease-out;
+  @apply relative overflow-hidden transition-transform duration-200 ease-out bg-gray-100 dark:bg-koya-card;
 }
 
 .movie-card:hover {

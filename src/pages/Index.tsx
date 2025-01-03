@@ -61,25 +61,19 @@ const MOCK_MOVIES = {
   highlyRated: Array.from({ length: 7 }, (_, i) => ({
     id: i + 30,
     title: `Highly Rated Movie ${i + 1}`,
-    image: i % 2 === 0
-      ? 'https://images.unsplash.com/photo-1478720568477-152d9b164e26'  // Cinema projector
-      : 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c',  // Movie reel
+    image: 'https://images.unsplash.com/photo-1542204165-65bf26472b9b',  // Movie clapper
     category: 'Highly Rated'
   })),
   action: Array.from({ length: 7 }, (_, i) => ({
     id: i + 10,
     title: `Action Movie ${i + 1}`,
-    image: i % 2 === 0 
-      ? 'https://images.unsplash.com/photo-1485846234645-a62644f84728'  // Movie theater
-      : 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1',  // Film equipment
+    image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728',  // Movie theater
     category: 'Action'
   })),
   comedy: Array.from({ length: 7 }, (_, i) => ({
     id: i + 20,
     title: `Comedy Movie ${i + 1}`,
-    image: i % 2 === 0
-      ? 'https://images.unsplash.com/photo-1542204165-65bf26472b9b'  // Movie clapper
-      : 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba',  // Cinema reels
+    image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba',  // Cinema reels
     category: 'Comedy'
   }))
 };
@@ -96,7 +90,7 @@ const Index = () => {
           variant="outline"
           size="icon"
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          className="rounded-full w-10 h-10"
+          className="rounded-full w-10 h-10 bg-white dark:bg-koya-card"
         >
           <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
           <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
