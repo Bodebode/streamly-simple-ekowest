@@ -1,4 +1,4 @@
-import { Home, Globe, Star, Calendar, Film, Drum, Search, Mail, LogOut } from 'lucide-react';
+import { Globe, Star, Calendar, Film, Drum, Search, Mail, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthProvider';
@@ -24,11 +24,6 @@ export const Navbar = () => {
             </Link>
             
             <div className="hidden md:flex items-center space-x-6">
-              <Link to="/" className="flex items-center space-x-2 text-koya-text hover:text-koya-accent transition-colors">
-                <Home size={20} />
-                <span>Home</span>
-              </Link>
-              
               <Link to="/language" className="flex items-center space-x-2 text-koya-text hover:text-koya-accent transition-colors">
                 <Globe size={20} />
                 <span>Browse by Language</span>
