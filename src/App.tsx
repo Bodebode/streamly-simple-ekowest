@@ -18,10 +18,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <div>Loading...</div>;
   }
 
-  if (!user) {
-    return <Navigate to="/auth" />;
-  }
-
+  // Allow access without authentication
   return <>{children}</>;
 };
 
