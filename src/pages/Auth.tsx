@@ -21,16 +21,21 @@ const Auth = () => {
       });
     }
 
-    const handleError = (error: AuthError) => {
+    const handleAuthError = (error: AuthError) => {
       console.error('Auth error:', error);
-      let errorMessage = "Failed to authenticate. Please try again.";
+      let errorMessage = "An error occurred during authentication. Please try again.";
       
+      // Handle specific error cases
       if (error.message.includes('Invalid login credentials')) {
         errorMessage = "Incorrect email or password. Please try again.";
       } else if (error.message.includes('Email not confirmed')) {
         errorMessage = "Please verify your email address before signing in.";
       } else if (error.message.includes('Password should be')) {
         errorMessage = "Password must be at least 6 characters long.";
+      } else if (error.message.includes('Invalid email')) {
+        errorMessage = "Please enter a valid email address.";
+      } else if (error.message.includes('rate limit')) {
+        errorMessage = "Too many login attempts. Please try again later.";
       }
       
       toast({
@@ -58,14 +63,19 @@ const Auth = () => {
           description: "Your profile has been successfully updated.",
         });
       }
+    });
 
-      // Handle any errors that occur during authentication
-      if (session?.error) {
-        handleError(session.error);
+    // Listen for authentication errors
+    const authListener = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT' && session?.error) {
+        handleAuthError(session.error as AuthError);
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      authListener.data.subscription.unsubscribe();
+    };
   }, [navigate, toast]);
 
   return (
