@@ -25,23 +25,70 @@ export const AuthUI = () => {
               colors: {
                 brand: '#FF5733',
                 brandAccent: '#E64A2E',
+                inputText: 'white',
+                inputBackground: '#1f1f1f',
+                inputBorder: '#333333',
+                inputBorderFocus: '#FF5733',
               },
             },
           },
-          className: {
-            container: 'auth-container',
-            button: 'auth-button',
-            input: 'auth-input',
+          style: {
+            input: {
+              color: 'white',
+              backgroundColor: '#1f1f1f',
+              borderColor: '#333333',
+            },
+            label: {
+              color: 'white',
+            },
+            message: {
+              color: '#FF5733',
+            },
           },
         }}
+        localization={{
+          variables: {
+            sign_in: {
+              email_input_placeholder: 'Your email address',
+              password_input_placeholder: 'Your password',
+              email_label: 'Email',
+              password_label: 'Password',
+              button_label: 'Sign In',
+              loading_button_label: 'Signing in ...',
+              social_provider_text: 'Sign in with {{provider}}',
+              link_text: "Already have an account? Sign in",
+            },
+            sign_up: {
+              email_input_placeholder: 'Your email address',
+              password_input_placeholder: 'Your password',
+              email_label: 'Email',
+              password_label: 'Password',
+              button_label: 'Sign Up',
+              loading_button_label: 'Signing up ...',
+              social_provider_text: 'Sign up with {{provider}}',
+              link_text: "Don't have an account? Sign up",
+            },
+          },
+        }}
+        showLinks={true}
         providers={['google', 'twitter']}
         redirectTo={window.location.origin}
         onError={(error) => {
           console.error('Auth error:', error);
+          let errorMessage = "Failed to authenticate. Please try again.";
+          
+          if (error.message.includes('Invalid login credentials')) {
+            errorMessage = "Incorrect email or password. Please try again.";
+          } else if (error.message.includes('Email not confirmed')) {
+            errorMessage = "Please verify your email address before signing in.";
+          } else if (error.message.includes('Password should be')) {
+            errorMessage = "Password must be at least 6 characters long.";
+          }
+          
           toast({
             variant: "destructive",
             title: "Authentication Error",
-            description: error.message || "Failed to authenticate. Please try again.",
+            description: errorMessage,
           });
         }}
       />
