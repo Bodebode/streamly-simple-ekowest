@@ -3,9 +3,11 @@ import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from './ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 export const AuthUI = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleGuestAccess = () => {
     navigate('/');
@@ -34,6 +36,14 @@ export const AuthUI = () => {
         }}
         providers={['google', 'twitter']}
         redirectTo={window.location.origin}
+        onError={(error) => {
+          console.error('Auth error:', error);
+          toast({
+            variant: "destructive",
+            title: "Authentication Error",
+            description: error.message || "Failed to authenticate. Please try again.",
+          });
+        }}
       />
       <div className="mt-6 text-center">
         <div className="relative">
