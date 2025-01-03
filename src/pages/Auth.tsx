@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { AuthUI } from '@/components/AuthUI';
 import { useToast } from '@/hooks/use-toast';
+import { AuthError } from '@supabase/supabase-js';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -20,27 +21,7 @@ const Auth = () => {
       });
     }
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth event:', event);
-      if (event === 'SIGNED_IN' && session) {
-        navigate('/');
-      } else if (event === 'USER_DELETED' || event === 'SIGNED_OUT') {
-        navigate('/auth');
-      } else if (event === 'PASSWORD_RECOVERY') {
-        toast({
-          title: "Password Recovery",
-          description: "Please check your email for password reset instructions.",
-        });
-      } else if (event === 'USER_UPDATED') {
-        toast({
-          title: "Profile Updated",
-          description: "Your profile has been successfully updated.",
-        });
-      }
-    });
-
-    // Set up error handling for auth events
-    supabase.auth.onError((error) => {
+    const handleError = (error: AuthError) => {
       console.error('Auth error:', error);
       let errorMessage = "Failed to authenticate. Please try again.";
       
@@ -57,6 +38,31 @@ const Auth = () => {
         title: "Authentication Error",
         description: errorMessage,
       });
+    };
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth event:', event);
+      
+      if (event === 'SIGNED_IN' && session) {
+        navigate('/');
+      } else if (event === 'SIGNED_OUT') {
+        navigate('/auth');
+      } else if (event === 'PASSWORD_RECOVERY') {
+        toast({
+          title: "Password Recovery",
+          description: "Please check your email for password reset instructions.",
+        });
+      } else if (event === 'USER_UPDATED') {
+        toast({
+          title: "Profile Updated",
+          description: "Your profile has been successfully updated.",
+        });
+      }
+
+      // Handle any errors that occur during authentication
+      if (session?.error) {
+        handleError(session.error);
+      }
     });
 
     return () => subscription.unsubscribe();
