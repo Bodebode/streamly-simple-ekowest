@@ -2,6 +2,9 @@ import { Hero } from '../components/Hero';
 import { CategoryRow } from '../components/CategoryRow';
 import { Navbar } from '../components/Navbar';
 import { EmailPopup } from '../components/EmailPopup';
+import { Moon, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { Button } from '@/components/ui/button';
 
 const MOCK_MOVIES = {
   trending: [
@@ -55,6 +58,14 @@ const MOCK_MOVIES = {
       videoId: 'UPzXAvL36Ag'
     }
   ],
+  highlyRated: Array.from({ length: 7 }, (_, i) => ({
+    id: i + 30,
+    title: `Highly Rated Movie ${i + 1}`,
+    image: i % 2 === 0
+      ? 'https://images.unsplash.com/photo-1478720568477-152d9b164e26'  // Cinema projector
+      : 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c',  // Movie reel
+    category: 'Highly Rated'
+  })),
   action: Array.from({ length: 7 }, (_, i) => ({
     id: i + 10,
     title: `Action Movie ${i + 1}`,
@@ -74,14 +85,29 @@ const MOCK_MOVIES = {
 };
 
 const Index = () => {
+  const { theme, setTheme } = useTheme();
+
   return (
     <div className="min-h-screen">
       <Navbar />
       <EmailPopup />
+      <div className="fixed bottom-4 right-4 z-50">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          className="rounded-full w-10 h-10"
+        >
+          <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+          <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          <span className="sr-only">Toggle theme</span>
+        </Button>
+      </div>
       <div className="pt-16">
         <Hero />
         <div className="pb-8">
           <CategoryRow title="Trending Now" movies={MOCK_MOVIES.trending} />
+          <CategoryRow title="Highly Rated" movies={MOCK_MOVIES.highlyRated} />
           <CategoryRow title="Action" movies={MOCK_MOVIES.action} />
           <CategoryRow title="Comedy" movies={MOCK_MOVIES.comedy} />
         </div>
