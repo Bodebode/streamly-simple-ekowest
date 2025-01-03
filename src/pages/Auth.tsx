@@ -65,16 +65,19 @@ const Auth = () => {
       }
     });
 
-    // Listen for authentication errors
-    const authListener = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT' && session?.error) {
-        handleAuthError(session.error as AuthError);
+    // Listen for authentication errors through the error callback
+    const { data: { subscription: errorSubscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        const authError = (session as any)?.error;
+        if (authError) {
+          handleAuthError(authError as AuthError);
+        }
       }
     });
 
     return () => {
       subscription.unsubscribe();
-      authListener.data.subscription.unsubscribe();
+      errorSubscription.unsubscribe();
     };
   }, [navigate, toast]);
 
