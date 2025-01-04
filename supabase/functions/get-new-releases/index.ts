@@ -33,26 +33,45 @@ serve(async (req) => {
   }
 
   try {
-    // Search for Nollywood movies
+    if (!API_KEY) {
+      console.error('YouTube API key is not configured')
+      throw new Error('YouTube API key is not configured')
+    }
+
+    console.log('Fetching new releases...')
     const searchResponse = await fetch(
       `${BASE_URL}/search?part=snippet&q=nollywood+full+movie&type=video&order=date&maxResults=50&key=${API_KEY}`
     )
-    const searchData = await searchResponse.json()
-
-    if (!searchData.items) {
-      throw new Error('No videos found')
+    
+    if (!searchResponse.ok) {
+      const error = await searchResponse.text()
+      console.error('YouTube API error:', error)
+      throw new Error(`YouTube API error: ${error}`)
     }
 
-    // Get video IDs
+    const searchData = await searchResponse.json()
+    console.log(`Found ${searchData.items?.length || 0} initial videos`)
+
+    if (!searchData.items || searchData.items.length === 0) {
+      return new Response(JSON.stringify([]), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
     const videoIds = searchData.items.map((item: any) => item.id.videoId).join(',')
 
-    // Get detailed video information including statistics and contentDetails
     const videoResponse = await fetch(
       `${BASE_URL}/videos?part=snippet,statistics,contentDetails&id=${videoIds}&key=${API_KEY}`
     )
+    
+    if (!videoResponse.ok) {
+      const error = await videoResponse.text()
+      console.error('YouTube API error when fetching video details:', error)
+      throw new Error(`YouTube API error: ${error}`)
+    }
+
     const videoData = await videoResponse.json()
 
-    // Filter and transform videos
     const videos = videoData.items
       .filter((video: any) => {
         const commentCount = parseInt(video.statistics.commentCount || '0')
@@ -71,14 +90,18 @@ serve(async (req) => {
         }
       })
 
+    console.log(`Returning ${videos.length} filtered videos`)
+
     return new Response(JSON.stringify(videos), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   } catch (error) {
-    console.error('Error:', error)
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    console.error('Error in get-new-releases function:', error)
+    return new Response(
+      JSON.stringify({ error: error.message || 'Failed to fetch videos from YouTube' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      }
+    )
   }
 })

@@ -5,13 +5,10 @@ const API_KEY = Deno.env.get('YOUTUBE_API_KEY')
 const BASE_URL = 'https://www.googleapis.com/youtube/v3'
 
 const truncateTitle = (title: string): string => {
-  // Find the first occurrence of any separator
   const separatorIndex = title.search(/[-|(]/)
   if (separatorIndex !== -1) {
-    // Return the part before the separator, trimmed
     return title.substring(0, separatorIndex).trim()
   }
-  // If no separator is found, return the original title
   return title
 }
 
@@ -21,22 +18,46 @@ serve(async (req) => {
   }
 
   try {
+    if (!API_KEY) {
+      console.error('YouTube API key is not configured')
+      throw new Error('YouTube API key is not configured')
+    }
+
+    console.log('Fetching highly rated videos...')
     const url = `${BASE_URL}/search?part=snippet&maxResults=50&q=Nollywood&type=video&key=${API_KEY}`
     const response = await fetch(url)
+    
+    if (!response.ok) {
+      const error = await response.text()
+      console.error('YouTube API error:', error)
+      throw new Error(`YouTube API error: ${error}`)
+    }
+
     const data = await response.json()
+    console.log(`Found ${data.items?.length || 0} initial videos`)
+
+    if (!data.items || data.items.length === 0) {
+      return new Response(JSON.stringify([]), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
 
     const videoDetailsPromises = data.items.map(async (video: any) => {
       const videoId = video.id.videoId
-      // Fetch both statistics and contentDetails to get duration
       const detailsResponse = await fetch(
         `${BASE_URL}/videos?part=statistics,contentDetails&id=${videoId}&key=${API_KEY}`
       )
+      
+      if (!detailsResponse.ok) {
+        console.error(`Failed to fetch details for video ${videoId}`)
+        return null
+      }
+
       const detailsData = await detailsResponse.json()
       const videoDetails = detailsData.items[0]
       
       if (!videoDetails) return null
 
-      // Convert YouTube duration format (PT1H2M10S) to minutes
       const duration = videoDetails.contentDetails.duration
       const durationMatch = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/)
       const hours = parseInt(durationMatch[1] || '0')
@@ -69,14 +90,18 @@ serve(async (req) => {
       .sort((a, b) => new Date(b!.publishedAt).getTime() - new Date(a!.publishedAt).getTime())
       .slice(0, 10)
 
+    console.log(`Returning ${videos.length} filtered videos`)
+
     return new Response(JSON.stringify(videos), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   } catch (error) {
     console.error('Error in get-highly-rated function:', error)
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 500,
-    })
+    return new Response(
+      JSON.stringify({ error: error.message || 'Failed to fetch videos from YouTube' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      }
+    )
   }
 })
