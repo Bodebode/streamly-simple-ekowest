@@ -29,16 +29,14 @@ export const CategoryRow = ({ title, movies, updateHighlyRated }: CategoryRowPro
   useEffect(() => {
     const fetchNollywoodVideos = async () => {
       try {
-        // Only fetch for Highly Rated section and only once
+        // Only fetch for Highly Rated section
         if (title !== 'Highly Rated') return;
         
         setIsLoading(true);
-        // Using a popular Nollywood movie video ID as seed
-        const seedVideoId = 'YPJ_iwLJx2U';
-        console.log('Fetching Nollywood videos using seed:', seedVideoId);
+        console.log('Fetching Nollywood videos...');
         
         const { data, error } = await supabase.functions.invoke('get-related-videos', {
-          body: { videoId: seedVideoId }
+          body: {}
         });
 
         if (error) {
