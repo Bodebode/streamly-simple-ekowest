@@ -49,57 +49,45 @@ serve(async (req) => {
     
     if (!searchResponse.ok) {
       console.error('YouTube API search error:', await searchResponse.text())
-      throw new Error('Failed to fetch videos from YouTube')
+      return new Response(
+        JSON.stringify({ error: 'Failed to fetch videos from YouTube' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      )
     }
 
     const searchData = await searchResponse.json()
     console.log(`Found ${searchData.items?.length || 0} initial videos`)
 
     if (!searchData.items || searchData.items.length === 0) {
-      return new Response(JSON.stringify([]), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+      return new Response(
+        JSON.stringify([]),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
     }
 
-    // Filter out non-playable videos
     const playableVideos = await Promise.all(
-      searchData.items.map(async (item: any) => {
-        const isPlayable = await checkVideoPlayability(item.id.videoId)
-        return isPlayable ? item : null
+      searchData.items.map(async (video: any) => {
+        const videoId = video.id.videoId
+        const isPlayable = await checkVideoPlayability(videoId)
+        
+        if (!isPlayable) {
+          console.log(`Video ${videoId} is not embeddable, skipping`)
+          return null
+        }
+
+        return {
+          id: videoId,
+          title: truncateTitle(video.snippet.title),
+          image: video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url,
+          category: "New Release",
+          videoId: videoId,
+        }
       })
     )
 
-    const filteredVideos = playableVideos.filter(video => video !== null)
-    console.log(`${filteredVideos.length} videos are playable`)
-
-    if (filteredVideos.length === 0) {
-      return new Response(JSON.stringify([]), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
-    }
-
-    // Get video details
-    const videoIds = filteredVideos.map((item: any) => item.id.videoId).join(',')
-    const videoResponse = await fetch(
-      `${BASE_URL}/videos?part=snippet,statistics,contentDetails&id=${videoIds}&key=${API_KEY}`
-    )
-
-    if (!videoResponse.ok) {
-      console.error('YouTube API videos error:', await videoResponse.text())
-      throw new Error('Failed to fetch video details')
-    }
-
-    const videoData = await videoResponse.json()
-
-    const videos = videoData.items
+    const videos = playableVideos
+      .filter(video => video !== null)
       .slice(0, 12)
-      .map((video: any) => ({
-        id: video.id,
-        title: truncateTitle(video.snippet.title),
-        image: video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url,
-        category: "New Release",
-        videoId: video.id,
-      }))
 
     console.log(`Returning ${videos.length} videos`)
 
@@ -108,9 +96,9 @@ serve(async (req) => {
     })
   } catch (error) {
     console.error('Error:', error)
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+    )
   }
 })
