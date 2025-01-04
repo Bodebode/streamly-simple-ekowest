@@ -7,7 +7,7 @@ export const useSkits = () => {
     queryKey: ['skits'],
     queryFn: async () => {
       const { data, error } = await supabase.functions.invoke('get-skits', {
-        query: {
+        body: {
           min_length: 0,
           max_length: 42,
           min_views: 4000

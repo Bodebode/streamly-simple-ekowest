@@ -33,10 +33,8 @@ serve(async (req) => {
   }
 
   try {
-    const url = new URL(req.url)
-    const minLength = parseInt(url.searchParams.get('min_length') || '0')
-    const maxLength = parseInt(url.searchParams.get('max_length') || '42')
-    const minViews = parseInt(url.searchParams.get('min_views') || '4000')
+    const { min_length = 0, max_length = 42, min_views = 4000 } = await req.json()
+    console.log('Received parameters:', { min_length, max_length, min_views });
 
     // Search for Nollywood skits
     const searchResponse = await fetch(
@@ -62,7 +60,7 @@ serve(async (req) => {
       .filter((video: any) => {
         const viewCount = parseInt(video.statistics.viewCount || '0')
         const durationMinutes = convertDurationToMinutes(video.contentDetails.duration)
-        return viewCount >= minViews && durationMinutes <= maxLength && durationMinutes >= minLength
+        return viewCount >= min_views && durationMinutes <= max_length && durationMinutes >= min_length
       })
       .slice(0, 12)
       .map((video: any) => {
