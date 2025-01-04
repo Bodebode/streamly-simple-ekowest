@@ -21,7 +21,3 @@ enabled = true
 
 [auth]
 enabled = true
-
-[[functions]]
-name = "get-related-videos"
-verify_jwt = false
