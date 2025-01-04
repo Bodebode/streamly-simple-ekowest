@@ -19,6 +19,13 @@ serve(async (req) => {
 
   try {
     const { videoId } = await req.json()
+    
+    // Validate videoId
+    if (!videoId || typeof videoId !== 'string') {
+      console.error('Invalid or missing videoId:', videoId)
+      throw new Error('Invalid video ID provided')
+    }
+
     console.log('Fetching related videos for:', videoId)
 
     const YOUTUBE_API_KEY = Deno.env.get('YOUTUBE_API_KEY')
@@ -27,9 +34,14 @@ serve(async (req) => {
       throw new Error('YouTube API key not configured')
     }
 
-    const response = await fetch(
-      `https://www.googleapis.com/youtube/v3/search?part=snippet&relatedToVideoId=${videoId}&type=video&maxResults=7&key=${YOUTUBE_API_KEY}`
-    )
+    const youtubeUrl = new URL('https://www.googleapis.com/youtube/v3/search')
+    youtubeUrl.searchParams.append('part', 'snippet')
+    youtubeUrl.searchParams.append('relatedToVideoId', videoId)
+    youtubeUrl.searchParams.append('type', 'video')
+    youtubeUrl.searchParams.append('maxResults', '7')
+    youtubeUrl.searchParams.append('key', YOUTUBE_API_KEY)
+
+    const response = await fetch(youtubeUrl.toString())
 
     if (!response.ok) {
       const errorData = await response.json()
@@ -39,6 +51,11 @@ serve(async (req) => {
 
     const data = await response.json()
     console.log('YouTube API response received')
+
+    if (!data.items || !Array.isArray(data.items)) {
+      console.error('Invalid response format:', data)
+      throw new Error('Invalid response from YouTube API')
+    }
 
     const relatedVideos: RelatedVideo[] = data.items.map((item: any) => ({
       id: item.id.videoId,
