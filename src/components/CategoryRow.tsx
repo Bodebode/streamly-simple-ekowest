@@ -29,6 +29,9 @@ export const CategoryRow = ({ title, movies, updateHighlyRated }: CategoryRowPro
   useEffect(() => {
     const fetchRelatedVideos = async (videoId: string) => {
       try {
+        // Only fetch related videos for Comedy section
+        if (title !== 'Comedy') return;
+        
         setIsLoading(true);
         console.log('Fetching related videos for:', videoId);
         
@@ -42,16 +45,17 @@ export const CategoryRow = ({ title, movies, updateHighlyRated }: CategoryRowPro
           throw error;
         }
 
-        if (data && updateHighlyRated) {
+        if (data) {
           console.log('Received related videos:', data);
           const relatedMovies: Movie[] = data.map((video: any, index: number) => ({
             id: index + 1000,
             title: video.title,
             image: video.thumbnail,
-            category: 'Highly Rated',
+            category: 'Comedy',
             videoId: video.id
           }));
-          updateHighlyRated(relatedMovies);
+          // Update the comedy section instead
+          movies = [...movies, ...relatedMovies];
         }
       } catch (error) {
         console.error('Error fetching related videos:', error);
@@ -64,12 +68,12 @@ export const CategoryRow = ({ title, movies, updateHighlyRated }: CategoryRowPro
     if (selectedVideoId) {
       fetchRelatedVideos(selectedVideoId);
     }
-  }, [selectedVideoId, updateHighlyRated]);
+  }, [selectedVideoId, title, movies]);
 
   return (
     <div className="mb-8">
       <h2 className="text-2xl font-bold mb-4 text-center">
-        {title} {isLoading && title === 'Highly Rated' && '(Loading...)'}
+        {title} {isLoading && title === 'Comedy' && '(Loading...)'}
       </h2>
       <div className="category-row flex space-x-4 justify-center">
         {movies.map((movie) => (
