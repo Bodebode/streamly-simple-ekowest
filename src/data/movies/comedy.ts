@@ -22,10 +22,10 @@ export const comedyMovies = [
   },
   {
     id: 4,
-    title: "Best Comedy Clips",
-    image: "https://i3.ytimg.com/vi/jANuVKeYezs/maxresdefault.jpg",
+    title: "Aki and Pawpaw: The Return",
+    image: "https://i3.ytimg.com/vi/Qxh_PYFhcfI/maxresdefault.jpg",
     category: "Comedy",
-    videoId: "jANuVKeYezs"
+    videoId: "Qxh_PYFhcfI"
   },
   {
     id: 5,
