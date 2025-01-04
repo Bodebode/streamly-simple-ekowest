@@ -4,13 +4,12 @@ import { Navbar } from '../components/Navbar';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
-import { MovieData } from '../types/movies';
+import { useHighlyRated } from '@/hooks/use-highly-rated';
 import { MOCK_MOVIES } from '../data/mockMovies';
 
 const Index = () => {
   const { theme, setTheme } = useTheme();
-  const [highlyRatedMovies, setHighlyRatedMovies] = useState(MOCK_MOVIES.highlyRated);
+  const { data: highlyRatedVideos, isLoading } = useHighlyRated();
 
   return (
     <div className="min-h-screen">
@@ -33,8 +32,7 @@ const Index = () => {
           <CategoryRow title="Trending Now" movies={MOCK_MOVIES.trending} />
           <CategoryRow 
             title="Highly Rated" 
-            movies={highlyRatedMovies}
-            updateHighlyRated={setHighlyRatedMovies}
+            movies={highlyRatedVideos || MOCK_MOVIES.highlyRated}
           />
           <CategoryRow title="Action" movies={MOCK_MOVIES.action} />
           <CategoryRow title="Comedy" movies={MOCK_MOVIES.comedy} />
