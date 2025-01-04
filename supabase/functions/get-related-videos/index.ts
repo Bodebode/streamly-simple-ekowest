@@ -14,7 +14,7 @@ serve(async (req) => {
   }
 
   try {
-    // Using a known working Nollywood movie ID as seed
+    // Using a popular Nollywood movie as seed (Battle on Buka Street)
     const seedVideoId = 'YPJ_iwLJx2U'
     console.log('Using seed video ID:', seedVideoId)
 
@@ -24,7 +24,7 @@ serve(async (req) => {
     }
 
     // Construct the URL with proper encoding
-    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&relatedToVideoId=${encodeURIComponent(seedVideoId)}&type=video&maxResults=7&key=${encodeURIComponent(YOUTUBE_API_KEY)}`
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&relatedToVideoId=${encodeURIComponent(seedVideoId)}&type=video&maxResults=10&key=${encodeURIComponent(YOUTUBE_API_KEY)}&regionCode=NG&relevanceLanguage=en&videoDuration=long`
     console.log('Fetching from YouTube API...')
     
     const response = await fetch(url)

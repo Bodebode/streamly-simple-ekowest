@@ -29,8 +29,8 @@ export const CategoryRow = ({ title, movies, updateHighlyRated }: CategoryRowPro
   useEffect(() => {
     const fetchNollywoodVideos = async () => {
       try {
-        // Only fetch for Highly Rated section
-        if (title !== 'Highly Rated') return;
+        // Only fetch for Nollywood section
+        if (title !== 'Nollywood Suggested Movies') return;
         
         setIsLoading(true);
         console.log('Fetching Nollywood videos...');
@@ -46,10 +46,10 @@ export const CategoryRow = ({ title, movies, updateHighlyRated }: CategoryRowPro
         if (data && updateHighlyRated) {
           console.log('Received Nollywood videos:', data);
           const nollywoodMovies: Movie[] = data.map((video: any, index: number) => ({
-            id: index + 1000,
+            id: index + 2000, // Using a different range to avoid conflicts
             title: video.title,
             image: video.thumbnail,
-            category: 'Highly Rated',
+            category: 'Nollywood',
             videoId: video.id
           }));
           updateHighlyRated(nollywoodMovies);
@@ -68,7 +68,7 @@ export const CategoryRow = ({ title, movies, updateHighlyRated }: CategoryRowPro
   return (
     <div className="mb-8">
       <h2 className="text-2xl font-bold mb-4 text-center">
-        {title} {isLoading && title === 'Highly Rated' && '(Loading...)'}
+        {title} {isLoading && title === 'Nollywood Suggested Movies' && '(Loading...)'}
       </h2>
       <div className="category-row flex space-x-4 justify-center">
         {movies.map((movie) => (
