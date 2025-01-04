@@ -14,13 +14,13 @@ export const MovieThumbnail = ({ title, image, category, videoId, isHovered, isV
   const [thumbnailError, setThumbnailError] = useState(false);
   
   const thumbnailUrl = videoId 
-    ? `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`
-    : image;
+    ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
+    : 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80';
 
   return (
     <>
       <img
-        src={thumbnailError ? image : thumbnailUrl}
+        src={thumbnailError ? thumbnailUrl : (videoId ? thumbnailUrl : image)}
         alt={title}
         className="w-full h-full object-cover rounded-lg"
         onError={() => setThumbnailError(true)}
