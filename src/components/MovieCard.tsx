@@ -85,7 +85,7 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect, isVi
 
   return (
     <div
-      className={`relative movie-card w-[200px] h-[300px] rounded-lg cursor-pointer ${isVideoPlaying ? 'pointer-events-none opacity-50' : ''}`}
+      className={`relative movie-card w-full h-[210px] md:h-[300px] rounded-lg cursor-pointer ${isVideoPlaying ? 'pointer-events-none opacity-50' : ''}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}

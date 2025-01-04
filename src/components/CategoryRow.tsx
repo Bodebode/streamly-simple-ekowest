@@ -75,20 +75,21 @@ export const CategoryRow = ({ title, movies, updateHighlyRated }: CategoryRowPro
 
   return (
     <div className="mb-8">
-      <h2 className="text-2xl font-bold mb-4 text-center">
+      <h2 className="text-xl md:text-2xl font-bold mb-4 px-4 md:text-center">
         {title} {isLoading && title === 'Comedy' && '(Loading...)'}
       </h2>
-      <div className="category-row flex space-x-4 justify-center">
+      <div className="category-row flex space-x-4 px-4 md:px-16 pb-4 overflow-x-auto scrollbar-hide">
         {movies.map((movie) => (
-          <MovieCard
-            key={movie.id}
-            title={movie.title}
-            image={movie.image}
-            category={movie.category}
-            videoId={movie.videoId}
-            onMovieSelect={setSelectedVideoId}
-            isVideoPlaying={selectedVideoId !== null}
-          />
+          <div key={movie.id} className="flex-none w-[140px] md:w-[200px]">
+            <MovieCard
+              title={movie.title}
+              image={movie.image}
+              category={movie.category}
+              videoId={movie.videoId}
+              onMovieSelect={setSelectedVideoId}
+              isVideoPlaying={selectedVideoId !== null}
+            />
+          </div>
         ))}
       </div>
       <VideoPlayer videoId={selectedVideoId} onClose={handleCloseVideo} />
