@@ -8,6 +8,7 @@ import { AuthProvider } from "./components/AuthProvider";
 import { useAuth } from "./components/AuthProvider";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Watch2Earn from "./pages/Watch2Earn";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/auth" element={<Auth />} />
+              <Route path="/watch2earn" element={<Watch2Earn />} />
               <Route
                 path="/"
                 element={
