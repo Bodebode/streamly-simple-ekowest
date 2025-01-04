@@ -37,13 +37,13 @@ serve(async (req) => {
     youtubeUrl.searchParams.append('maxResults', '7')
     youtubeUrl.searchParams.append('key', YOUTUBE_API_KEY)
 
-    console.log('Making request to YouTube API...')
+    console.log('Making request to YouTube API:', youtubeUrl.toString().replace(YOUTUBE_API_KEY, 'REDACTED'))
     const response = await fetch(youtubeUrl.toString())
     const data = await response.json()
 
     if (!response.ok) {
-      console.error('YouTube API error:', JSON.stringify(data, null, 2))
-      throw new Error(`YouTube API error: ${response.status}`)
+      console.error('YouTube API error details:', JSON.stringify(data, null, 2))
+      throw new Error(`YouTube API error: ${response.status} - ${data.error?.message || 'Unknown error'}`)
     }
 
     console.log('Successfully received YouTube API response')
