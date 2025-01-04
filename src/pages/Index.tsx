@@ -11,7 +11,6 @@ import { MOCK_MOVIES } from '../data/mockMovies';
 const Index = () => {
   const { theme, setTheme } = useTheme();
   const [highlyRatedMovies, setHighlyRatedMovies] = useState(MOCK_MOVIES.highlyRated);
-  const [nollywoodMovies, setNollywoodMovies] = useState<MovieData['trending']>([]);
 
   return (
     <div className="min-h-screen">
@@ -36,11 +35,6 @@ const Index = () => {
             title="Highly Rated" 
             movies={highlyRatedMovies}
             updateHighlyRated={setHighlyRatedMovies}
-          />
-          <CategoryRow 
-            title="Nollywood Suggested Movies" 
-            movies={nollywoodMovies}
-            updateHighlyRated={setNollywoodMovies}
           />
           <CategoryRow title="Action" movies={MOCK_MOVIES.action} />
           <CategoryRow title="Comedy" movies={MOCK_MOVIES.comedy} />

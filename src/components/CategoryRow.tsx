@@ -27,56 +27,56 @@ export const CategoryRow = ({ title, movies, updateHighlyRated }: CategoryRowPro
   };
 
   useEffect(() => {
-    const fetchNollywoodVideos = async () => {
+    const fetchRelatedVideos = async (videoId: string) => {
       try {
-        // Only fetch for Nollywood section
-        if (title !== 'Nollywood Suggested Movies') return;
+        // Only fetch related videos for Comedy section
+        if (title !== 'Comedy') return;
         
         setIsLoading(true);
-        console.log('Fetching Nollywood videos...');
+        console.log('Fetching related videos for:', videoId);
         
-        const { data, error } = await supabase.functions.invoke('get-related-videos');
+        const { data, error } = await supabase.functions.invoke('get-related-videos', {
+          body: { videoId }
+        });
 
         if (error) {
           console.error('Supabase function error:', error);
-          toast.error(`Failed to fetch Nollywood movies: ${error.message}`);
+          toast.error('Failed to fetch related videos');
           throw error;
         }
 
-        if (!data) {
-          console.error('No data received from function');
-          toast.error('No Nollywood movies data received');
-          return;
-        }
-
-        console.log('Received Nollywood videos:', data);
-
-        if (updateHighlyRated) {
-          const nollywoodMovies: Movie[] = data.map((video: any, index: number) => ({
-            id: index + 2000,
+        if (data) {
+          console.log('Received related videos:', data);
+          const relatedMovies: Movie[] = data.map((video: any, index: number) => ({
+            id: index + 1000,
             title: video.title,
             image: video.thumbnail,
-            category: 'Nollywood',
+            category: 'Comedy',
             videoId: video.id
           }));
-          updateHighlyRated(nollywoodMovies);
-          toast.success('Successfully loaded Nollywood movies');
+          
+          console.log('Adding related movies:', relatedMovies);
+          // Update the movies array with the new related videos
+          movies.push(...relatedMovies);
         }
       } catch (error) {
-        console.error('Error fetching Nollywood videos:', error);
-        toast.error(`Failed to load Nollywood movies: ${error.message}`);
+        console.error('Error fetching related videos:', error);
+        toast.error('Failed to load related videos');
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchNollywoodVideos();
-  }, [title, updateHighlyRated]);
+    if (selectedVideoId) {
+      console.log('Selected video ID:', selectedVideoId);
+      fetchRelatedVideos(selectedVideoId);
+    }
+  }, [selectedVideoId, title]);
 
   return (
     <div className="mb-8">
       <h2 className="text-2xl font-bold mb-4 text-center">
-        {title} {isLoading && title === 'Nollywood Suggested Movies' && '(Loading...)'}
+        {title} {isLoading && title === 'Comedy' && '(Loading...)'}
       </h2>
       <div className="category-row flex space-x-4 justify-center">
         {movies.map((movie) => (

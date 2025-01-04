@@ -1,6 +1,5 @@
-// Follow this setup guide to integrate the Deno runtime into your application:
-// https://docs.supabase.com/guides/functions/connect-to-supabase
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+// @ts-ignore
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,85 +7,74 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    // Using a verified Nollywood movie as seed (Brotherhood Official Trailer)
-    const seedVideoId = 'h3DBCPOqh8c'
-    console.log('Using seed video ID:', seedVideoId)
+    const { videoId } = await req.json()
+    
+    // Validate videoId
+    if (!videoId || typeof videoId !== 'string') {
+      console.error('Invalid or missing videoId:', videoId)
+      throw new Error('Invalid video ID provided')
+    }
+
+    console.log('Fetching related videos for:', videoId)
 
     const YOUTUBE_API_KEY = Deno.env.get('YOUTUBE_API_KEY')
     if (!YOUTUBE_API_KEY) {
+      console.error('YouTube API key not found')
       throw new Error('YouTube API key not configured')
     }
 
-    // Using URLSearchParams for proper parameter encoding
-    const params = new URLSearchParams({
-      part: 'snippet',
-      relatedToVideoId: seedVideoId,
-      type: 'video',
-      maxResults: '10',
-      key: YOUTUBE_API_KEY,
-      regionCode: 'NG',
-      videoDuration: 'long'
-    });
+    console.log('Using API key starting with:', YOUTUBE_API_KEY.substring(0, 5) + '...')
 
-    const url = `https://www.googleapis.com/youtube/v3/search?${params.toString()}`
-    console.log('Fetching from YouTube API...')
-    
-    const response = await fetch(url)
+    const youtubeUrl = new URL('https://www.googleapis.com/youtube/v3/search')
+    youtubeUrl.searchParams.append('part', 'snippet')
+    youtubeUrl.searchParams.append('relatedToVideoId', videoId)
+    youtubeUrl.searchParams.append('type', 'video')
+    youtubeUrl.searchParams.append('maxResults', '7')
+    youtubeUrl.searchParams.append('key', YOUTUBE_API_KEY)
+
+    console.log('Making request to YouTube API:', youtubeUrl.toString().replace(YOUTUBE_API_KEY, 'REDACTED'))
+    const response = await fetch(youtubeUrl.toString())
     const data = await response.json()
 
-    console.log('YouTube API response status:', response.status)
-    console.log('YouTube API response:', JSON.stringify(data, null, 2))
-
     if (!response.ok) {
-      throw new Error(`YouTube API error: ${data.error?.message || JSON.stringify(data.error || data)}`)
+      console.error('YouTube API error details:', JSON.stringify(data, null, 2))
+      throw new Error(`YouTube API error: ${response.status} - ${data.error?.message || 'Unknown error'}`)
     }
+
+    console.log('Successfully received YouTube API response')
 
     if (!data.items || !Array.isArray(data.items)) {
       console.error('Invalid response format:', data)
-      throw new Error('Invalid response format from YouTube API')
+      throw new Error('Invalid response from YouTube API')
     }
 
-    const videos = data.items.map((item: any) => ({
+    const relatedVideos = data.items.map((item: any) => ({
       id: item.id.videoId,
       title: item.snippet.title,
-      thumbnail: item.snippet.thumbnails.high?.url || 
-                item.snippet.thumbnails.medium?.url || 
+      thumbnail: item.snippet.thumbnails.maxres?.url || 
+                item.snippet.thumbnails.high?.url || 
                 item.snippet.thumbnails.default.url,
-      description: item.snippet.description
     }))
 
-    console.log(`Successfully processed ${videos.length} videos`)
+    console.log('Returning related videos:', relatedVideos.length)
 
-    return new Response(
-      JSON.stringify(videos),
-      { 
-        headers: { 
-          ...corsHeaders,
-          'Content-Type': 'application/json'
-        },
-        status: 200,
-      },
-    )
+    return new Response(JSON.stringify(relatedVideos), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
+    })
   } catch (error) {
     console.error('Error in get-related-videos:', error)
     return new Response(
-      JSON.stringify({ 
-        error: error.message,
-        details: error.stack
-      }),
-      { 
-        headers: { 
-          ...corsHeaders,
-          'Content-Type': 'application/json'
-        },
+      JSON.stringify({ error: error.message }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
-      },
+      }
     )
   }
 })
