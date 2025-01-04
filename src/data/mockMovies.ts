@@ -55,47 +55,89 @@ export const MOCK_MOVIES: MovieData = {
   highlyRated: [
     {
       id: 1,
-      title: "Highly Rated Movie 1",
-      image: "https://example.com/highlyrated1.jpg",
-      category: "Highly Rated",
-      videoId: "highlyrated1"
+      title: "The Matrix Code",
+      image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
+      category: "Highly Rated"
     },
     {
       id: 2,
-      title: "Highly Rated Movie 2",
-      image: "https://example.com/highlyrated2.jpg",
-      category: "Highly Rated",
-      videoId: "highlyrated2"
+      title: "Digital Dreams",
+      image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
+      category: "Highly Rated"
     },
     {
       id: 3,
-      title: "Highly Rated Movie 3",
-      image: "https://example.com/highlyrated3.jpg",
-      category: "Highly Rated",
-      videoId: "highlyrated3"
+      title: "Code Runner",
+      image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+      category: "Highly Rated"
+    },
+    {
+      id: 4,
+      title: "Binary Sunset",
+      image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
+      category: "Highly Rated"
+    },
+    {
+      id: 5,
+      title: "Digital Noir",
+      image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
+      category: "Highly Rated"
+    },
+    {
+      id: 6,
+      title: "Code Warriors",
+      image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+      category: "Highly Rated"
+    },
+    {
+      id: 7,
+      title: "Matrix Reloaded",
+      image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
+      category: "Highly Rated"
     }
   ],
   action: [
     {
       id: 1,
-      title: "Action Movie 1",
-      image: "https://example.com/action1.jpg",
-      category: "Action",
-      videoId: "action1"
+      title: "Digital Storm",
+      image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
+      category: "Action"
     },
     {
       id: 2,
-      title: "Action Movie 2",
-      image: "https://example.com/action2.jpg",
-      category: "Action",
-      videoId: "action2"
+      title: "Code Breaker",
+      image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+      category: "Action"
     },
     {
       id: 3,
-      title: "Action Movie 3",
-      image: "https://example.com/action3.jpg",
-      category: "Action",
-      videoId: "action3"
+      title: "Matrix Revolution",
+      image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
+      category: "Action"
+    },
+    {
+      id: 4,
+      title: "Cyber Chase",
+      image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
+      category: "Action"
+    },
+    {
+      id: 5,
+      title: "Digital Warrior",
+      image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+      category: "Action"
+    },
+    {
+      id: 6,
+      title: "Code Master",
+      image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
+      category: "Action"
+    },
+    {
+      id: 7,
+      title: "Binary Battle",
+      image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
+      category: "Action"
     }
   ],
   comedy: [
