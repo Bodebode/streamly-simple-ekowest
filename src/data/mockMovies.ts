@@ -55,47 +55,47 @@ export const MOCK_MOVIES: MovieData = {
   highlyRated: [
     {
       id: 1,
-      title: "Highly Rated Movie 1",
-      image: "https://example.com/highlyrated1.jpg",
+      title: "Brotherhood",
+      image: "https://img.youtube.com/vi/mQ4C0JtRh-8/maxresdefault.jpg",
       category: "Highly Rated",
-      videoId: "highlyrated1"
+      videoId: "mQ4C0JtRh-8"
     },
     {
       id: 2,
-      title: "Highly Rated Movie 2",
-      image: "https://example.com/highlyrated2.jpg",
+      title: "Battle on Buka Street",
+      image: "https://img.youtube.com/vi/5gxYqszmXQE/maxresdefault.jpg",
       category: "Highly Rated",
-      videoId: "highlyrated2"
+      videoId: "5gxYqszmXQE"
     },
     {
       id: 3,
-      title: "Highly Rated Movie 3",
-      image: "https://example.com/highlyrated3.jpg",
+      title: "King of Thieves",
+      image: "https://img.youtube.com/vi/mJwG-nQqGTU/maxresdefault.jpg",
       category: "Highly Rated",
-      videoId: "highlyrated3"
+      videoId: "mJwG-nQqGTU"
     }
   ],
   action: [
     {
       id: 1,
-      title: "Action Movie 1",
-      image: "https://example.com/action1.jpg",
+      title: "Blood Sisters",
+      image: "https://img.youtube.com/vi/0XkiJyqQfxE/maxresdefault.jpg",
       category: "Action",
-      videoId: "action1"
+      videoId: "0XkiJyqQfxE"
     },
     {
       id: 2,
-      title: "Action Movie 2",
-      image: "https://example.com/action2.jpg",
+      title: "Gangs of Lagos",
+      image: "https://img.youtube.com/vi/smANhcPiXvA/maxresdefault.jpg",
       category: "Action",
-      videoId: "action2"
+      videoId: "smANhcPiXvA"
     },
     {
       id: 3,
-      title: "Action Movie 3",
-      image: "https://example.com/action3.jpg",
+      title: "Rise of Igbinogun",
+      image: "https://img.youtube.com/vi/Yd1IqXvCZFg/maxresdefault.jpg",
       category: "Action",
-      videoId: "action3"
+      videoId: "Yd1IqXvCZFg"
     }
   ],
   comedy: [
