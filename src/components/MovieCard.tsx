@@ -14,9 +14,14 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect, isVi
   const [isHovered, setIsHovered] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [showTitle, setShowTitle] = useState(true);
+  const [thumbnailError, setThumbnailError] = useState(false);
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
   const titleTimerRef = useRef<NodeJS.Timeout | null>(null);
   const previewPlayerRef = useRef<HTMLIFrameElement | null>(null);
+
+  const thumbnailUrl = videoId 
+    ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
+    : 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80'; // Filmic placeholder
 
   useEffect(() => {
     return () => {
@@ -97,6 +102,10 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect, isVi
     }
   };
 
+  const handleImageError = () => {
+    setThumbnailError(true);
+  };
+
   return (
     <div
       className={`relative movie-card w-[200px] h-[300px] rounded-lg cursor-pointer ${isVideoPlaying ? 'pointer-events-none opacity-50' : ''}`}
@@ -130,9 +139,10 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect, isVi
       ) : (
         <>
           <img
-            src={image}
+            src={thumbnailError ? thumbnailUrl : (videoId ? thumbnailUrl : image)}
             alt={title}
             className="w-full h-full object-cover rounded-lg"
+            onError={handleImageError}
           />
           {isHovered && !isVideoPlaying && (
             <div className="absolute inset-0 bg-black bg-opacity-75 p-4 flex flex-col justify-end rounded-lg">
