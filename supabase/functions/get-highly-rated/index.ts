@@ -4,6 +4,17 @@ import { corsHeaders } from '../_shared/cors.ts'
 const API_KEY = Deno.env.get('YOUTUBE_API_KEY')
 const BASE_URL = 'https://www.googleapis.com/youtube/v3'
 
+const truncateTitle = (title: string): string => {
+  // Find the first occurrence of any separator
+  const separatorIndex = title.search(/[-|(]/)
+  if (separatorIndex !== -1) {
+    // Return the part before the separator, trimmed
+    return title.substring(0, separatorIndex).trim()
+  }
+  // If no separator is found, return the original title
+  return title
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -37,7 +48,7 @@ serve(async (req) => {
 
       return {
         id: videoId,
-        title: video.snippet.title,
+        title: truncateTitle(video.snippet.title),
         image: video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url,
         category: "Highly Rated",
         videoId: videoId,
