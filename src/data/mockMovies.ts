@@ -50,34 +50,6 @@ export const MOCK_MOVIES: MovieData = {
       image: "https://img.youtube.com/vi/UPzXAvL36Ag/maxresdefault.jpg",
       category: "Trending",
       videoId: "UPzXAvL36Ag"
-    },
-    {
-      id: 8,
-      title: "The Last Dance",
-      image: "https://img.youtube.com/vi/yPnj3pjdf64/maxresdefault.jpg",
-      category: "Trending",
-      videoId: "yPnj3pjdf64"
-    },
-    {
-      id: 9,
-      title: "Sweet Dreams",
-      image: "https://img.youtube.com/vi/mjUH1mE3l9U/maxresdefault.jpg",
-      category: "Trending",
-      videoId: "mjUH1mE3l9U"
-    },
-    {
-      id: 10,
-      title: "Love Story",
-      image: "https://img.youtube.com/vi/UPzXAvL36Ag/maxresdefault.jpg",
-      category: "Trending",
-      videoId: "UPzXAvL36Ag"
-    },
-    {
-      id: 11,
-      title: "The Journey",
-      image: "https://img.youtube.com/vi/Yg9z8lv1k_4/maxresdefault.jpg",
-      category: "Trending",
-      videoId: "Yg9z8lv1k_4"
     }
   ],
   highlyRated: [
@@ -122,30 +94,6 @@ export const MOCK_MOVIES: MovieData = {
       title: "Matrix Reloaded",
       image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
       category: "Highly Rated"
-    },
-    {
-      id: 8,
-      title: "Digital Frontier",
-      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
-      category: "Highly Rated"
-    },
-    {
-      id: 9,
-      title: "Code Masters",
-      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
-      category: "Highly Rated"
-    },
-    {
-      id: 10,
-      title: "Binary Tales",
-      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
-      category: "Highly Rated"
-    },
-    {
-      id: 11,
-      title: "Digital Dreams 2",
-      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
-      category: "Highly Rated"
     }
   ],
   action: [
@@ -188,30 +136,6 @@ export const MOCK_MOVIES: MovieData = {
     {
       id: 7,
       title: "Binary Battle",
-      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
-      category: "Action"
-    },
-    {
-      id: 8,
-      title: "Digital Warriors",
-      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
-      category: "Action"
-    },
-    {
-      id: 9,
-      title: "Code Fighters",
-      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
-      category: "Action"
-    },
-    {
-      id: 10,
-      title: "Matrix Legacy",
-      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
-      category: "Action"
-    },
-    {
-      id: 11,
-      title: "Digital Combat",
       image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
       category: "Action"
     }
