@@ -55,47 +55,47 @@ export const MOCK_MOVIES: MovieData = {
   highlyRated: [
     {
       id: 1,
-      title: "Brotherhood",
-      image: "https://img.youtube.com/vi/mQ4C0JtRh-8/maxresdefault.jpg",
+      title: "Highly Rated Movie 1",
+      image: "https://example.com/highlyrated1.jpg",
       category: "Highly Rated",
-      videoId: "mQ4C0JtRh-8"
+      videoId: "highlyrated1"
     },
     {
       id: 2,
-      title: "Battle on Buka Street",
-      image: "https://img.youtube.com/vi/5gxYqszmXQE/maxresdefault.jpg",
+      title: "Highly Rated Movie 2",
+      image: "https://example.com/highlyrated2.jpg",
       category: "Highly Rated",
-      videoId: "5gxYqszmXQE"
+      videoId: "highlyrated2"
     },
     {
       id: 3,
-      title: "King of Thieves",
-      image: "https://img.youtube.com/vi/mJwG-nQqGTU/maxresdefault.jpg",
+      title: "Highly Rated Movie 3",
+      image: "https://example.com/highlyrated3.jpg",
       category: "Highly Rated",
-      videoId: "mJwG-nQqGTU"
+      videoId: "highlyrated3"
     }
   ],
   action: [
     {
       id: 1,
-      title: "Blood Sisters",
-      image: "https://img.youtube.com/vi/0XkiJyqQfxE/maxresdefault.jpg",
+      title: "Action Movie 1",
+      image: "https://example.com/action1.jpg",
       category: "Action",
-      videoId: "0XkiJyqQfxE"
+      videoId: "action1"
     },
     {
       id: 2,
-      title: "Gangs of Lagos",
-      image: "https://img.youtube.com/vi/smANhcPiXvA/maxresdefault.jpg",
+      title: "Action Movie 2",
+      image: "https://example.com/action2.jpg",
       category: "Action",
-      videoId: "smANhcPiXvA"
+      videoId: "action2"
     },
     {
       id: 3,
-      title: "Rise of Igbinogun",
-      image: "https://img.youtube.com/vi/Yd1IqXvCZFg/maxresdefault.jpg",
+      title: "Action Movie 3",
+      image: "https://example.com/action3.jpg",
       category: "Action",
-      videoId: "Yd1IqXvCZFg"
+      videoId: "action3"
     }
   ],
   comedy: [
