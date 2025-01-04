@@ -23,7 +23,8 @@ serve(async (req) => {
       throw new Error('YouTube API key not configured')
     }
 
-    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&relatedToVideoId=${seedVideoId}&type=video&maxResults=7&key=${YOUTUBE_API_KEY}`
+    // Construct the URL with proper encoding
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&relatedToVideoId=${encodeURIComponent(seedVideoId)}&type=video&maxResults=7&key=${encodeURIComponent(YOUTUBE_API_KEY)}`
     console.log('Fetching from YouTube API...')
     
     const response = await fetch(url)

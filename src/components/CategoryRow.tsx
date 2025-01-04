@@ -35,9 +35,7 @@ export const CategoryRow = ({ title, movies, updateHighlyRated }: CategoryRowPro
         setIsLoading(true);
         console.log('Fetching Nollywood videos...');
         
-        const { data, error } = await supabase.functions.invoke('get-related-videos', {
-          body: {}
-        });
+        const { data, error } = await supabase.functions.invoke('get-related-videos');
 
         if (error) {
           console.error('Supabase function error:', error);
