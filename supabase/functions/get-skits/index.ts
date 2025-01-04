@@ -1,8 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { corsHeaders } from '../_shared/cors.ts'
 
 const API_KEY = Deno.env.get('YOUTUBE_API_KEY')
 const BASE_URL = 'https://www.googleapis.com/youtube/v3'
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
 const truncateTitle = (title: string): string => {
   const separatorIndex = title.search(/[-|(#]/)
@@ -25,7 +29,6 @@ async function checkVideoPlayability(videoId: string): Promise<boolean> {
     
     if (!embedData.items || embedData.items.length === 0) return false
     
-    // Check if video is embeddable
     return embedData.items[0].status.embeddable === true
   } catch (error) {
     console.error('Error checking video playability:', error)
@@ -35,23 +38,34 @@ async function checkVideoPlayability(videoId: string): Promise<boolean> {
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const { min_length = 0, max_length = 42 } = await req.json()
-    console.log('Received parameters:', { min_length, max_length })
-
-    const searchResponse = await fetch(
-      `${BASE_URL}/search?part=snippet&q=nollywood+skit+comedy&type=video&order=date&maxResults=50&key=${API_KEY}`
-    )
-    const searchData = await searchResponse.json()
-
-    if (!searchData.items) {
-      throw new Error('No videos found')
+    if (!API_KEY) {
+      throw new Error('YouTube API key not configured')
     }
 
-    // Filter out non-playable videos first
+    console.log('Fetching skits...')
+    const searchResponse = await fetch(
+      `${BASE_URL}/search?part=snippet&q=nollywood+comedy+skit&type=video&order=date&maxResults=50&key=${API_KEY}`
+    )
+    
+    if (!searchResponse.ok) {
+      console.error('YouTube API search error:', await searchResponse.text())
+      throw new Error('Failed to fetch videos from YouTube')
+    }
+
+    const searchData = await searchResponse.json()
+    console.log(`Found ${searchData.items?.length || 0} initial videos`)
+
+    if (!searchData.items || searchData.items.length === 0) {
+      return new Response(JSON.stringify([]), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Filter out non-playable videos
     const playableVideos = await Promise.all(
       searchData.items.map(async (item: any) => {
         const isPlayable = await checkVideoPlayability(item.id.videoId)
@@ -59,36 +73,39 @@ serve(async (req) => {
       })
     )
 
-    // Get video IDs of playable videos
-    const videoIds = playableVideos
-      .filter(video => video !== null)
-      .map((item: any) => item.id.videoId)
-      .join(',')
+    const filteredVideos = playableVideos.filter(video => video !== null)
+    console.log(`${filteredVideos.length} videos are playable`)
 
+    if (filteredVideos.length === 0) {
+      return new Response(JSON.stringify([]), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Get video details
+    const videoIds = filteredVideos.map((item: any) => item.id.videoId).join(',')
     const videoResponse = await fetch(
       `${BASE_URL}/videos?part=snippet,statistics,contentDetails&id=${videoIds}&key=${API_KEY}`
     )
+
+    if (!videoResponse.ok) {
+      console.error('YouTube API videos error:', await videoResponse.text())
+      throw new Error('Failed to fetch video details')
+    }
+
     const videoData = await videoResponse.json()
 
     const videos = videoData.items
-      .filter((video: any) => {
-        const viewCount = parseInt(video.statistics.viewCount || '0')
-        const durationMinutes = convertDurationToMinutes(video.contentDetails.duration)
-        return viewCount >= 10000 && durationMinutes <= max_length && durationMinutes >= min_length
-      })
       .slice(0, 12)
-      .map((video: any) => {
-        const videoId = video.id
-        return {
-          id: videoId,
-          title: truncateTitle(video.snippet.title),
-          image: video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url,
-          category: "Skits",
-          videoId: videoId,
-        }
-      })
+      .map((video: any) => ({
+        id: video.id,
+        title: truncateTitle(video.snippet.title),
+        image: video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url,
+        category: "Skits",
+        videoId: video.id,
+      }))
 
-    console.log(`Found ${videos.length} videos matching criteria`)
+    console.log(`Returning ${videos.length} videos`)
 
     return new Response(JSON.stringify(videos), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -101,14 +118,3 @@ serve(async (req) => {
     })
   }
 })
-
-const convertDurationToMinutes = (duration: string): number => {
-  const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/)
-  if (!match) return 0
-  
-  const hours = parseInt(match[1] || '0')
-  const minutes = parseInt(match[2] || '0')
-  const seconds = parseInt(match[3] || '0')
-  
-  return hours * 60 + minutes + Math.ceil(seconds / 60)
-}
