@@ -15,7 +15,7 @@ serve(async (req) => {
 
   try {
     // Using a popular Nollywood movie as seed (Battle on Buka Street)
-    const seedVideoId = 'YPJ_iwLJx2U'
+    const seedVideoId = 'jFoQ4RLPXQs'
     console.log('Using seed video ID:', seedVideoId)
 
     const YOUTUBE_API_KEY = Deno.env.get('YOUTUBE_API_KEY')
@@ -23,32 +23,45 @@ serve(async (req) => {
       throw new Error('YouTube API key not configured')
     }
 
-    // Construct the URL with proper encoding
-    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&relatedToVideoId=${encodeURIComponent(seedVideoId)}&type=video&maxResults=10&key=${encodeURIComponent(YOUTUBE_API_KEY)}&regionCode=NG&relevanceLanguage=en&videoDuration=long`
-    console.log('Fetching from YouTube API...')
+    // Construct the URL with proper encoding and required parameters
+    const params = new URLSearchParams({
+      part: 'snippet',
+      relatedToVideoId: seedVideoId,
+      type: 'video',
+      maxResults: '10',
+      key: YOUTUBE_API_KEY,
+      regionCode: 'NG',
+      relevanceLanguage: 'en',
+      videoDuration: 'long'
+    });
+
+    const url = `https://www.googleapis.com/youtube/v3/search?${params.toString()}`
+    console.log('Fetching from YouTube API with URL:', url)
     
     const response = await fetch(url)
     const data = await response.json()
 
     if (!response.ok) {
-      console.error('YouTube API error:', data)
-      throw new Error(`YouTube API error: ${data.error?.message || 'Unknown error'}`)
+      console.error('YouTube API error response:', data)
+      throw new Error(`YouTube API error: ${data.error?.message || JSON.stringify(data)}`)
     }
 
     if (!data.items || !Array.isArray(data.items)) {
+      console.error('Invalid response format:', data)
       throw new Error('Invalid response format from YouTube API')
     }
 
-    console.log('Successfully received YouTube data')
+    console.log(`Successfully received ${data.items.length} videos from YouTube API`)
 
     const videos = data.items.map((item: any) => ({
       id: item.id.videoId,
       title: item.snippet.title,
-      thumbnail: item.snippet.thumbnails.high?.url || 
+      thumbnail: item.snippet.thumbnails.maxres?.url || 
+                item.snippet.thumbnails.high?.url || 
                 item.snippet.thumbnails.default.url,
     }))
 
-    console.log(`Returning ${videos.length} related videos`)
+    console.log('Processed videos:', videos)
 
     return new Response(
       JSON.stringify(videos),
