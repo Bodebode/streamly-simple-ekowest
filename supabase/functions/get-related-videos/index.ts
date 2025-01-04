@@ -6,12 +6,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-interface RelatedVideo {
-  id: string;
-  title: string;
-  thumbnail: string;
-}
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -34,6 +28,8 @@ serve(async (req) => {
       throw new Error('YouTube API key not configured')
     }
 
+    console.log('Using API key starting with:', YOUTUBE_API_KEY.substring(0, 5) + '...')
+
     const youtubeUrl = new URL('https://www.googleapis.com/youtube/v3/search')
     youtubeUrl.searchParams.append('part', 'snippet')
     youtubeUrl.searchParams.append('relatedToVideoId', videoId)
@@ -41,29 +37,31 @@ serve(async (req) => {
     youtubeUrl.searchParams.append('maxResults', '7')
     youtubeUrl.searchParams.append('key', YOUTUBE_API_KEY)
 
+    console.log('Making request to YouTube API...')
     const response = await fetch(youtubeUrl.toString())
+    const data = await response.json()
 
     if (!response.ok) {
-      const errorData = await response.json()
-      console.error('YouTube API error:', errorData)
+      console.error('YouTube API error:', JSON.stringify(data, null, 2))
       throw new Error(`YouTube API error: ${response.status}`)
     }
 
-    const data = await response.json()
-    console.log('YouTube API response received')
+    console.log('Successfully received YouTube API response')
 
     if (!data.items || !Array.isArray(data.items)) {
       console.error('Invalid response format:', data)
       throw new Error('Invalid response from YouTube API')
     }
 
-    const relatedVideos: RelatedVideo[] = data.items.map((item: any) => ({
+    const relatedVideos = data.items.map((item: any) => ({
       id: item.id.videoId,
       title: item.snippet.title,
       thumbnail: item.snippet.thumbnails.maxres?.url || 
                 item.snippet.thumbnails.high?.url || 
                 item.snippet.thumbnails.default.url,
     }))
+
+    console.log('Returning related videos:', relatedVideos.length)
 
     return new Response(JSON.stringify(relatedVideos), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
