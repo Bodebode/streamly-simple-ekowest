@@ -1,18 +1,17 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { corsHeaders } from '../_shared/cors.ts'
 
 const API_KEY = Deno.env.get('YOUTUBE_API_KEY')
 const BASE_URL = 'https://www.googleapis.com/youtube/v3'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
-
 const truncateTitle = (title: string): string => {
+  // Find the first occurrence of any separator
   const separatorIndex = title.search(/[-|(]/)
   if (separatorIndex !== -1) {
+    // Return the part before the separator, trimmed
     return title.substring(0, separatorIndex).trim()
   }
+  // If no separator is found, return the original title
   return title
 }
 
@@ -29,7 +28,7 @@ const convertDurationToMinutes = (duration: string): number => {
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response('ok', { headers: corsHeaders })
   }
 
   try {
@@ -74,7 +73,7 @@ serve(async (req) => {
         }
       })
 
-    console.log(`Found ${videos.length} skits matching criteria`)
+    console.log(`Found ${videos.length} videos matching criteria`)
 
     return new Response(JSON.stringify(videos), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
