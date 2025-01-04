@@ -6,6 +6,7 @@ import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { useHighlyRated } from '@/hooks/use-highly-rated';
 import { useNewReleases } from '@/hooks/use-new-releases';
+import { useSkits } from '@/hooks/use-skits';
 import { MOCK_MOVIES } from '../data/mockMovies';
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -14,6 +15,7 @@ const Index = () => {
   const { theme, setTheme } = useTheme();
   const { data: highlyRatedVideos, isLoading: isLoadingHighlyRated } = useHighlyRated();
   const { data: newReleases, isLoading: isLoadingNewReleases } = useNewReleases();
+  const { data: skits, isLoading: isLoadingSkits } = useSkits();
   const newReleaseRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
 
@@ -50,7 +52,10 @@ const Index = () => {
             movies={highlyRatedVideos || MOCK_MOVIES.highlyRated}
           />
           <CategoryRow title="Yoruba Movies" movies={MOCK_MOVIES.yoruba} />
-          <CategoryRow title="Skits" movies={MOCK_MOVIES.skits} />
+          <CategoryRow 
+            title="Skits" 
+            movies={skits || MOCK_MOVIES.skits} 
+          />
           <div ref={newReleaseRef} id="new-release">
             <CategoryRow 
               title="New Release" 
