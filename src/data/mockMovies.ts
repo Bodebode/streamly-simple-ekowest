@@ -56,43 +56,43 @@ export const MOCK_MOVIES: MovieData = {
     {
       id: 1,
       title: "The Matrix Code",
-      image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
+      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
       category: "Highly Rated"
     },
     {
       id: 2,
       title: "Digital Dreams",
-      image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
+      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
       category: "Highly Rated"
     },
     {
       id: 3,
       title: "Code Runner",
-      image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
       category: "Highly Rated"
     },
     {
       id: 4,
       title: "Binary Sunset",
-      image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
+      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
       category: "Highly Rated"
     },
     {
       id: 5,
       title: "Digital Noir",
-      image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
+      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
       category: "Highly Rated"
     },
     {
       id: 6,
       title: "Code Warriors",
-      image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
       category: "Highly Rated"
     },
     {
       id: 7,
       title: "Matrix Reloaded",
-      image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
+      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
       category: "Highly Rated"
     }
   ],
@@ -100,43 +100,43 @@ export const MOCK_MOVIES: MovieData = {
     {
       id: 1,
       title: "Digital Storm",
-      image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
+      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
       category: "Action"
     },
     {
       id: 2,
       title: "Code Breaker",
-      image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
       category: "Action"
     },
     {
       id: 3,
       title: "Matrix Revolution",
-      image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
+      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
       category: "Action"
     },
     {
       id: 4,
       title: "Cyber Chase",
-      image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
+      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
       category: "Action"
     },
     {
       id: 5,
       title: "Digital Warrior",
-      image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
       category: "Action"
     },
     {
       id: 6,
       title: "Code Master",
-      image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
+      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
       category: "Action"
     },
     {
       id: 7,
       title: "Binary Battle",
-      image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
+      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
       category: "Action"
     }
   ],
