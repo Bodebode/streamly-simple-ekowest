@@ -7,11 +7,11 @@ export const trendingMovies = [
     videoId: "Yg9z8lv1k_4"
   },
   {
-    id: 2,
-    title: "Love Unplanned",
-    image: "https://img.youtube.com/vi/GfF4Dz_e3P4/maxresdefault.jpg",
+    id: 12,
+    title: "The Ghost Chase",
+    image: "https://img.youtube.com/vi/3aQFM1ZtMG0/maxresdefault.jpg",
     category: "Trending",
-    videoId: "GfF4Dz_e3P4"
+    videoId: "3aQFM1ZtMG0"
   },
   {
     id: 3,
@@ -77,10 +77,10 @@ export const trendingMovies = [
     videoId: "GoWZfsdd1yw"
   },
   {
-    id: 12,
-    title: "The Ghost Chase",
-    image: "https://img.youtube.com/vi/3aQFM1ZtMG0/maxresdefault.jpg",
+    id: 2,
+    title: "Love Unplanned",
+    image: "https://img.youtube.com/vi/GfF4Dz_e3P4/maxresdefault.jpg",
     category: "Trending",
-    videoId: "3aQFM1ZtMG0"
+    videoId: "GfF4Dz_e3P4"
   }
 ];
