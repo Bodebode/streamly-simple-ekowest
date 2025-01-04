@@ -4,24 +4,52 @@ export const MOCK_MOVIES: MovieData = {
   trending: [
     {
       id: 1,
-      title: "Trending Movie 1",
-      image: "https://example.com/trending1.jpg",
+      title: "Do you Wanna Japa",
+      image: "https://img.youtube.com/vi/Yg9z8lv1k_4/maxresdefault.jpg",
       category: "Trending",
-      videoId: "trending1"
+      videoId: "Yg9z8lv1k_4"
     },
     {
       id: 2,
-      title: "Trending Movie 2",
-      image: "https://example.com/trending2.jpg",
+      title: "Love Unplanned",
+      image: "https://img.youtube.com/vi/GfF4Dz_e3P4/maxresdefault.jpg",
       category: "Trending",
-      videoId: "trending2"
+      videoId: "GfF4Dz_e3P4"
     },
     {
       id: 3,
-      title: "Trending Movie 3",
-      image: "https://example.com/trending3.jpg",
+      title: "Love me again",
+      image: "https://img.youtube.com/vi/pY4L5IXFXPA/maxresdefault.jpg",
       category: "Trending",
-      videoId: "trending3"
+      videoId: "pY4L5IXFXPA"
+    },
+    {
+      id: 4,
+      title: "Black Ashes",
+      image: "https://img.youtube.com/vi/grDl2G_3WuY/maxresdefault.jpg",
+      category: "Trending",
+      videoId: "grDl2G_3WuY"
+    },
+    {
+      id: 5,
+      title: "The Estate Cleaner",
+      image: "https://img.youtube.com/vi/yPnj3pjdf64/maxresdefault.jpg",
+      category: "Trending",
+      videoId: "yPnj3pjdf64"
+    },
+    {
+      id: 6,
+      title: "Mercy",
+      image: "https://img.youtube.com/vi/mjUH1mE3l9U/maxresdefault.jpg",
+      category: "Trending",
+      videoId: "mjUH1mE3l9U"
+    },
+    {
+      id: 7,
+      title: "When Love Spins",
+      image: "https://img.youtube.com/vi/UPzXAvL36Ag/maxresdefault.jpg",
+      category: "Trending",
+      videoId: "UPzXAvL36Ag"
     }
   ],
   highlyRated: [
