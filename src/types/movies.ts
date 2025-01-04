@@ -9,6 +9,6 @@ export interface Movie {
 export interface MovieData {
   trending: Movie[];
   highlyRated: Movie[];
-  action: Movie[];
-  comedy: Movie[];
+  yoruba: Movie[];
+  skits: Movie[];
 }
