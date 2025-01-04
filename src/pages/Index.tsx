@@ -18,7 +18,6 @@ const Index = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // Check if the URL has a hash and scroll to the section
     if (location.hash === '#new-release' && newReleaseRef.current) {
       newReleaseRef.current.scrollIntoView({ 
         behavior: 'smooth',
@@ -50,8 +49,8 @@ const Index = () => {
             title="Highly Rated" 
             movies={highlyRatedVideos || MOCK_MOVIES.highlyRated}
           />
-          <CategoryRow title="Action" movies={MOCK_MOVIES.action} />
-          <CategoryRow title="Comedy" movies={MOCK_MOVIES.comedy} />
+          <CategoryRow title="Yoruba Movies" movies={MOCK_MOVIES.yoruba} />
+          <CategoryRow title="Skits" movies={MOCK_MOVIES.skits} />
           <div ref={newReleaseRef} id="new-release">
             <CategoryRow 
               title="New Release" 
