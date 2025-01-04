@@ -94,6 +94,30 @@ export const MOCK_MOVIES: MovieData = {
       title: "Matrix Reloaded",
       image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
       category: "Highly Rated"
+    },
+    {
+      id: 8,
+      title: "Cyber Protocol",
+      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
+      category: "Highly Rated"
+    },
+    {
+      id: 9,
+      title: "Neural Network",
+      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
+      category: "Highly Rated"
+    },
+    {
+      id: 10,
+      title: "Digital Fortress",
+      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
+      category: "Highly Rated"
+    },
+    {
+      id: 11,
+      title: "Quantum Code",
+      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
+      category: "Highly Rated"
     }
   ],
   action: [
@@ -136,6 +160,30 @@ export const MOCK_MOVIES: MovieData = {
     {
       id: 7,
       title: "Binary Battle",
+      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
+      category: "Action"
+    },
+    {
+      id: 8,
+      title: "Cyber Assault",
+      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
+      category: "Action"
+    },
+    {
+      id: 9,
+      title: "Digital Defense",
+      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
+      category: "Action"
+    },
+    {
+      id: 10,
+      title: "Code Combat",
+      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
+      category: "Action"
+    },
+    {
+      id: 11,
+      title: "Binary Force",
       image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
       category: "Action"
     }
