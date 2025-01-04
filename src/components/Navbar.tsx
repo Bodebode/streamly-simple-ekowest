@@ -1,5 +1,5 @@
 import { Globe, Star, Calendar, Film, Drum, Search, Mail, LogOut, Menu, Coins } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthProvider';
 import { Button } from './ui/button';
@@ -8,11 +8,23 @@ import { useState } from 'react';
 export const Navbar = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate('/auth');
+  };
+
+  const handleNewReleaseClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    // If we're not on the home page, navigate to it first
+    if (location.pathname !== '/') {
+      navigate('/#new-release');
+    } else {
+      // If we're already on the home page, just update the hash
+      window.location.hash = 'new-release';
+    }
   };
 
   return (
@@ -26,7 +38,6 @@ export const Navbar = () => {
             </Link>
           </div>
 
-          {/* Mobile menu button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="md:hidden text-koya-text hover:text-koya-accent"
@@ -34,7 +45,6 @@ export const Navbar = () => {
             <Menu size={24} />
           </button>
 
-          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
             <Link to="/watch2earn" className="flex items-center space-x-2 text-koya-text hover:text-koya-accent transition-colors">
               <Coins size={20} />
@@ -51,10 +61,14 @@ export const Navbar = () => {
               <span>My Favourites</span>
             </Link>
             
-            <Link to="/new" className="flex items-center space-x-2 text-koya-text hover:text-koya-accent transition-colors">
+            <a
+              href="#new-release"
+              onClick={handleNewReleaseClick}
+              className="flex items-center space-x-2 text-koya-text hover:text-koya-accent transition-colors cursor-pointer"
+            >
               <Film size={20} />
               <span>New Release</span>
-            </Link>
+            </a>
 
             <button className="text-koya-text hover:text-koya-accent transition-colors">
               <Search size={24} />
@@ -75,7 +89,6 @@ export const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
         {isMobileMenuOpen && (
           <div className="md:hidden bg-koya-background border-t border-gray-700 py-4">
             <div className="flex flex-col space-y-4 px-4">
@@ -94,10 +107,14 @@ export const Navbar = () => {
                 <span>My Favourites</span>
               </Link>
               
-              <Link to="/new" className="flex items-center space-x-2 text-koya-text hover:text-koya-accent transition-colors">
+              <a
+                href="#new-release"
+                onClick={handleNewReleaseClick}
+                className="flex items-center space-x-2 text-koya-text hover:text-koya-accent transition-colors cursor-pointer"
+              >
                 <Film size={20} />
                 <span>New Release</span>
-              </Link>
+              </a>
 
               <div className="flex space-x-4">
                 <button className="text-koya-text hover:text-koya-accent transition-colors">

@@ -5,11 +5,27 @@ import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { useHighlyRated } from '@/hooks/use-highly-rated';
+import { useNewReleases } from '@/hooks/use-new-releases';
 import { MOCK_MOVIES } from '../data/mockMovies';
+import { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const Index = () => {
   const { theme, setTheme } = useTheme();
-  const { data: highlyRatedVideos, isLoading } = useHighlyRated();
+  const { data: highlyRatedVideos, isLoading: isLoadingHighlyRated } = useHighlyRated();
+  const { data: newReleases, isLoading: isLoadingNewReleases } = useNewReleases();
+  const newReleaseRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    // Check if the URL has a hash and scroll to the section
+    if (location.hash === '#new-release' && newReleaseRef.current) {
+      newReleaseRef.current.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  }, [location.hash, newReleases]);
 
   return (
     <div className="min-h-screen">
@@ -36,6 +52,12 @@ const Index = () => {
           />
           <CategoryRow title="Action" movies={MOCK_MOVIES.action} />
           <CategoryRow title="Comedy" movies={MOCK_MOVIES.comedy} />
+          <div ref={newReleaseRef} id="new-release">
+            <CategoryRow 
+              title="New Release" 
+              movies={newReleases || []}
+            />
+          </div>
         </div>
       </div>
     </div>
