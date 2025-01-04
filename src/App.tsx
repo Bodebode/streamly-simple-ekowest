@@ -9,6 +9,7 @@ import { useAuth } from "./components/AuthProvider";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Watch2Earn from "./pages/Watch2Earn";
+import TechStack from "./pages/TechStack";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
             <Routes>
               <Route path="/auth" element={<Auth />} />
               <Route path="/watch2earn" element={<Watch2Earn />} />
+              <Route path="/tech-stack" element={<TechStack />} />
               <Route
                 path="/"
                 element={
