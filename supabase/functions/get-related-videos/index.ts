@@ -14,8 +14,8 @@ serve(async (req) => {
   }
 
   try {
-    // Using a popular Nollywood movie as seed (Battle on Buka Street)
-    const seedVideoId = 'jFoQ4RLPXQs'
+    // Using a popular Nollywood movie as seed
+    const seedVideoId = 'YPJ_iwLJx2U' // Battle on Buka Street trailer
     console.log('Using seed video ID:', seedVideoId)
 
     const YOUTUBE_API_KEY = Deno.env.get('YOUTUBE_API_KEY')
@@ -23,7 +23,7 @@ serve(async (req) => {
       throw new Error('YouTube API key not configured')
     }
 
-    // Construct the URL with proper encoding and required parameters
+    // Using URLSearchParams for proper parameter encoding
     const params = new URLSearchParams({
       part: 'snippet',
       relatedToVideoId: seedVideoId,
@@ -36,22 +36,22 @@ serve(async (req) => {
     });
 
     const url = `https://www.googleapis.com/youtube/v3/search?${params.toString()}`
-    console.log('Fetching from YouTube API with URL:', url)
+    console.log('Fetching from YouTube API...')
     
     const response = await fetch(url)
     const data = await response.json()
 
+    console.log('YouTube API response status:', response.status)
+    console.log('YouTube API response:', JSON.stringify(data, null, 2))
+
     if (!response.ok) {
-      console.error('YouTube API error response:', data)
-      throw new Error(`YouTube API error: ${data.error?.message || JSON.stringify(data)}`)
+      throw new Error(`YouTube API error: ${data.error?.message || JSON.stringify(data.error || data)}`)
     }
 
     if (!data.items || !Array.isArray(data.items)) {
       console.error('Invalid response format:', data)
       throw new Error('Invalid response format from YouTube API')
     }
-
-    console.log(`Successfully received ${data.items.length} videos from YouTube API`)
 
     const videos = data.items.map((item: any) => ({
       id: item.id.videoId,
@@ -61,23 +61,32 @@ serve(async (req) => {
                 item.snippet.thumbnails.default.url,
     }))
 
-    console.log('Processed videos:', videos)
+    console.log(`Successfully processed ${videos.length} videos`)
 
     return new Response(
       JSON.stringify(videos),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      { 
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        },
         status: 200,
-      }
+      },
     )
   } catch (error) {
     console.error('Error in get-related-videos:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: error.stack
+      }),
       { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        },
         status: 500,
-      }
+      },
     )
   }
 })

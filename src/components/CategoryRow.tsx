@@ -39,24 +39,32 @@ export const CategoryRow = ({ title, movies, updateHighlyRated }: CategoryRowPro
 
         if (error) {
           console.error('Supabase function error:', error);
-          toast.error('Failed to fetch Nollywood movies');
+          toast.error(`Failed to fetch Nollywood movies: ${error.message}`);
           throw error;
         }
 
-        if (data && updateHighlyRated) {
-          console.log('Received Nollywood videos:', data);
+        if (!data) {
+          console.error('No data received from function');
+          toast.error('No Nollywood movies data received');
+          return;
+        }
+
+        console.log('Received Nollywood videos:', data);
+
+        if (updateHighlyRated) {
           const nollywoodMovies: Movie[] = data.map((video: any, index: number) => ({
-            id: index + 2000, // Using a different range to avoid conflicts
+            id: index + 2000,
             title: video.title,
             image: video.thumbnail,
             category: 'Nollywood',
             videoId: video.id
           }));
           updateHighlyRated(nollywoodMovies);
+          toast.success('Successfully loaded Nollywood movies');
         }
       } catch (error) {
         console.error('Error fetching Nollywood videos:', error);
-        toast.error('Failed to load Nollywood movies');
+        toast.error(`Failed to load Nollywood movies: ${error.message}`);
       } finally {
         setIsLoading(false);
       }
