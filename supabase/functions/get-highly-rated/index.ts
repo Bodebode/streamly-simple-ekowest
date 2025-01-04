@@ -5,14 +5,28 @@ const API_KEY = Deno.env.get('YOUTUBE_API_KEY')
 const BASE_URL = 'https://www.googleapis.com/youtube/v3'
 
 const truncateTitle = (title: string): string => {
-  // Find the first occurrence of any separator
   const separatorIndex = title.search(/[-|(]/)
   if (separatorIndex !== -1) {
-    // Return the part before the separator, trimmed
     return title.substring(0, separatorIndex).trim()
   }
-  // If no separator is found, return the original title
   return title
+}
+
+async function checkVideoPlayability(videoId: string): Promise<boolean> {
+  try {
+    const embedResponse = await fetch(
+      `${BASE_URL}/videos?part=status&id=${videoId}&key=${API_KEY}`
+    )
+    const embedData = await embedResponse.json()
+    
+    if (!embedData.items || embedData.items.length === 0) return false
+    
+    // Check if video is embeddable
+    return embedData.items[0].status.embeddable === true
+  } catch (error) {
+    console.error('Error checking video playability:', error)
+    return false
+  }
 }
 
 serve(async (req) => {
@@ -27,7 +41,14 @@ serve(async (req) => {
 
     const videoDetailsPromises = data.items.map(async (video: any) => {
       const videoId = video.id.videoId
-      // Fetch both statistics and contentDetails to get duration
+      
+      // Check if video is playable before proceeding
+      const isPlayable = await checkVideoPlayability(videoId)
+      if (!isPlayable) {
+        console.log(`Video ${videoId} is not embeddable, skipping`)
+        return null
+      }
+
       const detailsResponse = await fetch(
         `${BASE_URL}/videos?part=statistics,contentDetails&id=${videoId}&key=${API_KEY}`
       )
@@ -36,7 +57,6 @@ serve(async (req) => {
       
       if (!videoDetails) return null
 
-      // Convert YouTube duration format (PT1H2M10S) to minutes
       const duration = videoDetails.contentDetails.duration
       const durationMatch = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/)
       const hours = parseInt(durationMatch[1] || '0')

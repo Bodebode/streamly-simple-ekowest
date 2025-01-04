@@ -27,13 +27,29 @@ const convertDurationToMinutes = (duration: string): number => {
   return hours * 60 + minutes + Math.ceil(seconds / 60)
 }
 
+async function checkVideoPlayability(videoId: string): Promise<boolean> {
+  try {
+    const embedResponse = await fetch(
+      `${BASE_URL}/videos?part=status&id=${videoId}&key=${API_KEY}`
+    )
+    const embedData = await embedResponse.json()
+    
+    if (!embedData.items || embedData.items.length === 0) return false
+    
+    // Check if video is embeddable
+    return embedData.items[0].status.embeddable === true
+  } catch (error) {
+    console.error('Error checking video playability:', error)
+    return false
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    // Search for Nollywood movies
     const searchResponse = await fetch(
       `${BASE_URL}/search?part=snippet&q=nollywood+full+movie&type=video&order=date&maxResults=50&key=${API_KEY}`
     )
@@ -43,16 +59,25 @@ serve(async (req) => {
       throw new Error('No videos found')
     }
 
-    // Get video IDs
-    const videoIds = searchData.items.map((item: any) => item.id.videoId).join(',')
+    // Filter out non-playable videos first
+    const playableVideos = await Promise.all(
+      searchData.items.map(async (item: any) => {
+        const isPlayable = await checkVideoPlayability(item.id.videoId)
+        return isPlayable ? item : null
+      })
+    )
 
-    // Get detailed video information including statistics and contentDetails
+    // Get video IDs of playable videos
+    const videoIds = playableVideos
+      .filter(video => video !== null)
+      .map((item: any) => item.id.videoId)
+      .join(',')
+
     const videoResponse = await fetch(
       `${BASE_URL}/videos?part=snippet,statistics,contentDetails&id=${videoIds}&key=${API_KEY}`
     )
     const videoData = await videoResponse.json()
 
-    // Filter and transform videos
     const videos = videoData.items
       .filter((video: any) => {
         const commentCount = parseInt(video.statistics.commentCount || '0')
