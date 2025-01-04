@@ -5,14 +5,17 @@ const API_KEY = Deno.env.get('YOUTUBE_API_KEY')
 const BASE_URL = 'https://www.googleapis.com/youtube/v3'
 
 const truncateTitle = (title: string): string => {
-  // Find the first occurrence of any separator (including #)
+  // First, find the first occurrence of any separator
   const separatorIndex = title.search(/[-|(#]/)
-  if (separatorIndex !== -1) {
-    // Return the part before the separator, trimmed
-    return title.substring(0, separatorIndex).trim()
-  }
-  // If no separator is found, return the original title
-  return title
+  let processedTitle = separatorIndex !== -1 
+    ? title.substring(0, separatorIndex).trim()
+    : title.trim()
+    
+  // Then limit to 2-3 words
+  const words = processedTitle.split(' ')
+  processedTitle = words.slice(0, Math.min(3, words.length)).join(' ')
+  
+  return processedTitle
 }
 
 serve(async (req) => {
