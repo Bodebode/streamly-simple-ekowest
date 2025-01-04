@@ -1,7 +1,6 @@
 import { Hero } from '../components/Hero';
 import { CategoryRow } from '../components/CategoryRow';
 import { Navbar } from '../components/Navbar';
-import { EmailPopup } from '../components/EmailPopup';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
@@ -205,7 +204,6 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
-      <EmailPopup />
       <div className="fixed bottom-4 right-4 z-50">
         <Button
           variant="outline"
