@@ -73,6 +73,34 @@ export const MOCK_MOVIES: MovieData = {
       image: "https://example.com/highlyrated3.jpg",
       category: "Highly Rated",
       videoId: "highlyrated3"
+    },
+    {
+      id: 4,
+      title: "Highly Rated Movie 4",
+      image: "https://example.com/highlyrated4.jpg",
+      category: "Highly Rated",
+      videoId: "highlyrated4"
+    },
+    {
+      id: 5,
+      title: "Highly Rated Movie 5",
+      image: "https://example.com/highlyrated5.jpg",
+      category: "Highly Rated",
+      videoId: "highlyrated5"
+    },
+    {
+      id: 6,
+      title: "Highly Rated Movie 6",
+      image: "https://example.com/highlyrated6.jpg",
+      category: "Highly Rated",
+      videoId: "highlyrated6"
+    },
+    {
+      id: 7,
+      title: "Highly Rated Movie 7",
+      image: "https://example.com/highlyrated7.jpg",
+      category: "Highly Rated",
+      videoId: "highlyrated7"
     }
   ],
   action: [
@@ -96,6 +124,34 @@ export const MOCK_MOVIES: MovieData = {
       image: "https://example.com/action3.jpg",
       category: "Action",
       videoId: "action3"
+    },
+    {
+      id: 4,
+      title: "Action Movie 4",
+      image: "https://example.com/action4.jpg",
+      category: "Action",
+      videoId: "action4"
+    },
+    {
+      id: 5,
+      title: "Action Movie 5",
+      image: "https://example.com/action5.jpg",
+      category: "Action",
+      videoId: "action5"
+    },
+    {
+      id: 6,
+      title: "Action Movie 6",
+      image: "https://example.com/action6.jpg",
+      category: "Action",
+      videoId: "action6"
+    },
+    {
+      id: 7,
+      title: "Action Movie 7",
+      image: "https://example.com/action7.jpg",
+      category: "Action",
+      videoId: "action7"
     }
   ],
   comedy: [
