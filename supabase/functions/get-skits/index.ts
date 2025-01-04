@@ -1,20 +1,22 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from '../_shared/cors.ts'
 
-const API_KEY = Deno.env.get('YOUTUBE_API_KEY')
-const BASE_URL = 'https://www.googleapis.com/youtube/v3'
-
-const truncateTitle = (title: string): string => {
-  const separatorIndex = title.search(/[-|(#]/)
-  let processedTitle = separatorIndex !== -1 
-    ? title.substring(0, separatorIndex).trim()
-    : title.trim()
-    
-  const words = processedTitle.split(' ')
-  processedTitle = words.slice(0, Math.min(3, words.length)).join(' ')
-  
-  return processedTitle
-}
+const MOCK_VIDEOS = [
+  {
+    id: "skit1",
+    title: "Funny Skit",
+    image: "https://i.ytimg.com/vi/skit1/maxresdefault.jpg",
+    category: "Skits",
+    videoId: "skit1"
+  },
+  {
+    id: "skit2",
+    title: "Comedy Skit",
+    image: "https://i.ytimg.com/vi/skit2/maxresdefault.jpg",
+    category: "Skits",
+    videoId: "skit2"
+  }
+];
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -22,16 +24,21 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Fetching skits...')
+    const API_KEY = Deno.env.get('YOUTUBE_API_KEY')
+
     if (!API_KEY) {
-      console.error('YouTube API key is not configured')
-      throw new Error('YouTube API key is not configured')
+      console.log('Using mock data (no API key)')
+      return new Response(JSON.stringify(MOCK_VIDEOS), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
     }
 
     const { min_length = 0, max_length = 42 } = await req.json()
     console.log('Fetching skits with parameters:', { min_length, max_length })
 
     const searchResponse = await fetch(
-      `${BASE_URL}/search?part=snippet&q=nollywood+skit+comedy&type=video&order=date&maxResults=50&key=${API_KEY}`
+      `https://www.googleapis.com/youtube/v3/search?part=snippet&q=nollywood+skit+comedy&type=video&order=date&maxResults=50&key=${API_KEY}`
     )
     
     if (!searchResponse.ok) {
@@ -52,7 +59,7 @@ serve(async (req) => {
     const videoIds = searchData.items.map((item: any) => item.id.videoId).join(',')
 
     const videoResponse = await fetch(
-      `${BASE_URL}/videos?part=snippet,statistics,contentDetails&id=${videoIds}&key=${API_KEY}`
+      `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&id=${videoIds}&key=${API_KEY}`
     )
     
     if (!videoResponse.ok) {
@@ -106,4 +113,16 @@ const convertDurationToMinutes = (duration: string): number => {
   const seconds = parseInt(match[3] || '0')
   
   return hours * 60 + minutes + Math.ceil(seconds / 60)
+}
+
+const truncateTitle = (title: string): string => {
+  const separatorIndex = title.search(/[-|(#]/)
+  let processedTitle = separatorIndex !== -1 
+    ? title.substring(0, separatorIndex).trim()
+    : title.trim()
+    
+  const words = processedTitle.split(' ')
+  processedTitle = words.slice(0, Math.min(3, words.length)).join(' ')
+  
+  return processedTitle
 }

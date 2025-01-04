@@ -1,16 +1,30 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { corsHeaders } from '../_shared/cors.ts'
 
-const API_KEY = Deno.env.get('YOUTUBE_API_KEY')
-const BASE_URL = 'https://www.googleapis.com/youtube/v3'
-
-const truncateTitle = (title: string): string => {
-  const separatorIndex = title.search(/[-|(]/)
-  if (separatorIndex !== -1) {
-    return title.substring(0, separatorIndex).trim()
+const MOCK_VIDEOS = [
+  {
+    id: "KDHhiwoP5Ng",
+    title: "The Wedding Party",
+    image: "https://i.ytimg.com/vi/KDHhiwoP5Ng/maxresdefault.jpg",
+    category: "Highly Rated",
+    videoId: "KDHhiwoP5Ng",
+    views: 1000000,
+    comments: 500,
+    duration: 120,
+    publishedAt: "2023-01-01T00:00:00Z"
+  },
+  {
+    id: "9uYzWX-mGcE",
+    title: "King of Boys",
+    image: "https://i.ytimg.com/vi/9uYzWX-mGcE/maxresdefault.jpg",
+    category: "Highly Rated",
+    videoId: "9uYzWX-mGcE",
+    views: 800000,
+    comments: 400,
+    duration: 110,
+    publishedAt: "2023-02-01T00:00:00Z"
   }
-  return title
-}
+];
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -18,13 +32,17 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Fetching highly rated videos...')
+    const API_KEY = Deno.env.get('YOUTUBE_API_KEY')
+
     if (!API_KEY) {
-      console.error('YouTube API key is not configured')
-      throw new Error('YouTube API key is not configured')
+      console.log('Using mock data (no API key)')
+      return new Response(JSON.stringify(MOCK_VIDEOS), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
     }
 
-    console.log('Fetching highly rated videos...')
-    const url = `${BASE_URL}/search?part=snippet&maxResults=50&q=Nollywood&type=video&key=${API_KEY}`
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=Nollywood&type=video&key=${API_KEY}`
     const response = await fetch(url)
     
     if (!response.ok) {
@@ -45,7 +63,7 @@ serve(async (req) => {
     const videoDetailsPromises = data.items.map(async (video: any) => {
       const videoId = video.id.videoId
       const detailsResponse = await fetch(
-        `${BASE_URL}/videos?part=statistics,contentDetails&id=${videoId}&key=${API_KEY}`
+        `https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails&id=${videoId}&key=${API_KEY}`
       )
       
       if (!detailsResponse.ok) {
@@ -69,7 +87,7 @@ serve(async (req) => {
 
       return {
         id: videoId,
-        title: truncateTitle(video.snippet.title),
+        title: video.snippet.title,
         image: video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url,
         category: "Highly Rated",
         videoId: videoId,
