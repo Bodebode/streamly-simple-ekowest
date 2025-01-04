@@ -14,8 +14,8 @@ serve(async (req) => {
   }
 
   try {
-    // Using a popular Nollywood movie as seed
-    const seedVideoId = 'YPJ_iwLJx2U' // Battle on Buka Street trailer
+    // Using a verified Nollywood movie as seed (Brotherhood Official Trailer)
+    const seedVideoId = 'h3DBCPOqh8c'
     console.log('Using seed video ID:', seedVideoId)
 
     const YOUTUBE_API_KEY = Deno.env.get('YOUTUBE_API_KEY')
@@ -31,7 +31,6 @@ serve(async (req) => {
       maxResults: '10',
       key: YOUTUBE_API_KEY,
       regionCode: 'NG',
-      relevanceLanguage: 'en',
       videoDuration: 'long'
     });
 
@@ -56,9 +55,10 @@ serve(async (req) => {
     const videos = data.items.map((item: any) => ({
       id: item.id.videoId,
       title: item.snippet.title,
-      thumbnail: item.snippet.thumbnails.maxres?.url || 
-                item.snippet.thumbnails.high?.url || 
+      thumbnail: item.snippet.thumbnails.high?.url || 
+                item.snippet.thumbnails.medium?.url || 
                 item.snippet.thumbnails.default.url,
+      description: item.snippet.description
     }))
 
     console.log(`Successfully processed ${videos.length} videos`)
