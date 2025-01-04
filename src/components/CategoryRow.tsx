@@ -18,22 +18,12 @@ interface CategoryRowProps {
   updateHighlyRated?: (movies: Movie[]) => void;
 }
 
-export const CategoryRow = ({ title, movies: initialMovies, updateHighlyRated }: CategoryRowProps) => {
+export const CategoryRow = ({ title, movies, updateHighlyRated }: CategoryRowProps) => {
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [movies, setMovies] = useState<Movie[]>(initialMovies);
-
-  useEffect(() => {
-    // Reset movies when initial movies change
-    setMovies(initialMovies);
-  }, [initialMovies]);
 
   const handleCloseVideo = () => {
     setSelectedVideoId(null);
-    // Reset movies to initial state when video is closed (only for Comedy section)
-    if (title === 'Comedy') {
-      setMovies(initialMovies);
-    }
   };
 
   useEffect(() => {
@@ -64,10 +54,8 @@ export const CategoryRow = ({ title, movies: initialMovies, updateHighlyRated }:
             category: 'Comedy',
             videoId: video.id
           }));
-          
-          console.log('Adding related movies:', relatedMovies);
-          // Update only the Comedy section with initial movies plus related ones
-          setMovies([...initialMovies, ...relatedMovies]);
+          // Update the comedy section instead
+          movies = [...movies, ...relatedMovies];
         }
       } catch (error) {
         console.error('Error fetching related videos:', error);
@@ -77,11 +65,10 @@ export const CategoryRow = ({ title, movies: initialMovies, updateHighlyRated }:
       }
     };
 
-    if (selectedVideoId && title === 'Comedy') {
-      console.log('Selected video ID:', selectedVideoId);
+    if (selectedVideoId) {
       fetchRelatedVideos(selectedVideoId);
     }
-  }, [selectedVideoId, title, initialMovies]);
+  }, [selectedVideoId, title, movies]);
 
   return (
     <div className="mb-8">
