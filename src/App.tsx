@@ -18,12 +18,11 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <div>Loading...</div>;
   }
 
-  // Allow access without authentication
   return <>{children}</>;
 };
 
 const App = () => (
-  <ThemeProvider attribute="class" defaultTheme="system" enableSystem={false}>
+  <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <TooltipProvider>

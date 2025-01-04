@@ -10,7 +10,7 @@ export const Hero = () => {
       />
       <div className="absolute inset-0 bg-gradient-to-t from-koya-background via-transparent to-transparent" />
       <div className="absolute bottom-0 left-0 p-8 w-full">
-        <h1 className="text-5xl font-bold mb-4">Featured Title</h1>
+        <h1 className="text-5xl font-bold mb-4 text-white">Featured Title</h1>
         <p className="text-xl text-koya-subtext mb-6 max-w-2xl">
           Experience the latest blockbuster with stunning visuals and an engaging storyline that will keep you on the edge of your seat.
         </p>
