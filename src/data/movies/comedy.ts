@@ -1,72 +1,72 @@
 export const comedyMovies = [
   {
     id: 1,
-    title: "Funny Moments Compilation",
-    image: "https://i3.ytimg.com/vi/VB4CCHHYOqY/maxresdefault.jpg",
-    category: "Comedy",
-    videoId: "VB4CCHHYOqY"
+    title: "Aki and PawPaw Return",
+    image: "https://i3.ytimg.com/vi/Qxh_PYFhcfI/maxresdefault.jpg",
+    category: "Nollywood Comedy",
+    videoId: "Qxh_PYFhcfI"
   },
   {
     id: 2,
-    title: "Stand-up Special",
-    image: "https://i3.ytimg.com/vi/Ks-_Mh1QhMc/maxresdefault.jpg",
-    category: "Comedy",
-    videoId: "Ks-_Mh1QhMc"
+    title: "The Return of Jenifa",
+    image: "https://i3.ytimg.com/vi/jm5YjC8txHo/maxresdefault.jpg",
+    category: "Nollywood Comedy",
+    videoId: "jm5YjC8txHo"
   },
   {
     id: 3,
-    title: "Comedy Sketch Show",
-    image: "https://i3.ytimg.com/vi/8S0FDjFBj8o/maxresdefault.jpg",
-    category: "Comedy",
-    videoId: "8S0FDjFBj8o"
+    title: "Chief Daddy 2",
+    image: "https://i3.ytimg.com/vi/0fYMLQjK-MI/maxresdefault.jpg",
+    category: "Nollywood Comedy",
+    videoId: "0fYMLQjK-MI"
   },
   {
     id: 4,
-    title: "Best Comedy Clips",
-    image: "https://i3.ytimg.com/vi/jANuVKeYezs/maxresdefault.jpg",
-    category: "Comedy",
-    videoId: "jANuVKeYezs"
+    title: "Breaded Life",
+    image: "https://i3.ytimg.com/vi/YPM76JJcBj4/maxresdefault.jpg",
+    category: "Nollywood Comedy",
+    videoId: "YPM76JJcBj4"
   },
   {
     id: 5,
-    title: "Hilarious Pranks",
-    image: "https://i3.ytimg.com/vi/VHnVsjBoHnY/maxresdefault.jpg",
-    category: "Comedy",
-    videoId: "VHnVsjBoHnY"
+    title: "Quam's Money",
+    image: "https://i3.ytimg.com/vi/2TDJkFRfyxM/maxresdefault.jpg",
+    category: "Nollywood Comedy",
+    videoId: "2TDJkFRfyxM"
   },
   {
     id: 6,
-    title: "Comedy Central Presents",
-    image: "https://i3.ytimg.com/vi/R8mcBdBL-t0/maxresdefault.jpg",
-    category: "Comedy",
-    videoId: "R8mcBdBL-t0"
+    title: "Namaste Wahala",
+    image: "https://i3.ytimg.com/vi/vfbZHrYqonA/maxresdefault.jpg",
+    category: "Nollywood Comedy",
+    videoId: "vfbZHrYqonA"
   },
   {
     id: 7,
-    title: "Late Night Comedy",
-    image: "https://i3.ytimg.com/vi/YbJOTdZBX1g/maxresdefault.jpg",
-    category: "Comedy",
-    videoId: "YbJOTdZBX1g"
+    title: "Day of Destiny",
+    image: "https://i3.ytimg.com/vi/qKY9aORzVhI/maxresdefault.jpg",
+    category: "Nollywood Comedy",
+    videoId: "qKY9aORzVhI"
   },
   {
     id: 8,
-    title: "Improv Comedy Show",
-    image: "https://i3.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
-    category: "Comedy",
-    videoId: "dQw4w9WgXcQ"
+    title: "Prophetess",
+    image: "https://i3.ytimg.com/vi/7xbZV7GgMp4/maxresdefault.jpg",
+    category: "Nollywood Comedy",
+    videoId: "7xbZV7GgMp4"
   },
   {
     id: 9,
-    title: "Comedy Club Special",
-    image: "https://i3.ytimg.com/vi/M7lc1UVf-VE/maxresdefault.jpg",
-    category: "Comedy",
-    videoId: "M7lc1UVf-VE"
+    title: "Progressive Tailors Club",
+    image: "https://i3.ytimg.com/vi/YEG3bmU_WaI/maxresdefault.jpg",
+    category: "Nollywood Comedy",
+    videoId: "YEG3bmU_WaI"
   },
   {
     id: 10,
-    title: "Best Stand-up Moments",
-    image: "https://i3.ytimg.com/vi/rfscVS0vtbw/maxresdefault.jpg",
-    category: "Comedy",
-    videoId: "rfscVS0vtbw"
+    title: "Ayinla",
+    image: "https://i3.ytimg.com/vi/hrH2UH_BGp0/maxresdefault.jpg",
+    category: "Nollywood Comedy",
+    videoId: "hrH2UH_BGp0"
   }
 ];
