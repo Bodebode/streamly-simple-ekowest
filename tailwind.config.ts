@@ -31,6 +31,7 @@ export default {
         "scale-up": "scale-up 0.4s ease-out",
         "scale-down": "scale-down 0.4s ease-out",
         "fade-out-title": "fade-out-title 4s ease-out forwards",
+        "bounce-x": "bounce-x 1s ease-in-out",
       },
       keyframes: {
         "scale-up": {
@@ -44,6 +45,10 @@ export default {
         "fade-out-title": {
           "0%, 50%": { opacity: "1" },
           "100%": { opacity: "0" }
+        },
+        "bounce-x": {
+          "0%, 100%": { transform: "translateX(0)" },
+          "50%": { transform: "translateX(10px)" }
         }
       },
     },
