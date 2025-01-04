@@ -3,6 +3,14 @@ import { VideoPlayer } from './VideoPlayer';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from "sonner";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Movie {
   id: number;
@@ -21,6 +29,7 @@ interface CategoryRowProps {
 export const CategoryRow = ({ title, movies, updateHighlyRated }: CategoryRowProps) => {
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const isMobile = useIsMobile();
 
   const handleCloseVideo = () => {
     setSelectedVideoId(null);
@@ -29,7 +38,6 @@ export const CategoryRow = ({ title, movies, updateHighlyRated }: CategoryRowPro
   useEffect(() => {
     const fetchRelatedVideos = async (videoId: string) => {
       try {
-        // Only fetch related videos for Comedy section
         if (title !== 'Comedy') return;
         
         setIsLoading(true);
@@ -56,7 +64,6 @@ export const CategoryRow = ({ title, movies, updateHighlyRated }: CategoryRowPro
           }));
           
           console.log('Adding related movies:', relatedMovies);
-          // Update the movies array with the new related videos
           movies.push(...relatedMovies);
         }
       } catch (error) {
@@ -78,19 +85,35 @@ export const CategoryRow = ({ title, movies, updateHighlyRated }: CategoryRowPro
       <h2 className="text-xl md:text-2xl font-bold mb-4 px-4 md:text-center">
         {title} {isLoading && title === 'Comedy' && '(Loading...)'}
       </h2>
-      <div className="category-row flex space-x-4 px-4 md:px-16 pb-4 overflow-x-auto scrollbar-hide">
-        {movies.map((movie) => (
-          <div key={movie.id} className="flex-none w-[140px] md:w-[200px]">
-            <MovieCard
-              title={movie.title}
-              image={movie.image}
-              category={movie.category}
-              videoId={movie.videoId}
-              onMovieSelect={setSelectedVideoId}
-              isVideoPlaying={selectedVideoId !== null}
-            />
-          </div>
-        ))}
+      <div className="relative px-4 md:px-16">
+        <Carousel
+          opts={{
+            align: "start",
+            loop: true,
+          }}
+          className="w-full"
+        >
+          <CarouselContent className="-ml-2 md:-ml-4">
+            {movies.map((movie) => (
+              <CarouselItem key={movie.id} className="pl-2 md:pl-4 basis-[140px] md:basis-[200px]">
+                <MovieCard
+                  title={movie.title}
+                  image={movie.image}
+                  category={movie.category}
+                  videoId={movie.videoId}
+                  onMovieSelect={setSelectedVideoId}
+                  isVideoPlaying={selectedVideoId !== null}
+                />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          {!isMobile && (
+            <>
+              <CarouselPrevious className="hidden md:flex -left-12" />
+              <CarouselNext className="hidden md:flex -right-12" />
+            </>
+          )}
+        </Carousel>
       </div>
       <VideoPlayer videoId={selectedVideoId} onClose={handleCloseVideo} />
     </div>
