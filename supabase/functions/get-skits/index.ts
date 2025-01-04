@@ -1,8 +1,13 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from '../_shared/cors.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const API_KEY = Deno.env.get('YOUTUBE_API_KEY')
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
+const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')
 const BASE_URL = 'https://www.googleapis.com/youtube/v3'
+
+const supabase = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!)
 
 const MOCK_SKITS = [
   {
@@ -30,6 +35,28 @@ serve(async (req) => {
     const { min_length = 0, max_length = 42 } = await req.json()
     console.log('Received parameters:', { min_length, max_length })
 
+    console.log('Checking cache for skits...')
+    const { data: cachedVideos, error: cacheError } = await supabase
+      .from('cached_videos')
+      .select('*')
+      .eq('category', 'Skits')
+      .gt('expires_at', new Date().toISOString())
+      .order('views', { ascending: false })
+      .limit(12)
+
+    if (cacheError) {
+      console.error('Cache error:', cacheError)
+      throw cacheError
+    }
+
+    if (cachedVideos && cachedVideos.length > 0) {
+      console.log('Returning cached videos:', cachedVideos.length)
+      return new Response(JSON.stringify(cachedVideos), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    console.log('Cache miss, fetching from YouTube API...')
     const searchResponse = await fetch(
       `${BASE_URL}/search?part=snippet&q=nollywood+skit+comedy&type=video&order=date&maxResults=50&key=${API_KEY}`
     )
@@ -60,16 +87,29 @@ serve(async (req) => {
         return viewCount >= 10000 && durationMinutes <= max_length && durationMinutes >= min_length
       })
       .slice(0, 12)
-      .map((video: any) => {
-        const videoId = video.id
-        return {
-          id: videoId,
-          title: truncateTitle(video.snippet.title),
-          image: video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url,
-          category: "Skits",
-          videoId: videoId,
-        }
-      })
+      .map((video: any) => ({
+        id: video.id,
+        title: truncateTitle(video.snippet.title),
+        image: video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url,
+        category: "Skits",
+        video_id: video.id,
+        views: parseInt(video.statistics.viewCount || '0'),
+        comments: parseInt(video.statistics.commentCount || '0'),
+        duration: convertDurationToMinutes(video.contentDetails.duration),
+        published_at: video.snippet.publishedAt,
+      }))
+
+    // Cache the videos
+    if (videos.length > 0) {
+      console.log('Caching videos:', videos.length)
+      const { error: insertError } = await supabase
+        .from('cached_videos')
+        .upsert(videos)
+
+      if (insertError) {
+        console.error('Cache insert error:', insertError)
+      }
+    }
 
     console.log(`Found ${videos.length} videos matching criteria`)
 
@@ -78,7 +118,6 @@ serve(async (req) => {
     })
   } catch (error) {
     console.error('Error:', error)
-    // Return mock data for any error
     return new Response(JSON.stringify(MOCK_SKITS), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
@@ -97,13 +136,11 @@ const convertDurationToMinutes = (duration: string): number => {
 }
 
 const truncateTitle = (title: string): string => {
-  // First, find the first occurrence of any separator
   const separatorIndex = title.search(/[-|(#]/)
   let processedTitle = separatorIndex !== -1 
     ? title.substring(0, separatorIndex).trim()
     : title.trim()
     
-  // Then limit to 2-3 words
   const words = processedTitle.split(' ')
   processedTitle = words.slice(0, Math.min(3, words.length)).join(' ')
   

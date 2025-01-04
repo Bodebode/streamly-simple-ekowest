@@ -1,8 +1,13 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { corsHeaders } from '../_shared/cors.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const API_KEY = Deno.env.get('YOUTUBE_API_KEY')
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
+const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')
 const BASE_URL = 'https://www.googleapis.com/youtube/v3'
+
+const supabase = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!)
 
 const MOCK_HIGHLY_RATED = [
   {
@@ -35,6 +40,28 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Checking cache for highly rated videos...')
+    const { data: cachedVideos, error: cacheError } = await supabase
+      .from('cached_videos')
+      .select('*')
+      .eq('category', 'Highly Rated')
+      .gt('expires_at', new Date().toISOString())
+      .order('views', { ascending: false })
+      .limit(10)
+
+    if (cacheError) {
+      console.error('Cache error:', cacheError)
+      throw cacheError
+    }
+
+    if (cachedVideos && cachedVideos.length > 0) {
+      console.log('Returning cached videos:', cachedVideos.length)
+      return new Response(JSON.stringify(cachedVideos), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    console.log('Cache miss, fetching from YouTube API...')
     const url = `${BASE_URL}/search?part=snippet&maxResults=50&q=Nollywood&type=video&key=${API_KEY}`
     const response = await fetch(url)
     const data = await response.json()
@@ -74,11 +101,11 @@ serve(async (req) => {
         title: truncateTitle(video.snippet.title),
         image: video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url,
         category: "Highly Rated",
-        videoId: videoId,
+        video_id: videoId,
         views: parseInt(stats.viewCount),
         comments: parseInt(stats.commentCount),
         duration: totalMinutes,
-        publishedAt: video.snippet.publishedAt,
+        published_at: video.snippet.publishedAt,
       }
     })
 
@@ -89,8 +116,20 @@ serve(async (req) => {
         video.comments >= 100 &&
         video.duration >= 40
       )
-      .sort((a, b) => new Date(b!.publishedAt).getTime() - new Date(a!.publishedAt).getTime())
+      .sort((a, b) => b!.views - a!.views)
       .slice(0, 10)
+
+    // Cache the videos
+    if (videos.length > 0) {
+      console.log('Caching videos:', videos.length)
+      const { error: insertError } = await supabase
+        .from('cached_videos')
+        .upsert(videos)
+
+      if (insertError) {
+        console.error('Cache insert error:', insertError)
+      }
+    }
 
     return new Response(JSON.stringify(videos), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
