@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { Play } from 'lucide-react';
+import { MoviePreview } from './movie/MoviePreview';
+import { MovieThumbnail } from './movie/MovieThumbnail';
 
 interface MovieCardProps {
   title: string;
@@ -14,23 +15,13 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect, isVi
   const [isHovered, setIsHovered] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [showTitle, setShowTitle] = useState(true);
-  const [thumbnailError, setThumbnailError] = useState(false);
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
   const titleTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const previewPlayerRef = useRef<HTMLIFrameElement | null>(null);
-
-  const thumbnailUrl = videoId 
-    ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
-    : 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80'; // Filmic placeholder
 
   useEffect(() => {
     return () => {
-      if (hoverTimerRef.current) {
-        clearTimeout(hoverTimerRef.current);
-      }
-      if (titleTimerRef.current) {
-        clearTimeout(titleTimerRef.current);
-      }
+      if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+      if (titleTimerRef.current) clearTimeout(titleTimerRef.current);
     };
   }, []);
 
@@ -38,12 +29,8 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect, isVi
     if (isVideoPlaying) {
       setShowPreview(false);
       setShowTitle(true);
-      if (hoverTimerRef.current) {
-        clearTimeout(hoverTimerRef.current);
-      }
-      if (titleTimerRef.current) {
-        clearTimeout(titleTimerRef.current);
-      }
+      if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+      if (titleTimerRef.current) clearTimeout(titleTimerRef.current);
     }
   }, [isVideoPlaying]);
 
@@ -57,9 +44,7 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect, isVi
     }
 
     return () => {
-      if (titleTimerRef.current) {
-        clearTimeout(titleTimerRef.current);
-      }
+      if (titleTimerRef.current) clearTimeout(titleTimerRef.current);
     };
   }, [showPreview]);
 
@@ -93,17 +78,9 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect, isVi
       onMovieSelect(videoId);
       setShowPreview(false);
       setShowTitle(true);
-      if (hoverTimerRef.current) {
-        clearTimeout(hoverTimerRef.current);
-      }
-      if (titleTimerRef.current) {
-        clearTimeout(titleTimerRef.current);
-      }
+      if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+      if (titleTimerRef.current) clearTimeout(titleTimerRef.current);
     }
-  };
-
-  const handleImageError = () => {
-    setThumbnailError(true);
   };
 
   return (
@@ -114,49 +91,22 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect, isVi
       onClick={handleClick}
     >
       {showPreview && videoId && !isVideoPlaying ? (
-        <div className="relative w-full h-full" onClick={handleClick}>
-          <div className="absolute inset-0 w-full h-full" style={{ pointerEvents: 'none' }}>
-            <iframe
-              ref={previewPlayerRef}
-              className="w-full h-full rounded-lg"
-              src={`https://www.youtube.com/embed/${videoId}?start=85&end=115&autoplay=1&controls=0&modestbranding=1&disablekb=1`}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            />
-          </div>
-          <div className="absolute inset-0">
-            <div className="absolute inset-x-0 bottom-0 p-4 flex flex-col justify-end">
-              {showTitle && (
-                <h3 className="text-lg font-bold animate-fade-out transition-opacity duration-[4s]">{title}</h3>
-              )}
-              <p className="text-sm text-koya-subtext mb-2">{category}</p>
-              <button className="bg-koya-accent hover:bg-opacity-80 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors pointer-events-auto">
-                <Play className="w-4 h-4" />
-                Watch Now
-              </button>
-            </div>
-          </div>
-        </div>
+        <MoviePreview
+          videoId={videoId}
+          title={title}
+          category={category}
+          showTitle={showTitle}
+          onClick={handleClick}
+        />
       ) : (
-        <>
-          <img
-            src={thumbnailError ? thumbnailUrl : (videoId ? thumbnailUrl : image)}
-            alt={title}
-            className="w-full h-full object-cover rounded-lg"
-            onError={handleImageError}
-          />
-          {isHovered && !isVideoPlaying && (
-            <div className="absolute inset-0 bg-black bg-opacity-75 p-4 flex flex-col justify-end rounded-lg">
-              <h3 className="text-lg font-bold">{title}</h3>
-              <p className="text-sm text-koya-subtext mb-2">{category}</p>
-              {videoId && (
-                <button className="bg-koya-accent hover:bg-opacity-80 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
-                  <Play className="w-4 h-4" />
-                  Watch Now
-                </button>
-              )}
-            </div>
-          )}
-        </>
+        <MovieThumbnail
+          title={title}
+          image={image}
+          category={category}
+          videoId={videoId}
+          isHovered={isHovered}
+          isVideoPlaying={isVideoPlaying}
+        />
       )}
     </div>
   );
