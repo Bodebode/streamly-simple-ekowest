@@ -54,8 +54,10 @@ export const CategoryRow = ({ title, movies, updateHighlyRated }: CategoryRowPro
             category: 'Comedy',
             videoId: video.id
           }));
-          // Update the comedy section instead
-          movies = [...movies, ...relatedMovies];
+          
+          console.log('Adding related movies:', relatedMovies);
+          // Update the movies array with the new related videos
+          movies.push(...relatedMovies);
         }
       } catch (error) {
         console.error('Error fetching related videos:', error);
@@ -66,9 +68,10 @@ export const CategoryRow = ({ title, movies, updateHighlyRated }: CategoryRowPro
     };
 
     if (selectedVideoId) {
+      console.log('Selected video ID:', selectedVideoId);
       fetchRelatedVideos(selectedVideoId);
     }
-  }, [selectedVideoId, title, movies]);
+  }, [selectedVideoId, title]);
 
   return (
     <div className="mb-8">
