@@ -9,12 +9,9 @@ const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')
 const supabase = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!)
 
 const truncateTitle = (title: string): string => {
-  // Look for any forward slash with optional characters around it
   const slashIndex = title.search(/\/?[^/]*\//)
-  // Look for other common separators
   const separatorIndex = title.search(/[-|(]/)
   
-  // Use the earliest occurrence of either pattern
   const cutoffIndex = (slashIndex !== -1 && (separatorIndex === -1 || slashIndex < separatorIndex))
     ? slashIndex
     : separatorIndex;
@@ -33,23 +30,56 @@ serve(async (req) => {
   try {
     console.log('Starting get-highly-rated function execution')
     
-    // First, try to get cached videos (including expired ones)
+    // First, try to get non-expired cached videos
     const { data: cachedVideos, error: cacheError } = await supabase
       .from('cached_videos')
       .select('*')
       .eq('category', 'Highly Rated')
-      .order('published_at', { ascending: false })
+      .gt('expires_at', new Date().toISOString())
+      .order('access_count', { ascending: false })
       .limit(12)
 
-    // If we have any cached videos, return them immediately
+    // Update access count for retrieved videos
     if (cachedVideos && cachedVideos.length > 0) {
+      const videoIds = cachedVideos.map(video => video.id)
+      await supabase
+        .from('cached_videos')
+        .update({ access_count: supabase.sql`access_count + 1` })
+        .in('id', videoIds)
+
       console.log('Returning cached videos:', cachedVideos.length)
       return new Response(JSON.stringify(cachedVideos), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
 
-    // Only try YouTube API if we have no cached data at all
+    // If we don't have enough fresh cached videos, try to get expired ones
+    const { data: expiredVideos } = await supabase
+      .from('cached_videos')
+      .select('*')
+      .eq('category', 'Highly Rated')
+      .lte('expires_at', new Date().toISOString())
+      .order('access_count', { ascending: false })
+      .limit(12)
+
+    if (expiredVideos && expiredVideos.length > 0) {
+      // Update access count and refresh expiration for frequently accessed videos
+      const videoIds = expiredVideos.map(video => video.id)
+      await supabase
+        .from('cached_videos')
+        .update({ 
+          access_count: supabase.sql`access_count + 1`,
+          expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // Extend by 30 days
+        })
+        .in('id', videoIds)
+
+      console.log('Returning expired but frequently accessed videos:', expiredVideos.length)
+      return new Response(JSON.stringify(expiredVideos), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Only fetch from YouTube API if we have no usable cached data
     if (!YOUTUBE_API_KEY) {
       console.error('YouTube API key not configured')
       throw new Error('YouTube API key not configured')
@@ -62,7 +92,6 @@ serve(async (req) => {
 
     if (data.error) {
       console.error('YouTube API error:', data.error)
-      // If API fails and we have no cached data, return an empty array with an error message
       return new Response(JSON.stringify([]), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 503
@@ -71,39 +100,41 @@ serve(async (req) => {
 
     console.log('Successfully fetched videos from YouTube API')
 
-    const videoDetailsPromises = data.items.map(async (video: any) => {
-      const videoId = video.id.videoId
-      const detailsResponse = await fetch(
-        `https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails&id=${videoId}&key=${YOUTUBE_API_KEY}`
-      )
-      const detailsData = await detailsResponse.json()
-      const videoDetails = detailsData.items[0]
-      
-      if (!videoDetails) return null
+    // Batch process video details to minimize API calls
+    const videoIds = data.items.map((item: any) => item.id.videoId).join(',')
+    const detailsResponse = await fetch(
+      `https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails&id=${videoIds}&key=${YOUTUBE_API_KEY}`
+    )
+    const detailsData = await detailsResponse.json()
 
-      const duration = videoDetails.contentDetails.duration
-      const durationMatch = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/)
-      const hours = parseInt(durationMatch[1] || '0')
-      const minutes = parseInt(durationMatch[2] || '0')
-      const seconds = parseInt(durationMatch[3] || '0')
-      const totalMinutes = hours * 60 + minutes + seconds / 60
+    const videos = data.items
+      .map((video: any) => {
+        const videoId = video.id.videoId
+        const videoDetails = detailsData.items.find((item: any) => item.id === videoId)
+        
+        if (!videoDetails) return null
 
-      const stats = videoDetails.statistics
+        const duration = videoDetails.contentDetails.duration
+        const durationMatch = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/)
+        const hours = parseInt(durationMatch[1] || '0')
+        const minutes = parseInt(durationMatch[2] || '0')
+        const seconds = parseInt(durationMatch[3] || '0')
+        const totalMinutes = hours * 60 + minutes + seconds / 60
 
-      return {
-        id: videoId,
-        title: truncateTitle(video.snippet.title),
-        image: video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url,
-        category: "Highly Rated",
-        video_id: videoId,
-        views: parseInt(stats.viewCount),
-        comments: parseInt(stats.commentCount),
-        duration: totalMinutes,
-        published_at: video.snippet.publishedAt,
-      }
-    })
+        const stats = videoDetails.statistics
 
-    const videos = (await Promise.all(videoDetailsPromises))
+        return {
+          id: videoId,
+          title: truncateTitle(video.snippet.title),
+          image: video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url,
+          category: "Highly Rated",
+          video_id: videoId,
+          views: parseInt(stats.viewCount),
+          comments: parseInt(stats.commentCount),
+          duration: totalMinutes,
+          published_at: video.snippet.publishedAt,
+        }
+      })
       .filter((video) => 
         video && 
         video.views >= 500000 && 
@@ -115,7 +146,6 @@ serve(async (req) => {
 
     console.log('Filtered and processed videos:', videos.length)
 
-    // Cache the filtered videos with a longer expiration time (7 days)
     if (videos.length > 0) {
       console.log('Caching new videos')
       const { error: insertError } = await supabase
@@ -123,7 +153,8 @@ serve(async (req) => {
         .upsert(videos.map(video => ({
           ...video,
           cached_at: new Date().toISOString(),
-          expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days from now
+          expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+          access_count: 1
         })))
 
       if (insertError) {
@@ -142,7 +173,7 @@ serve(async (req) => {
       .from('cached_videos')
       .select('*')
       .eq('category', 'Highly Rated')
-      .order('published_at', { ascending: false })
+      .order('access_count', { ascending: false })
       .limit(12)
 
     if (emergencyCachedVideos && emergencyCachedVideos.length > 0) {

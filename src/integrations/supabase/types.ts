@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       cached_videos: {
         Row: {
+          access_count: number | null
           cached_at: string | null
           category: string
           comments: number | null
@@ -24,6 +25,7 @@ export type Database = {
           views: number | null
         }
         Insert: {
+          access_count?: number | null
           cached_at?: string | null
           category: string
           comments?: number | null
@@ -37,6 +39,7 @@ export type Database = {
           views?: number | null
         }
         Update: {
+          access_count?: number | null
           cached_at?: string | null
           category?: string
           comments?: number | null
