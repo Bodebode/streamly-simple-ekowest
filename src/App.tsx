@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Watch2Earn from "./pages/Watch2Earn";
 import TechStack from "./pages/TechStack";
+import APIDocumentation from "./pages/APIDocumentation";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/watch2earn" element={<Watch2Earn />} />
               <Route path="/tech-stack" element={<TechStack />} />
+              <Route path="/api-documentation" element={<APIDocumentation />} />
               <Route
                 path="/"
                 element={
