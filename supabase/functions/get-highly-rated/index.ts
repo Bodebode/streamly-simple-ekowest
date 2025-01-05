@@ -1,36 +1,23 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { corsHeaders } from '../_shared/cors.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { fetchWithKeyRotation } from '../_shared/youtube.ts'
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from '@supabase/supabase-js';
+import { fetchWithKeyRotation } from '../_shared/youtube.ts';
 
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
-const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')
-
-const supabase = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!)
-
-const truncateTitle = (title: string): string => {
-  const slashIndex = title.search(/\/?[^/]*\//)
-  const separatorIndex = title.search(/[-|(]/)
-  
-  const cutoffIndex = (slashIndex !== -1 && (separatorIndex === -1 || slashIndex < separatorIndex))
-    ? slashIndex
-    : separatorIndex;
-
-  if (cutoffIndex !== -1) {
-    return title.substring(0, cutoffIndex).trim()
-  }
-  return title
-}
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    console.log('Starting get-highly-rated function execution')
-    
     // First try to get cached videos
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
     const { data: cachedVideos, error: cacheError } = await supabase
       .from('cached_videos')
       .select('*')
@@ -39,71 +26,53 @@ serve(async (req) => {
       .limit(12);
 
     if (cachedVideos && cachedVideos.length > 0) {
-      console.log('Using cached videos:', cachedVideos.length);
+      console.log('Using cached highly rated videos:', cachedVideos.length);
       return new Response(JSON.stringify(cachedVideos), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // If no cached videos, try YouTube API with key rotation
-    try {
-      console.log('Fetching from YouTube API with key rotation');
-      
-      const baseUrl = 'https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=Nollywood&type=video';
-      const response = await fetchWithKeyRotation(baseUrl);
-      const data = await response.json();
+    // If no cached videos, fetch from YouTube
+    console.log('No cached videos found, fetching from YouTube...');
+    const searchQuery = 'technology|programming|coding|tech|developer';
+    const url = `https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${searchQuery}&type=video&videoDuration=medium&videoEmbeddable=true&order=rating`;
 
-      if (data.error) {
-        console.error('YouTube API error:', data.error);
-        throw new Error('YouTube API error: ' + data.error.message);
-      }
+    const response = await fetchWithKeyRotation(url);
+    const data = await response.json();
 
-      if (!data.items || data.items.length === 0) {
-        console.error('No videos found in YouTube response');
-        throw new Error('No videos found in YouTube response');
-      }
-
-      const videos = data.items
-        .map((video: any) => {
-          const videoId = video.id.videoId;
-          return {
-            id: videoId,
-            title: truncateTitle(video.snippet.title),
-            image: video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url,
-            category: "Highly Rated",
-            video_id: videoId,
-            cached_at: new Date().toISOString(),
-            access_count: 1
-          }
-        })
-        .filter((video: any) => video)
-        .slice(0, 12);
-
-      // Cache the new videos
-      if (videos.length > 0) {
-        const { error: insertError } = await supabase
-          .from('cached_videos')
-          .upsert(videos);
-
-        if (insertError) {
-          console.error('Error caching videos:', insertError);
-        }
-      }
-
-      return new Response(JSON.stringify(videos), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    } catch (youtubeError) {
-      console.error('YouTube API or caching error:', youtubeError);
-      
-      // Return empty array with 200 status to prevent client errors
+    if (!data.items || data.items.length === 0) {
+      console.log('No videos found from YouTube API');
       return new Response(JSON.stringify([]), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    // Transform and cache the results
+    const videos = data.items.map((item: any, index: number) => ({
+      id: item.id.videoId,
+      title: item.snippet.title,
+      image: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url,
+      category: 'Highly Rated',
+      videoId: item.id.videoId,
+      cached_at: new Date().toISOString()
+    }));
+
+    // Cache the videos
+    const { error: insertError } = await supabase
+      .from('cached_videos')
+      .upsert(videos, { onConflict: 'id' });
+
+    if (insertError) {
+      console.error('Error caching videos:', insertError);
+    }
+
+    return new Response(JSON.stringify(videos), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   } catch (error) {
-    console.error('Fatal error in get-highly-rated function:', error);
-    return new Response(JSON.stringify([]), {
+    console.error('Error in get-highly-rated function:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
