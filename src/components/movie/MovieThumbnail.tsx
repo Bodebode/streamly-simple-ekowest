@@ -13,14 +13,28 @@ interface MovieThumbnailProps {
 export const MovieThumbnail = ({ title, image, category, videoId, isHovered, isVideoPlaying }: MovieThumbnailProps) => {
   const [thumbnailError, setThumbnailError] = useState(false);
   
+  // Array of fallback images for when the main thumbnail is missing
+  const fallbackImages = [
+    'https://images.unsplash.com/photo-1485846234645-a62644f84728',
+    'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b',
+    'https://images.unsplash.com/photo-1518770660439-4636190af475',
+    'https://images.unsplash.com/photo-1461749280684-dccba630e2f6'
+  ];
+  
+  // Get a consistent fallback image based on the movie title
+  const getFallbackImage = () => {
+    const index = title.length % fallbackImages.length;
+    return `${fallbackImages[index]}?auto=format&fit=crop&q=80`;
+  };
+  
   const thumbnailUrl = videoId 
     ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
-    : 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80';
+    : (image || getFallbackImage());
 
   return (
     <>
       <img
-        src={thumbnailError ? thumbnailUrl : (videoId ? thumbnailUrl : image)}
+        src={thumbnailError ? getFallbackImage() : thumbnailUrl}
         alt={title}
         className="w-full h-full object-cover rounded-lg"
         onError={() => setThumbnailError(true)}
