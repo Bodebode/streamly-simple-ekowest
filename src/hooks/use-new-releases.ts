@@ -94,9 +94,10 @@ export const useNewReleases = () => {
           console.log('Using cached new releases:', cachedVideos.length);
           // Update access count for retrieved videos
           const videoIds = cachedVideos.map(video => video.id);
-          for (const id of videoIds) {
-            await supabase.rpc('increment_access_count', { video_id: id });
-          }
+          await supabase
+            .from('cached_videos')
+            .update({ access_count: supabase.sql`access_count + 1` })
+            .in('id', videoIds);
 
           return cachedVideos;
         }

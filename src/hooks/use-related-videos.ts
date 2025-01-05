@@ -34,9 +34,10 @@ export const useRelatedVideos = (selectedVideoId: string | null, category: strin
           console.log('Using cached related videos:', cachedVideos.length);
           // Update access count for retrieved videos
           const videoIds = cachedVideos.map(video => video.id);
-          for (const id of videoIds) {
-            await supabase.rpc('increment_access_count', { video_id: id });
-          }
+          await supabase
+            .from('cached_videos')
+            .update({ access_count: supabase.sql`access_count + 1` })
+            .in('id', videoIds);
 
           const relatedMovies = cachedVideos.map(video => ({
             id: parseInt(video.id),

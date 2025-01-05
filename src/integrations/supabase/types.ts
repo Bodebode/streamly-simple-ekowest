@@ -80,12 +80,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      increment_access_count: {
-        Args: {
-          video_id: string
-        }
-        Returns: undefined
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
