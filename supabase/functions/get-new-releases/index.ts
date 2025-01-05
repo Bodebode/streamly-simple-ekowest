@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from '../_shared/cors.ts'
-import { getYouTubeApiKey } from '../_shared/youtube.ts'
+import { fetchWithKeyRotation } from '../_shared/youtube.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
@@ -40,25 +40,23 @@ serve(async (req) => {
     }
 
     try {
-      const apiKey = await getYouTubeApiKey();
-      console.log('Fetching from YouTube API');
+      console.log('Fetching from YouTube API with key rotation');
       
-      const searchResponse = await fetch(
-        `https://www.googleapis.com/youtube/v3/search?part=snippet&q=nollywood+full+movie&type=video&order=date&maxResults=50&key=${apiKey}`
-      );
-      const searchData = await searchResponse.json();
+      const baseUrl = 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=nollywood+full+movie&type=video&order=date&maxResults=50';
+      const response = await fetchWithKeyRotation(baseUrl);
+      const data = await response.json();
 
-      if (searchData.error) {
-        console.error('YouTube API error:', searchData.error);
-        throw new Error('YouTube API error: ' + searchData.error.message);
+      if (data.error) {
+        console.error('YouTube API error:', data.error);
+        throw new Error('YouTube API error: ' + data.error.message);
       }
 
-      if (!searchData.items || searchData.items.length === 0) {
+      if (!data.items || data.items.length === 0) {
         console.error('No videos found in YouTube response');
         throw new Error('No videos found in YouTube response');
       }
 
-      const videos = searchData.items
+      const videos = data.items
         .slice(0, 12)
         .map((video: any) => {
           const videoId = video.id.videoId;

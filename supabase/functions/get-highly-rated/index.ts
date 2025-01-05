@@ -1,7 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { corsHeaders } from '../_shared/cors.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { getYouTubeApiKey } from '../_shared/youtube.ts'
+import { fetchWithKeyRotation } from '../_shared/youtube.ts'
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')
@@ -45,13 +45,12 @@ serve(async (req) => {
       });
     }
 
-    // If no cached videos, try YouTube API
+    // If no cached videos, try YouTube API with key rotation
     try {
-      const apiKey = await getYouTubeApiKey();
-      console.log('Fetching from YouTube API');
+      console.log('Fetching from YouTube API with key rotation');
       
-      const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=Nollywood&type=video&key=${apiKey}`;
-      const response = await fetch(url);
+      const baseUrl = 'https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=Nollywood&type=video';
+      const response = await fetchWithKeyRotation(baseUrl);
       const data = await response.json();
 
       if (data.error) {
