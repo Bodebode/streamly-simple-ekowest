@@ -2,7 +2,14 @@ import { VideoPlayer } from './VideoPlayer';
 import { useState } from 'react';
 import { MovieCarousel } from './movie/MovieCarousel';
 import { useRelatedVideos } from '@/hooks/use-related-videos';
-import { Movie } from '@/types/movies';
+
+interface Movie {
+  id: number;
+  title: string;
+  image: string;
+  category: string;
+  videoId?: string;
+}
 
 interface CategoryRowProps {
   title: string;
@@ -13,9 +20,6 @@ interface CategoryRowProps {
 export const CategoryRow = ({ title, movies, updateHighlyRated }: CategoryRowProps) => {
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
   const { isLoading } = useRelatedVideos(selectedVideoId, title, movies);
-
-  console.log(`CategoryRow ${title} - Number of movies:`, movies?.length);
-  console.log(`CategoryRow ${title} - Movies data:`, movies);
 
   const handleCloseVideo = () => {
     setSelectedVideoId(null);
@@ -28,7 +32,7 @@ export const CategoryRow = ({ title, movies, updateHighlyRated }: CategoryRowPro
       </h2>
       <div className="relative px-4 md:px-16">
         <MovieCarousel
-          movies={movies || []}
+          movies={movies}
           onMovieSelect={setSelectedVideoId}
           isVideoPlaying={selectedVideoId !== null}
         />

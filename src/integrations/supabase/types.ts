@@ -9,48 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      cached_videos: {
-        Row: {
-          cached_at: string | null
-          category: string
-          comments: number | null
-          duration: number | null
-          expires_at: string | null
-          id: string
-          image: string
-          published_at: string | null
-          title: string
-          video_id: string
-          views: number | null
-        }
-        Insert: {
-          cached_at?: string | null
-          category: string
-          comments?: number | null
-          duration?: number | null
-          expires_at?: string | null
-          id: string
-          image: string
-          published_at?: string | null
-          title: string
-          video_id: string
-          views?: number | null
-        }
-        Update: {
-          cached_at?: string | null
-          category?: string
-          comments?: number | null
-          duration?: number | null
-          expires_at?: string | null
-          id?: string
-          image?: string
-          published_at?: string | null
-          title?: string
-          video_id?: string
-          views?: number | null
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           avatar_url: string | null

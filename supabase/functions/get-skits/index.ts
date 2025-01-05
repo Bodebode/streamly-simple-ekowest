@@ -1,13 +1,22 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from '../_shared/cors.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const API_KEY = Deno.env.get('YOUTUBE_API_KEY')
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
-const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')
 const BASE_URL = 'https://www.googleapis.com/youtube/v3'
 
-const supabase = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!)
+const truncateTitle = (title: string): string => {
+  // First, find the first occurrence of any separator
+  const separatorIndex = title.search(/[-|(#]/)
+  let processedTitle = separatorIndex !== -1 
+    ? title.substring(0, separatorIndex).trim()
+    : title.trim()
+    
+  // Then limit to 2-3 words
+  const words = processedTitle.split(' ')
+  processedTitle = words.slice(0, Math.min(3, words.length)).join(' ')
+  
+  return processedTitle
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -18,52 +27,26 @@ serve(async (req) => {
     const { min_length = 0, max_length = 42 } = await req.json()
     console.log('Received parameters:', { min_length, max_length })
 
-    console.log('Checking cache for skits...')
-    const { data: cachedVideos, error: cacheError } = await supabase
-      .from('cached_videos')
-      .select('*')
-      .eq('category', 'Skits')
-      .gt('expires_at', new Date().toISOString())
-      .order('views', { ascending: false })
-      .limit(12)
-
-    if (cacheError) {
-      console.error('Cache error:', cacheError)
-      throw cacheError
-    }
-
-    if (cachedVideos && cachedVideos.length > 0) {
-      console.log('Returning cached videos:', cachedVideos.length)
-      const formattedVideos = cachedVideos.map(video => ({
-        id: video.id,
-        title: video.title,
-        image: video.image,
-        category: video.category,
-        videoId: video.video_id
-      }));
-      return new Response(JSON.stringify(formattedVideos), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
-    }
-
-    console.log('Cache miss, fetching from YouTube API...')
+    // Search for Nollywood skits with order by date
     const searchResponse = await fetch(
       `${BASE_URL}/search?part=snippet&q=nollywood+skit+comedy&type=video&order=date&maxResults=50&key=${API_KEY}`
     )
     const searchData = await searchResponse.json()
 
-    if (searchData.error) {
-      console.error('YouTube API error:', searchData.error)
-      throw new Error(`YouTube API error: ${JSON.stringify(searchData.error)}`)
+    if (!searchData.items) {
+      throw new Error('No videos found')
     }
 
+    // Get video IDs
     const videoIds = searchData.items.map((item: any) => item.id.videoId).join(',')
 
+    // Get detailed video information including statistics and contentDetails
     const videoResponse = await fetch(
       `${BASE_URL}/videos?part=snippet,statistics,contentDetails&id=${videoIds}&key=${API_KEY}`
     )
     const videoData = await videoResponse.json()
 
+    // Filter and transform videos
     const videos = videoData.items
       .filter((video: any) => {
         const viewCount = parseInt(video.statistics.viewCount || '0')
@@ -84,35 +67,15 @@ serve(async (req) => {
 
     console.log(`Found ${videos.length} videos matching criteria`)
 
-    // Cache the videos with the correct structure
-    if (videos.length > 0) {
-      const videosToCache = videos.map((video: any) => ({
-        id: video.id,
-        title: video.title,
-        image: video.image,
-        category: video.category,
-        video_id: video.videoId,
-        views: 10000, // Default value since we filtered for this minimum
-        duration: 30, // Default reasonable duration
-        cached_at: new Date().toISOString(),
-        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours from now
-      }));
-
-      const { error: insertError } = await supabase
-        .from('cached_videos')
-        .upsert(videosToCache)
-
-      if (insertError) {
-        console.error('Cache insert error:', insertError)
-      }
-    }
-
     return new Response(JSON.stringify(videos), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   } catch (error) {
     console.error('Error:', error)
-    throw error
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
   }
 })
 
@@ -125,16 +88,4 @@ const convertDurationToMinutes = (duration: string): number => {
   const seconds = parseInt(match[3] || '0')
   
   return hours * 60 + minutes + Math.ceil(seconds / 60)
-}
-
-const truncateTitle = (title: string): string => {
-  const separatorIndex = title.search(/[-|(#]/)
-  let processedTitle = separatorIndex !== -1 
-    ? title.substring(0, separatorIndex).trim()
-    : title.trim()
-    
-  const words = processedTitle.split(' ')
-  processedTitle = words.slice(0, Math.min(3, words.length)).join(' ')
-  
-  return processedTitle
 }
