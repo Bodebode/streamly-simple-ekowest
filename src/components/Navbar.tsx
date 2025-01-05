@@ -1,4 +1,4 @@
-import { Globe, Star, Calendar, Film, Drum, Search, Mail, LogOut, Menu, Coins, FileText } from 'lucide-react';
+import { Globe, Star, Calendar, Film, Drum, Search, Mail, LogOut, Menu, Coins } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthProvider';
@@ -18,9 +18,11 @@ export const Navbar = () => {
 
   const handleNewReleaseClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    // If we're not on the home page, navigate to it first
     if (location.pathname !== '/') {
       navigate('/#new-release');
     } else {
+      // If we're already on the home page, just update the hash
       window.location.hash = 'new-release';
     }
   };
@@ -44,11 +46,6 @@ export const Navbar = () => {
           </button>
 
           <div className="hidden md:flex items-center space-x-6">
-            <Link to="/api-documentation" className="flex items-center space-x-2 text-koya-text hover:text-koya-accent transition-colors">
-              <FileText size={20} />
-              <span>API Docs</span>
-            </Link>
-            
             <Link to="/watch2earn" className="flex items-center space-x-2 text-koya-text hover:text-koya-accent transition-colors">
               <Coins size={20} />
               <span>Watch2Earn</span>
@@ -95,11 +92,6 @@ export const Navbar = () => {
         {isMobileMenuOpen && (
           <div className="md:hidden bg-koya-background border-t border-gray-700 py-4">
             <div className="flex flex-col space-y-4 px-4">
-              <Link to="/api-documentation" className="flex items-center space-x-2 text-koya-text hover:text-koya-accent transition-colors">
-                <FileText size={20} />
-                <span>API Docs</span>
-              </Link>
-              
               <Link to="/watch2earn" className="flex items-center space-x-2 text-koya-text hover:text-koya-accent transition-colors">
                 <Coins size={20} />
                 <span>Watch2Earn</span>
