@@ -9,7 +9,7 @@ import { MovieCard } from '../MovieCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Movie {
-  id: number;
+  id: number | string;
   title: string;
   image: string;
   category: string;
@@ -24,12 +24,23 @@ interface MovieCarouselProps {
 
 export const MovieCarousel = ({ movies, onMovieSelect, isVideoPlaying }: MovieCarouselProps) => {
   const isMobile = useIsMobile();
+  
+  console.log('MovieCarousel - Number of movies:', movies?.length);
+  console.log('MovieCarousel - Movies data:', movies);
+
+  if (!movies || movies.length === 0) {
+    return (
+      <div className="w-full h-[210px] md:h-[300px] flex items-center justify-center">
+        <p className="text-muted-foreground">No videos available</p>
+      </div>
+    );
+  }
 
   return (
     <Carousel
       opts={{
         align: "start",
-        loop: false,
+        loop: true,
       }}
       className="w-full"
     >
