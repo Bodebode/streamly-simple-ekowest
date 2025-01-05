@@ -2,14 +2,7 @@ import { VideoPlayer } from './VideoPlayer';
 import { useState } from 'react';
 import { MovieCarousel } from './movie/MovieCarousel';
 import { useRelatedVideos } from '@/hooks/use-related-videos';
-
-interface Movie {
-  id: number | string;
-  title: string;
-  image: string;
-  category: string;
-  videoId?: string;
-}
+import { Movie } from '@/types/movies';
 
 interface CategoryRowProps {
   title: string;

@@ -7,14 +7,7 @@ import {
 } from "@/components/ui/carousel";
 import { MovieCard } from '../MovieCard';
 import { useIsMobile } from '@/hooks/use-mobile';
-
-interface Movie {
-  id: number | string;
-  title: string;
-  image: string;
-  category: string;
-  videoId?: string;
-}
+import { Movie } from '@/types/movies';
 
 interface MovieCarouselProps {
   movies: Movie[];
