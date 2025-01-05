@@ -33,6 +33,10 @@ export const AuthUI = () => {
             },
           },
           style: {
+            button: {
+              borderRadius: '6px',
+              height: '40px',
+            },
             input: {
               color: 'white',
               backgroundColor: '#1f1f1f',
@@ -42,6 +46,12 @@ export const AuthUI = () => {
               color: 'white',
             },
             message: {
+              color: '#FF5733',
+            },
+            divider: {
+              background: '#333333',
+            },
+            anchor: {
               color: '#FF5733',
             },
           },
@@ -55,7 +65,7 @@ export const AuthUI = () => {
               password_label: 'Password',
               button_label: 'Sign In',
               loading_button_label: 'Signing in ...',
-              social_provider_text: 'Sign in with {{provider}}',
+              social_provider_text: 'Continue with {{provider}}',
               link_text: "Already have an account? Sign in",
             },
             sign_up: {
@@ -65,13 +75,12 @@ export const AuthUI = () => {
               password_label: 'Password',
               button_label: 'Sign Up',
               loading_button_label: 'Signing up ...',
-              social_provider_text: 'Sign up with {{provider}}',
+              social_provider_text: 'Continue with {{provider}}',
               link_text: "Don't have an account? Sign up",
             },
           },
         }}
-        showLinks={true}
-        providers={['google', 'twitter']}
+        providers={['google']}
         redirectTo={window.location.origin}
       />
       <div className="mt-6 text-center">
