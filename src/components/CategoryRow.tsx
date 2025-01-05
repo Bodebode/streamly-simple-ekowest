@@ -15,6 +15,7 @@ export const CategoryRow = ({ title, movies, updateHighlyRated }: CategoryRowPro
   const { isLoading } = useRelatedVideos(selectedVideoId, title, movies);
 
   console.log(`CategoryRow ${title} - Number of movies:`, movies?.length);
+  console.log(`CategoryRow ${title} - Movies data:`, movies);
 
   const handleCloseVideo = () => {
     setSelectedVideoId(null);

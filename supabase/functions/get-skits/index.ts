@@ -9,23 +9,6 @@ const BASE_URL = 'https://www.googleapis.com/youtube/v3'
 
 const supabase = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!)
 
-const MOCK_SKITS = [
-  {
-    id: "skit1",
-    title: "Funny Moments",
-    image: "https://img.youtube.com/vi/Yg9z8lv1k_4/maxresdefault.jpg",
-    category: "Skits",
-    videoId: "Yg9z8lv1k_4"
-  },
-  {
-    id: "skit2",
-    title: "Comedy Gold",
-    image: "https://img.youtube.com/vi/3aQFM1ZtMG0/maxresdefault.jpg",
-    category: "Skits",
-    videoId: "3aQFM1ZtMG0"
-  }
-];
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -51,7 +34,14 @@ serve(async (req) => {
 
     if (cachedVideos && cachedVideos.length > 0) {
       console.log('Returning cached videos:', cachedVideos.length)
-      return new Response(JSON.stringify(cachedVideos), {
+      const formattedVideos = cachedVideos.map(video => ({
+        id: video.id,
+        title: video.title,
+        image: video.image,
+        category: video.category,
+        videoId: video.video_id
+      }));
+      return new Response(JSON.stringify(formattedVideos), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
@@ -63,14 +53,8 @@ serve(async (req) => {
     const searchData = await searchResponse.json()
 
     if (searchData.error) {
-      console.error('YouTube API error:', JSON.stringify(searchData.error, null, 2))
-      if (searchData.error.code === 403 && searchData.error.errors?.[0]?.reason === 'quotaExceeded') {
-        console.log('Quota exceeded, returning mock data')
-        return new Response(JSON.stringify(MOCK_SKITS), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        })
-      }
-      throw new Error(`YouTube API error: ${JSON.stringify(searchData)}`)
+      console.error('YouTube API error:', searchData.error)
+      throw new Error(`YouTube API error: ${JSON.stringify(searchData.error)}`)
     }
 
     const videoIds = searchData.items.map((item: any) => item.id.videoId).join(',')
@@ -87,40 +71,48 @@ serve(async (req) => {
         return viewCount >= 10000 && durationMinutes <= max_length && durationMinutes >= min_length
       })
       .slice(0, 12)
-      .map((video: any) => ({
-        id: video.id,
-        title: truncateTitle(video.snippet.title),
-        image: video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url,
-        category: "Skits",
-        video_id: video.id,
-        views: parseInt(video.statistics.viewCount || '0'),
-        comments: parseInt(video.statistics.commentCount || '0'),
-        duration: convertDurationToMinutes(video.contentDetails.duration),
-        published_at: video.snippet.publishedAt,
-      }))
+      .map((video: any) => {
+        const videoId = video.id
+        return {
+          id: videoId,
+          title: truncateTitle(video.snippet.title),
+          image: video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url,
+          category: "Skits",
+          videoId: videoId,
+        }
+      })
 
-    // Cache the videos
+    console.log(`Found ${videos.length} videos matching criteria`)
+
+    // Cache the videos with the correct structure
     if (videos.length > 0) {
-      console.log('Caching videos:', videos.length)
+      const videosToCache = videos.map((video: any) => ({
+        id: video.id,
+        title: video.title,
+        image: video.image,
+        category: video.category,
+        video_id: video.videoId,
+        views: 10000, // Default value since we filtered for this minimum
+        duration: 30, // Default reasonable duration
+        cached_at: new Date().toISOString(),
+        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours from now
+      }));
+
       const { error: insertError } = await supabase
         .from('cached_videos')
-        .upsert(videos)
+        .upsert(videosToCache)
 
       if (insertError) {
         console.error('Cache insert error:', insertError)
       }
     }
 
-    console.log(`Found ${videos.length} videos matching criteria`)
-
     return new Response(JSON.stringify(videos), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   } catch (error) {
     console.error('Error:', error)
-    return new Response(JSON.stringify(MOCK_SKITS), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    throw error
   }
 })
 
