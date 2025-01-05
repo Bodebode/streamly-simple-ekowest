@@ -9,9 +9,18 @@ const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')
 const supabase = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!)
 
 const truncateTitle = (title: string): string => {
-  const separatorIndex = title.search(/[-|(|/]/)
-  if (separatorIndex !== -1) {
-    return title.substring(0, separatorIndex).trim()
+  // Look for any forward slash with optional characters around it
+  const slashIndex = title.search(/\/?[^/]*\//)
+  // Look for other common separators
+  const separatorIndex = title.search(/[-|(]/)
+  
+  // Use the earliest occurrence of either pattern
+  const cutoffIndex = (slashIndex !== -1 && (separatorIndex === -1 || slashIndex < separatorIndex))
+    ? slashIndex
+    : separatorIndex;
+
+  if (cutoffIndex !== -1) {
+    return title.substring(0, cutoffIndex).trim()
   }
   return title
 }
