@@ -56,32 +56,16 @@ export const AuthUI = () => {
             },
           },
         }}
-        localization={{
-          variables: {
-            sign_in: {
-              email_input_placeholder: 'Your email address',
-              password_input_placeholder: 'Your password',
-              email_label: 'Email',
-              password_label: 'Password',
-              button_label: 'Sign In',
-              loading_button_label: 'Signing in ...',
-              social_provider_text: 'Continue with {{provider}}',
-              link_text: "Already have an account? Sign in",
-            },
-            sign_up: {
-              email_input_placeholder: 'Your email address',
-              password_input_placeholder: 'Your password',
-              email_label: 'Email',
-              password_label: 'Password',
-              button_label: 'Sign Up',
-              loading_button_label: 'Signing up ...',
-              social_provider_text: 'Continue with {{provider}}',
-              link_text: "Don't have an account? Sign up",
-            },
-          },
-        }}
         providers={['google']}
-        redirectTo={window.location.origin}
+        redirectTo={`${window.location.origin}/auth/callback`}
+        onError={(error) => {
+          console.error('Auth error:', error);
+          toast({
+            variant: "destructive",
+            title: "Authentication Error",
+            description: error.message,
+          });
+        }}
       />
       <div className="mt-6 text-center">
         <div className="relative">
