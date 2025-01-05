@@ -95,6 +95,12 @@ export const useNewReleases = () => {
           return placeholderNewReleases;
         }
 
+        // If we have data but less than 12 items, pad with placeholders
+        if (data.length < 12) {
+          const neededPlaceholders = 12 - data.length;
+          return [...data, ...placeholderNewReleases.slice(0, neededPlaceholders)];
+        }
+
         return data;
       } catch (error) {
         console.error('Error in new releases query:', error);
