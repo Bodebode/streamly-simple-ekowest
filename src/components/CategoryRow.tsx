@@ -1,5 +1,5 @@
 import { VideoPlayer } from './VideoPlayer';
-import { useState } from 'react';
+import { useState, memo, useCallback } from 'react';
 import { MovieCarousel } from './movie/MovieCarousel';
 import { useRelatedVideos } from '@/hooks/use-related-videos';
 
@@ -17,13 +17,13 @@ interface CategoryRowProps {
   updateHighlyRated?: (movies: Movie[]) => void;
 }
 
-export const CategoryRow = ({ title, movies, updateHighlyRated }: CategoryRowProps) => {
+const CategoryRowComponent = ({ title, movies, updateHighlyRated }: CategoryRowProps) => {
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
   const { isLoading } = useRelatedVideos(selectedVideoId, title, movies);
 
-  const handleCloseVideo = () => {
+  const handleCloseVideo = useCallback(() => {
     setSelectedVideoId(null);
-  };
+  }, []);
 
   return (
     <div className="mb-8">
@@ -41,3 +41,5 @@ export const CategoryRow = ({ title, movies, updateHighlyRated }: CategoryRowPro
     </div>
   );
 };
+
+export const CategoryRow = memo(CategoryRowComponent);

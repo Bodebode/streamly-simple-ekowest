@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, memo, useCallback } from 'react';
 import { MoviePreview } from './movie/MoviePreview';
 import { MovieThumbnail } from './movie/MovieThumbnail';
 
@@ -11,28 +11,35 @@ interface MovieCardProps {
   isVideoPlaying: boolean;
 }
 
-export const MovieCard = ({ title, image, category, videoId, onMovieSelect, isVideoPlaying }: MovieCardProps) => {
+const MovieCardComponent = ({ title, image, category, videoId, onMovieSelect, isVideoPlaying }: MovieCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [showTitle, setShowTitle] = useState(true);
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
   const titleTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    return () => {
-      if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
-      if (titleTimerRef.current) clearTimeout(titleTimerRef.current);
-    };
+  const clearTimers = useCallback(() => {
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+    if (titleTimerRef.current) {
+      clearTimeout(titleTimerRef.current);
+      titleTimerRef.current = null;
+    }
   }, []);
+
+  useEffect(() => {
+    return clearTimers;
+  }, [clearTimers]);
 
   useEffect(() => {
     if (isVideoPlaying) {
       setShowPreview(false);
       setShowTitle(true);
-      if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
-      if (titleTimerRef.current) clearTimeout(titleTimerRef.current);
+      clearTimers();
     }
-  }, [isVideoPlaying]);
+  }, [isVideoPlaying, clearTimers]);
 
   useEffect(() => {
     if (showPreview) {
@@ -48,7 +55,7 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect, isVi
     };
   }, [showPreview]);
 
-  const handleMouseEnter = () => {
+  const handleMouseEnter = useCallback(() => {
     if (!isVideoPlaying) {
       setIsHovered(true);
       if (videoId) {
@@ -57,31 +64,23 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect, isVi
         }, 1400);
       }
     }
-  };
+  }, [isVideoPlaying, videoId]);
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     setIsHovered(false);
     setShowPreview(false);
     setShowTitle(true);
-    if (hoverTimerRef.current) {
-      clearTimeout(hoverTimerRef.current);
-      hoverTimerRef.current = null;
-    }
-    if (titleTimerRef.current) {
-      clearTimeout(titleTimerRef.current);
-      titleTimerRef.current = null;
-    }
-  };
+    clearTimers();
+  }, [clearTimers]);
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     if (videoId) {
       onMovieSelect(videoId);
       setShowPreview(false);
       setShowTitle(true);
-      if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
-      if (titleTimerRef.current) clearTimeout(titleTimerRef.current);
+      clearTimers();
     }
-  };
+  }, [videoId, onMovieSelect, clearTimers]);
 
   return (
     <div
@@ -111,3 +110,5 @@ export const MovieCard = ({ title, image, category, videoId, onMovieSelect, isVi
     </div>
   );
 };
+
+export const MovieCard = memo(MovieCardComponent);

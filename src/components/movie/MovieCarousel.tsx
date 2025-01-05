@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/carousel";
 import { MovieCard } from '../MovieCard';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { memo } from 'react';
 
 interface Movie {
   id: number;
@@ -22,7 +23,7 @@ interface MovieCarouselProps {
   isVideoPlaying: boolean;
 }
 
-export const MovieCarousel = ({ movies, onMovieSelect, isVideoPlaying }: MovieCarouselProps) => {
+const MovieCarouselComponent = ({ movies, onMovieSelect, isVideoPlaying }: MovieCarouselProps) => {
   const isMobile = useIsMobile();
 
   return (
@@ -59,3 +60,5 @@ export const MovieCarousel = ({ movies, onMovieSelect, isVideoPlaying }: MovieCa
     </Carousel>
   );
 };
+
+export const MovieCarousel = memo(MovieCarouselComponent);

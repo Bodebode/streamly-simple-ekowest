@@ -8,7 +8,7 @@ import { useHighlyRated } from '@/hooks/use-highly-rated';
 import { useNewReleases } from '@/hooks/use-new-releases';
 import { useSkits } from '@/hooks/use-skits';
 import { MOCK_MOVIES } from '../data/mockMovies';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, memo } from 'react';
 import { useLocation } from 'react-router-dom';
 
 const Index = () => {
@@ -26,7 +26,7 @@ const Index = () => {
         block: 'start'
       });
     }
-  }, [location.hash, newReleases]);
+  }, [location.hash]);
 
   return (
     <div className="min-h-screen">
@@ -68,4 +68,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default memo(Index);
