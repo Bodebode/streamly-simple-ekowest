@@ -24,15 +24,15 @@ serve(async (req) => {
   try {
     console.log('Starting get-highly-rated function execution')
     
-    // First, try to get cached videos
+    // First, try to get cached videos (including expired ones)
     const { data: cachedVideos, error: cacheError } = await supabase
       .from('cached_videos')
       .select('*')
       .eq('category', 'Highly Rated')
-      .gt('expires_at', new Date().toISOString())
       .order('published_at', { ascending: false })
       .limit(12)
 
+    // If we have any cached videos, return them immediately
     if (cachedVideos && cachedVideos.length > 0) {
       console.log('Returning cached videos:', cachedVideos.length)
       return new Response(JSON.stringify(cachedVideos), {
@@ -40,19 +40,24 @@ serve(async (req) => {
       })
     }
 
+    // Only try YouTube API if we have no cached data at all
     if (!YOUTUBE_API_KEY) {
       console.error('YouTube API key not configured')
       throw new Error('YouTube API key not configured')
     }
 
-    console.log('Fetching new videos from YouTube API')
+    console.log('No cached videos found, fetching from YouTube API')
     const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=Nollywood&type=video&key=${YOUTUBE_API_KEY}`
     const response = await fetch(url)
     const data = await response.json()
 
     if (data.error) {
       console.error('YouTube API error:', data.error)
-      throw new Error(data.error.message)
+      // If API fails and we have no cached data, return an empty array with an error message
+      return new Response(JSON.stringify([]), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 503
+      })
     }
 
     console.log('Successfully fetched videos from YouTube API')
@@ -101,7 +106,7 @@ serve(async (req) => {
 
     console.log('Filtered and processed videos:', videos.length)
 
-    // Cache the filtered videos
+    // Cache the filtered videos with a longer expiration time (7 days)
     if (videos.length > 0) {
       console.log('Caching new videos')
       const { error: insertError } = await supabase
@@ -109,7 +114,7 @@ serve(async (req) => {
         .upsert(videos.map(video => ({
           ...video,
           cached_at: new Date().toISOString(),
-          expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours from now
+          expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days from now
         })))
 
       if (insertError) {
