@@ -21,7 +21,15 @@ export const getYouTubeApiKey = async () => {
       if (data.error?.errors?.[0]?.reason === 'quotaExceeded') {
         console.log('Primary key quota exceeded, trying secondary key');
         if (SECONDARY_KEY) {
-          return SECONDARY_KEY;
+          // Test secondary key
+          const testSecondaryUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&key=${SECONDARY_KEY}`;
+          const secondaryResponse = await fetch(testSecondaryUrl);
+          const secondaryData = await secondaryResponse.json();
+          
+          if (!secondaryData.error) {
+            console.log('Using secondary API key');
+            return SECONDARY_KEY;
+          }
         }
       }
     } catch (error) {
@@ -29,7 +37,7 @@ export const getYouTubeApiKey = async () => {
     }
   }
 
-  // Fallback to secondary key
+  // Fallback to secondary key without testing if primary key failed
   if (SECONDARY_KEY) {
     console.log('Using secondary API key');
     return SECONDARY_KEY;

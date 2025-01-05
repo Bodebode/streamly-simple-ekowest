@@ -20,10 +20,9 @@ export const useHighlyRated = () => {
           console.log('Using cached highly rated videos:', cachedVideos.length);
           // Update access count for retrieved videos
           const videoIds = cachedVideos.map(video => video.id);
-          await supabase
-            .from('cached_videos')
-            .update({ access_count: supabase.sql`access_count + 1` })
-            .in('id', videoIds);
+          for (const id of videoIds) {
+            await supabase.rpc('increment_access_count', { video_id: id });
+          }
 
           return cachedVideos;
         }
