@@ -21,6 +21,36 @@ export const useRelatedVideos = (selectedVideoId: string | null, category: strin
         setIsLoading(true);
         console.log('Fetching related videos for:', videoId);
         
+        // First try to get cached related videos
+        const { data: cachedVideos, error: cacheError } = await supabase
+          .from('cached_videos')
+          .select('*')
+          .eq('category', 'Related')
+          .neq('video_id', videoId)
+          .order('access_count', { ascending: false })
+          .limit(7);
+
+        if (cachedVideos && cachedVideos.length >= 5) {
+          console.log('Using cached related videos:', cachedVideos.length);
+          // Update access count for retrieved videos
+          const videoIds = cachedVideos.map(video => video.id);
+          await supabase
+            .from('cached_videos')
+            .update({ access_count: supabase.sql`access_count + 1` })
+            .in('id', videoIds);
+
+          const relatedMovies = cachedVideos.map(video => ({
+            id: parseInt(video.id),
+            title: video.title,
+            image: video.image,
+            category: 'Comedy',
+            videoId: video.video_id
+          }));
+
+          movies.push(...relatedMovies);
+          return;
+        }
+
         const { data, error } = await supabase.functions.invoke('get-related-videos', {
           body: { videoId }
         });

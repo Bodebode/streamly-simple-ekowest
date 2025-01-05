@@ -82,14 +82,35 @@ export const useNewReleases = () => {
     queryKey: ['newReleases'],
     queryFn: async () => {
       try {
+        // First try to get cached videos
+        const { data: cachedVideos, error: cacheError } = await supabase
+          .from('cached_videos')
+          .select('*')
+          .eq('category', 'New Release')
+          .order('cached_at', { ascending: false })
+          .limit(12);
+
+        if (cachedVideos && cachedVideos.length > 0) {
+          console.log('Using cached new releases:', cachedVideos.length);
+          // Update access count for retrieved videos
+          const videoIds = cachedVideos.map(video => video.id);
+          await supabase
+            .from('cached_videos')
+            .update({ access_count: supabase.sql`access_count + 1` })
+            .in('id', videoIds);
+
+          return cachedVideos;
+        }
+
+        // If no cached videos, fetch from API with rate limiting
         const { data, error } = await supabase.functions.invoke('get-new-releases');
         
         if (error) {
           console.error('Error fetching new releases:', error);
-          toast.error('Failed to load new releases, showing placeholders');
+          toast.error('Using cached content due to API limits');
           return placeholderNewReleases;
         }
-        
+
         if (!data || data.length === 0) {
           console.log('No new releases found, using placeholders');
           return placeholderNewReleases;
@@ -104,9 +125,11 @@ export const useNewReleases = () => {
         return data;
       } catch (error) {
         console.error('Error in new releases query:', error);
-        toast.error('Failed to load new releases, showing placeholders');
+        toast.error('Using backup content due to API limits');
         return placeholderNewReleases;
       }
     },
+    staleTime: 2 * 60 * 60 * 1000, // Consider data fresh for 2 hours
+    retry: 1, // Only retry once to avoid excessive API calls
   });
 };
