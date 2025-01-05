@@ -22,6 +22,8 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Starting get-highly-rated function execution')
+    
     // First, try to get cached videos
     const { data: cachedVideos, error: cacheError } = await supabase
       .from('cached_videos')
@@ -39,9 +41,11 @@ serve(async (req) => {
     }
 
     if (!YOUTUBE_API_KEY) {
+      console.error('YouTube API key not configured')
       throw new Error('YouTube API key not configured')
     }
 
+    console.log('Fetching new videos from YouTube API')
     const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=Nollywood&type=video&key=${YOUTUBE_API_KEY}`
     const response = await fetch(url)
     const data = await response.json()
@@ -50,6 +54,8 @@ serve(async (req) => {
       console.error('YouTube API error:', data.error)
       throw new Error(data.error.message)
     }
+
+    console.log('Successfully fetched videos from YouTube API')
 
     const videoDetailsPromises = data.items.map(async (video: any) => {
       const videoId = video.id.videoId
@@ -93,8 +99,11 @@ serve(async (req) => {
       .sort((a, b) => new Date(b!.published_at).getTime() - new Date(a!.published_at).getTime())
       .slice(0, 12)
 
+    console.log('Filtered and processed videos:', videos.length)
+
     // Cache the filtered videos
     if (videos.length > 0) {
+      console.log('Caching new videos')
       const { error: insertError } = await supabase
         .from('cached_videos')
         .upsert(videos.map(video => ({
