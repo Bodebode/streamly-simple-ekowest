@@ -21,6 +21,15 @@ export const useHighlyRated = () => {
           return MOCK_MOVIES.highlyRated;
         }
 
+        // Increment access count for cached videos
+        if (Array.isArray(data)) {
+          data.forEach(async (video) => {
+            if (video.id) {
+              await supabase.rpc('increment_access_count', { video_id: video.id });
+            }
+          });
+        }
+
         return data;
       } catch (error) {
         console.error('Error in highly rated query:', error);

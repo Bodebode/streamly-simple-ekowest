@@ -19,7 +19,10 @@ export type Database = {
           expires_at: string | null
           id: string
           image: string
+          last_error: string | null
+          last_retry: string | null
           published_at: string | null
+          retry_count: number | null
           title: string
           video_id: string
           views: number | null
@@ -33,7 +36,10 @@ export type Database = {
           expires_at?: string | null
           id: string
           image: string
+          last_error?: string | null
+          last_retry?: string | null
           published_at?: string | null
+          retry_count?: number | null
           title: string
           video_id: string
           views?: number | null
@@ -47,7 +53,10 @@ export type Database = {
           expires_at?: string | null
           id?: string
           image?: string
+          last_error?: string | null
+          last_retry?: string | null
           published_at?: string | null
+          retry_count?: number | null
           title?: string
           video_id?: string
           views?: number | null
