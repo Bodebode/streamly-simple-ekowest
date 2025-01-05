@@ -1,35 +1,34 @@
-import { useQuery } from '@tanstack/react-query'
-import { supabase } from '@/integrations/supabase/client'
-import { toast } from 'sonner'
-
-interface HighlyRatedVideo {
-  id: number
-  title: string
-  image: string
-  category: string
-  videoId: string
-  views: number
-  comments: number
-  publishedAt: string
-}
-
-const fetchHighlyRatedVideos = async (): Promise<HighlyRatedVideo[]> => {
-  const { data, error } = await supabase.functions.invoke('get-highly-rated')
-  
-  if (error) {
-    console.error('Error fetching highly rated videos:', error)
-    toast.error('Failed to fetch highly rated videos')
-    throw error
-  }
-
-  return data
-}
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { MOCK_MOVIES } from '@/data/mockMovies';
 
 export const useHighlyRated = () => {
   return useQuery({
-    queryKey: ['highly-rated'],
-    queryFn: fetchHighlyRatedVideos,
-    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+    queryKey: ['highlyRated'],
+    queryFn: async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('get-highly-rated');
+        
+        if (error) {
+          console.error('Error fetching highly rated videos:', error);
+          toast.error('Failed to load videos, showing placeholders');
+          return MOCK_MOVIES.highlyRated;
+        }
+        
+        if (!data || data.length === 0) {
+          console.log('No highly rated videos found, using placeholders');
+          return MOCK_MOVIES.highlyRated;
+        }
+
+        return data;
+      } catch (error) {
+        console.error('Error in highly rated query:', error);
+        toast.error('Failed to load videos, showing placeholders');
+        return MOCK_MOVIES.highlyRated;
+      }
+    },
     retry: 2,
-  })
-}
+    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+  });
+};
