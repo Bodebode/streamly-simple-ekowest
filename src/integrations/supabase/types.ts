@@ -147,6 +147,10 @@ export type Database = {
         }
         Returns: Json
       }
+      your_function_name: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

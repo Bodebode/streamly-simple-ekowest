@@ -40,8 +40,8 @@ export const useYorubaMovies = () => {
             }
             return true;
           })
-          .map(video => ({
-            id: parseInt(video.id),
+          .map((video, index) => ({
+            id: index + 1, // Ensure unique IDs
             title: video.title,
             image: video.image,
             category: video.category,
