@@ -64,14 +64,15 @@ serve(async (req) => {
 
     // Search for Nollywood skits
     console.log('Fetching new skits from YouTube API')
-    const searchResponse = await fetch(
-      `${BASE_URL}/search?part=snippet&q=nollywood+skit+comedy&type=video&maxResults=50&key=${API_KEY}`
-    )
+    const searchUrl = `${BASE_URL}/search?part=snippet&q=nollywood+skit+comedy&type=video&maxResults=50&key=${API_KEY}`
+    console.log('Search URL:', searchUrl)
+    
+    const searchResponse = await fetch(searchUrl)
     
     if (!searchResponse.ok) {
       const errorText = await searchResponse.text()
       console.error('YouTube search API error:', errorText)
-      throw new Error('Failed to fetch from YouTube API')
+      throw new Error(`YouTube search API error: ${errorText}`)
     }
 
     const searchData = await searchResponse.json()
@@ -88,14 +89,15 @@ serve(async (req) => {
 
     // Get detailed video information
     console.log('Fetching video details')
-    const videoResponse = await fetch(
-      `${BASE_URL}/videos?part=snippet,statistics,contentDetails&id=${videoIds}&key=${API_KEY}`
-    )
+    const videoUrl = `${BASE_URL}/videos?part=snippet,statistics,contentDetails&id=${videoIds}&key=${API_KEY}`
+    console.log('Video URL:', videoUrl)
+    
+    const videoResponse = await fetch(videoUrl)
 
     if (!videoResponse.ok) {
       const errorText = await videoResponse.text()
       console.error('YouTube videos API error:', errorText)
-      throw new Error('Failed to fetch video details')
+      throw new Error(`YouTube videos API error: ${errorText}`)
     }
 
     const videoData = await videoResponse.json()
