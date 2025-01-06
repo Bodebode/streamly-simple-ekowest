@@ -10,6 +10,17 @@ import { useSkits } from '@/hooks/use-skits';
 import { MOCK_MOVIES } from '../data/mockMovies';
 import { useEffect, useRef, memo } from 'react';
 import { useLocation } from 'react-router-dom';
+import { Movie, CachedMovie } from '../types/movies';
+
+const transformCachedToMovie = (cachedMovies: CachedMovie[]): Movie[] => {
+  return cachedMovies.map(movie => ({
+    id: parseInt(movie.id),
+    title: movie.title,
+    image: movie.image,
+    category: movie.category,
+    videoId: movie.videoId
+  }));
+};
 
 const Index = () => {
   const { theme, setTheme } = useTheme();
@@ -49,17 +60,17 @@ const Index = () => {
           <CategoryRow title="Trending Now" movies={MOCK_MOVIES.trending} />
           <CategoryRow 
             title="Highly Rated" 
-            movies={highlyRatedVideos || MOCK_MOVIES.highlyRated}
+            movies={highlyRatedVideos ? transformCachedToMovie(highlyRatedVideos as CachedMovie[]) : MOCK_MOVIES.highlyRated}
           />
           <CategoryRow title="Yoruba Movies" movies={MOCK_MOVIES.yoruba} />
           <CategoryRow 
             title="Skits" 
-            movies={skits || MOCK_MOVIES.skits} 
+            movies={skits ? transformCachedToMovie(skits as CachedMovie[]) : MOCK_MOVIES.skits}
           />
           <div ref={newReleaseRef} id="new-release">
             <CategoryRow 
               title="New Release" 
-              movies={newReleases || []}
+              movies={newReleases ? transformCachedToMovie(newReleases as CachedMovie[]) : []}
             />
           </div>
         </div>
