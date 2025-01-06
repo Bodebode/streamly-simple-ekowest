@@ -1,18 +1,21 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const supabase = createClient(
-  Deno.env.get('SUPABASE_URL') ?? '',
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-)
-
 const API_KEY = Deno.env.get('YOUTUBE_API_KEY')
 const BASE_URL = 'https://www.googleapis.com/youtube/v3'
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+
+if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+  throw new Error('Missing Supabase environment variables')
+}
+
+const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
 const truncateTitle = (title: string): string => {
   const separatorIndex = title.search(/[-|(#]/)
@@ -35,12 +38,13 @@ serve(async (req) => {
 
   try {
     if (!API_KEY) {
+      console.error('YouTube API key not configured')
       throw new Error('YouTube API key not configured')
     }
 
     // First check cache
     console.log('Checking cache for skits videos')
-    const { data: cachedVideos, error: cacheError } = await supabase
+    const { data: cachedVideos, error: cacheError } = await supabaseAdmin
       .from('cached_videos')
       .select('*')
       .eq('category', 'Skits')
@@ -104,7 +108,7 @@ serve(async (req) => {
         title: truncateTitle(video.snippet.title),
         image: video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url,
         category: "Skits",
-        video_id: video.id,
+        videoId: video.id,
         views: parseInt(video.statistics.viewCount),
         comments: parseInt(video.statistics.commentCount),
         cached_at: new Date().toISOString(),
@@ -114,12 +118,12 @@ serve(async (req) => {
     // Cache the results
     if (videos.length > 0) {
       console.log('Caching new videos:', videos.length)
-      const { error: cacheError } = await supabase
+      const { error: insertError } = await supabaseAdmin
         .from('cached_videos')
         .upsert(videos)
 
-      if (cacheError) {
-        console.error('Error caching videos:', cacheError)
+      if (insertError) {
+        console.error('Error caching videos:', insertError)
       }
     }
 
