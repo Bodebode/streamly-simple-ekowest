@@ -11,7 +11,7 @@ export interface CachedMovie {
   title: string;
   image: string;
   category: string;
-  videoId?: string;
+  video_id?: string;
   access_count: number;
   cached_at: string;
   expires_at: string;

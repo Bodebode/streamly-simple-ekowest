@@ -18,7 +18,7 @@ const transformCachedToMovie = (cachedMovies: CachedMovie[]): Movie[] => {
     title: movie.title,
     image: movie.image,
     category: movie.category,
-    videoId: movie.videoId
+    videoId: movie.video_id // Map video_id to videoId for consistency
   }));
 };
 
