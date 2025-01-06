@@ -9,7 +9,7 @@ import { useNewReleases } from '@/hooks/use-new-releases';
 import { useSkits } from '@/hooks/use-skits';
 import { useYorubaMovies } from '@/hooks/use-yoruba';
 import { MOCK_MOVIES } from '../data/mockMovies';
-import { useEffect, useRef, memo } from 'react';
+import { useEffect, useRef, memo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Movie } from '../types/movies';
 import { supabase } from '@/integrations/supabase/client';
@@ -33,6 +33,7 @@ const Index = () => {
   const { data: yorubaMovies, isLoading: isLoadingYoruba, refetch: refetchYoruba } = useYorubaMovies();
   const newReleaseRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
+  const [isPopulating, setIsPopulating] = useState(false);
 
   useEffect(() => {
     if (location.hash === '#new-release' && newReleaseRef.current) {
@@ -44,22 +45,28 @@ const Index = () => {
   }, [location.hash]);
 
   const populateYorubaMovies = async () => {
+    if (isPopulating) return;
+    
     try {
-      toast.loading('Fetching Yoruba movies from YouTube...');
+      setIsPopulating(true);
+      const toastId = toast.loading('Fetching Yoruba movies from YouTube... This may take up to 30 seconds.');
+      
       const { data, error } = await supabase.functions.invoke('populate-yoruba');
       
       if (error) {
         console.error('Error populating Yoruba movies:', error);
-        toast.error('Failed to fetch Yoruba movies');
+        toast.error('Failed to fetch Yoruba movies', { id: toastId });
         return;
       }
 
       console.log('Population response:', data);
-      toast.success('Successfully fetched Yoruba movies');
+      toast.success('Successfully fetched Yoruba movies', { id: toastId });
       refetchYoruba();
     } catch (error) {
       console.error('Error:', error);
       toast.error('Failed to fetch Yoruba movies');
+    } finally {
+      setIsPopulating(false);
     }
   };
 
@@ -71,6 +78,7 @@ const Index = () => {
           variant="outline"
           size="icon"
           onClick={populateYorubaMovies}
+          disabled={isPopulating}
           className="rounded-full w-10 h-10 bg-white dark:bg-koya-card"
         >
           Y
