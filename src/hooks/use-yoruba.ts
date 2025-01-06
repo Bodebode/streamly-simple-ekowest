@@ -9,6 +9,7 @@ export const useYorubaMovies = () => {
     queryKey: ['yorubaMovies'],
     queryFn: async () => {
       try {
+        console.log('Fetching Yoruba movies...');
         const { data, error } = await supabase
           .from('cached_videos')
           .select('*')
@@ -25,18 +26,23 @@ export const useYorubaMovies = () => {
         }
         
         if (!data || data.length === 0) {
-          console.log('No Yoruba movies found, using placeholders');
+          console.log('No Yoruba movies found in database, using mock data');
           return MOCK_MOVIES.yoruba;
         }
+
+        console.log('Found Yoruba movies:', data);
 
         // Filter videos that meet the criteria
         const validVideos = data.filter(video => {
           const criteria = video.criteria_met as { meets_criteria: boolean } | null;
+          if (!criteria?.meets_criteria) {
+            console.log('Video failed criteria:', video.title);
+          }
           return criteria?.meets_criteria === true;
         });
 
         if (validVideos.length === 0) {
-          console.log('No valid Yoruba movies found, using placeholders');
+          console.log('No valid Yoruba movies found after criteria check, using mock data');
           return MOCK_MOVIES.yoruba;
         }
 
