@@ -14,6 +14,7 @@ import { useLocation } from 'react-router-dom';
 import { Movie } from '../types/movies';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 
 const transformCachedToMovie = (movies: any[]): Movie[] => {
   return movies.map(movie => ({
@@ -34,6 +35,7 @@ const Index = () => {
   const newReleaseRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const [isPopulating, setIsPopulating] = useState(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (location.hash === '#new-release' && newReleaseRef.current) {
@@ -61,7 +63,11 @@ const Index = () => {
 
       console.log('Population response:', data);
       toast.success('Successfully fetched Yoruba movies', { id: toastId });
-      refetchYoruba();
+      
+      // Invalidate and refetch the Yoruba movies query
+      await queryClient.invalidateQueries({ queryKey: ['yorubaMovies'] });
+      await refetchYoruba();
+      
     } catch (error) {
       console.error('Error:', error);
       toast.error('Failed to fetch Yoruba movies');
@@ -104,7 +110,7 @@ const Index = () => {
           />
           <CategoryRow 
             title="Yoruba Movies" 
-            movies={yorubaMovies ? transformCachedToMovie(yorubaMovies) : MOCK_MOVIES.yoruba}
+            movies={yorubaMovies || MOCK_MOVIES.yoruba}
           />
           <CategoryRow 
             title="Skits" 

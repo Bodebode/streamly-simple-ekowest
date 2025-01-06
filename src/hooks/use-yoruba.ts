@@ -9,7 +9,7 @@ export const useYorubaMovies = () => {
     queryKey: ['yorubaMovies'],
     queryFn: async () => {
       try {
-        console.log('Fetching Yoruba movies...');
+        console.log('Fetching Yoruba movies from database...');
         const { data, error } = await supabase
           .from('cached_videos')
           .select('*')
@@ -25,20 +25,21 @@ export const useYorubaMovies = () => {
           return MOCK_MOVIES.yoruba;
         }
         
+        console.log('Found Yoruba movies in database:', data);
+        
         if (!data || data.length === 0) {
           console.log('No Yoruba movies found in database, using mock data');
           return MOCK_MOVIES.yoruba;
         }
-
-        console.log('Found Yoruba movies:', data);
 
         // Filter videos that meet the criteria
         const validVideos = data.filter(video => {
           const criteria = video.criteria_met as { meets_criteria: boolean } | null;
           if (!criteria?.meets_criteria) {
             console.log('Video failed criteria:', video.title);
+            return false;
           }
-          return criteria?.meets_criteria === true;
+          return true;
         });
 
         if (validVideos.length === 0) {
@@ -46,20 +47,23 @@ export const useYorubaMovies = () => {
           return MOCK_MOVIES.yoruba;
         }
 
-        // Increment access count for retrieved videos
-        validVideos.forEach(video => {
-          supabase.rpc('increment_access_count', { video_id: video.id });
-        });
+        // Transform the data to match the Movie type
+        return validVideos.map(video => ({
+          id: parseInt(video.id),
+          title: video.title,
+          image: video.image,
+          category: video.category,
+          videoId: video.video_id
+        }));
 
-        return validVideos;
       } catch (error) {
         console.error('Error in Yoruba movies query:', error);
         toast.error('Failed to load Yoruba movies');
         return MOCK_MOVIES.yoruba;
       }
     },
-    staleTime: 1000 * 60 * 15, // Consider data fresh for 15 minutes
-    gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
+    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+    gcTime: 1000 * 60 * 10, // Keep in cache for 10 minutes
     retry: 1,
   });
 };
