@@ -16,66 +16,90 @@ const truncateTitle = (title: string): string => {
   return title
 }
 
-const convertDurationToMinutes = (duration: string): number => {
-  const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/)
-  if (!match) return 0
-  
-  const hours = parseInt(match[1] || '0')
-  const minutes = parseInt(match[2] || '0')
-  const seconds = parseInt(match[3] || '0')
-  
-  return hours * 60 + minutes + Math.ceil(seconds / 60)
-}
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
+    // First check cache
+    const { data: cachedVideos } = await supabase.from('cached_videos')
+      .select('*')
+      .eq('category', 'New Release')
+      .gt('expires_at', new Date().toISOString())
+      .limit(12)
+
+    if (cachedVideos && cachedVideos.length > 0) {
+      console.log('Returning cached new releases')
+      return new Response(JSON.stringify(cachedVideos), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
     // Search for Nollywood movies
     const searchResponse = await fetch(
       `${BASE_URL}/search?part=snippet&q=nollywood+full+movie&type=video&order=date&maxResults=50&key=${API_KEY}`
     )
+    
+    if (!searchResponse.ok) {
+      console.error('YouTube search API error:', await searchResponse.text())
+      throw new Error('Failed to fetch from YouTube API')
+    }
+
     const searchData = await searchResponse.json()
 
-    if (!searchData.items) {
-      throw new Error('No videos found')
+    if (!searchData.items || searchData.items.length === 0) {
+      console.log('No videos found in YouTube search')
+      return new Response(JSON.stringify([]), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
     }
 
     // Get video IDs
     const videoIds = searchData.items.map((item: any) => item.id.videoId).join(',')
 
-    // Get detailed video information including statistics and contentDetails
+    // Get detailed video information
     const videoResponse = await fetch(
       `${BASE_URL}/videos?part=snippet,statistics,contentDetails&id=${videoIds}&key=${API_KEY}`
     )
+
+    if (!videoResponse.ok) {
+      console.error('YouTube videos API error:', await videoResponse.text())
+      throw new Error('Failed to fetch video details')
+    }
+
     const videoData = await videoResponse.json()
 
-    // Filter and transform videos
+    // Transform videos
     const videos = videoData.items
-      .filter((video: any) => {
-        const commentCount = parseInt(video.statistics.commentCount || '0')
-        const durationMinutes = convertDurationToMinutes(video.contentDetails.duration)
-        return commentCount >= 12 && durationMinutes >= 40
-      })
       .slice(0, 12)
-      .map((video: any) => {
-        const videoId = video.id
-        return {
-          id: videoId,
-          title: truncateTitle(video.snippet.title),
-          image: video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url,
-          category: "New Release",
-          videoId: videoId,
-        }
-      })
+      .map((video: any) => ({
+        id: video.id,
+        title: truncateTitle(video.snippet.title),
+        image: video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url,
+        category: "New Release",
+        videoId: video.id,
+      }))
+
+    // Cache the results
+    if (videos.length > 0) {
+      const { error: cacheError } = await supabase.from('cached_videos')
+        .upsert(videos.map(video => ({
+          ...video,
+          cached_at: new Date().toISOString(),
+          expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours
+        })))
+
+      if (cacheError) {
+        console.error('Error caching videos:', cacheError)
+      }
+    }
 
     return new Response(JSON.stringify(videos), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error in get-new-releases function:', error)
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

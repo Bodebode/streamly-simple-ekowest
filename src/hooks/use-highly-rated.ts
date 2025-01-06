@@ -29,7 +29,7 @@ export const useHighlyRated = () => {
       }
     },
     staleTime: 1000 * 60 * 30, // Consider data fresh for 30 minutes
-    cacheTime: 1000 * 60 * 60, // Keep in cache for 1 hour
+    gcTime: 1000 * 60 * 60, // Keep in cache for 1 hour (replaces old cacheTime)
     retry: 1, // Only retry once to avoid excessive API calls
   });
 };
