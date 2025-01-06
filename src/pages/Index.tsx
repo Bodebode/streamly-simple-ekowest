@@ -12,19 +12,10 @@ import { useEffect, useRef, memo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Movie, CachedMovie } from '../types/movies';
 
-const truncateTitle = (title: string): string => {
-  const slashIndex = title.search(/\/?[^/]*\//)
-  const separatorIndex = title.search(/[-|(]/)
-  const cutoffIndex = (slashIndex !== -1 && (separatorIndex === -1 || slashIndex < separatorIndex))
-    ? slashIndex
-    : separatorIndex;
-  return cutoffIndex !== -1 ? title.substring(0, cutoffIndex).trim() : title;
-};
-
 const transformCachedToMovie = (cachedMovies: CachedMovie[]): Movie[] => {
   return cachedMovies.map(movie => ({
     id: parseInt(movie.id),
-    title: truncateTitle(movie.title),
+    title: movie.title,
     image: movie.image,
     category: movie.category,
     videoId: movie.videoId
@@ -48,17 +39,6 @@ const Index = () => {
     }
   }, [location.hash]);
 
-  // Transform mock movies to also have truncated titles
-  const transformedTrending = MOCK_MOVIES.trending.map(movie => ({
-    ...movie,
-    title: truncateTitle(movie.title)
-  }));
-
-  const transformedYoruba = MOCK_MOVIES.yoruba.map(movie => ({
-    ...movie,
-    title: truncateTitle(movie.title)
-  }));
-
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -77,21 +57,15 @@ const Index = () => {
       <div className="pt-16">
         <Hero />
         <div className="pb-8">
-          <CategoryRow title="Trending Now" movies={transformedTrending} />
+          <CategoryRow title="Trending Now" movies={MOCK_MOVIES.trending} />
           <CategoryRow 
             title="Highly Rated" 
-            movies={highlyRatedVideos ? transformCachedToMovie(highlyRatedVideos as CachedMovie[]) : MOCK_MOVIES.highlyRated.map(movie => ({
-              ...movie,
-              title: truncateTitle(movie.title)
-            }))}
+            movies={highlyRatedVideos ? transformCachedToMovie(highlyRatedVideos as CachedMovie[]) : MOCK_MOVIES.highlyRated}
           />
-          <CategoryRow title="Yoruba Movies" movies={transformedYoruba} />
+          <CategoryRow title="Yoruba Movies" movies={MOCK_MOVIES.yoruba} />
           <CategoryRow 
             title="Skits" 
-            movies={skits ? transformCachedToMovie(skits as CachedMovie[]) : MOCK_MOVIES.skits.map(movie => ({
-              ...movie,
-              title: truncateTitle(movie.title)
-            }))}
+            movies={skits ? transformCachedToMovie(skits as CachedMovie[]) : MOCK_MOVIES.skits}
           />
           <div ref={newReleaseRef} id="new-release">
             <CategoryRow 
