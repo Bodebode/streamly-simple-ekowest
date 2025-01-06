@@ -21,10 +21,3 @@ export interface CachedMovie {
   comments: number;
   duration?: number;
 }
-
-export interface MovieData {
-  trending: Movie[];
-  highlyRated: Movie[];
-  yoruba: Movie[];
-  skits: Movie[];
-}
