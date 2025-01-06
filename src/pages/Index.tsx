@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useHighlyRated } from '@/hooks/use-highly-rated';
 import { useNewReleases } from '@/hooks/use-new-releases';
 import { useSkits } from '@/hooks/use-skits';
+import { useYorubaMovies } from '@/hooks/use-yoruba';
 import { MOCK_MOVIES } from '../data/mockMovies';
 import { useEffect, useRef, memo } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -18,7 +19,7 @@ const transformCachedToMovie = (cachedMovies: CachedMovie[]): Movie[] => {
     title: movie.title,
     image: movie.image,
     category: movie.category,
-    videoId: movie.video_id // Map video_id to videoId for consistency
+    videoId: movie.video_id
   }));
 };
 
@@ -27,6 +28,7 @@ const Index = () => {
   const { data: highlyRatedVideos, isLoading: isLoadingHighlyRated } = useHighlyRated();
   const { data: newReleases, isLoading: isLoadingNewReleases } = useNewReleases();
   const { data: skits, isLoading: isLoadingSkits } = useSkits();
+  const { data: yorubaMovies, isLoading: isLoadingYoruba } = useYorubaMovies();
   const newReleaseRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
 
@@ -62,7 +64,10 @@ const Index = () => {
             title="Highly Rated" 
             movies={highlyRatedVideos ? transformCachedToMovie(highlyRatedVideos as CachedMovie[]) : MOCK_MOVIES.highlyRated}
           />
-          <CategoryRow title="Yoruba Movies" movies={MOCK_MOVIES.yoruba} />
+          <CategoryRow 
+            title="Yoruba Movies" 
+            movies={yorubaMovies ? transformCachedToMovie(yorubaMovies as CachedMovie[]) : MOCK_MOVIES.yoruba}
+          />
           <CategoryRow 
             title="Skits" 
             movies={skits ? transformCachedToMovie(skits as CachedMovie[]) : MOCK_MOVIES.skits}

@@ -14,57 +14,84 @@ export type Database = {
           access_count: number | null
           cached_at: string | null
           category: string
+          channel_metadata: Json | null
           comments: number | null
+          content_tags: string[] | null
+          criteria_met: Json | null
+          cultural_elements: string[] | null
           duration: number | null
           expires_at: string | null
           id: string
           image: string
           is_available: boolean | null
+          language_tags: string[] | null
           last_availability_check: string | null
           last_error: string | null
           last_retry: string | null
+          like_ratio: number | null
           published_at: string | null
           retry_count: number | null
+          setting_authenticity: boolean | null
+          storytelling_pattern: string | null
           title: string
           video_id: string
+          video_quality: string | null
           views: number | null
         }
         Insert: {
           access_count?: number | null
           cached_at?: string | null
           category: string
+          channel_metadata?: Json | null
           comments?: number | null
+          content_tags?: string[] | null
+          criteria_met?: Json | null
+          cultural_elements?: string[] | null
           duration?: number | null
           expires_at?: string | null
           id: string
           image: string
           is_available?: boolean | null
+          language_tags?: string[] | null
           last_availability_check?: string | null
           last_error?: string | null
           last_retry?: string | null
+          like_ratio?: number | null
           published_at?: string | null
           retry_count?: number | null
+          setting_authenticity?: boolean | null
+          storytelling_pattern?: string | null
           title: string
           video_id: string
+          video_quality?: string | null
           views?: number | null
         }
         Update: {
           access_count?: number | null
           cached_at?: string | null
           category?: string
+          channel_metadata?: Json | null
           comments?: number | null
+          content_tags?: string[] | null
+          criteria_met?: Json | null
+          cultural_elements?: string[] | null
           duration?: number | null
           expires_at?: string | null
           id?: string
           image?: string
           is_available?: boolean | null
+          language_tags?: string[] | null
           last_availability_check?: string | null
           last_error?: string | null
           last_retry?: string | null
+          like_ratio?: number | null
           published_at?: string | null
           retry_count?: number | null
+          setting_authenticity?: boolean | null
+          storytelling_pattern?: string | null
           title?: string
           video_id?: string
+          video_quality?: string | null
           views?: number | null
         }
         Relationships: []
@@ -104,6 +131,21 @@ export type Database = {
       refresh_video_cache: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      validate_yoruba_criteria: {
+        Args: {
+          p_duration: number
+          p_quality: string
+          p_views: number
+          p_language_tags: string[]
+          p_channel_metadata: Json
+          p_content_tags: string[]
+          p_like_ratio: number
+          p_cultural_elements: string[]
+          p_storytelling_pattern: string
+          p_setting_authenticity: boolean
+        }
+        Returns: Json
       }
     }
     Enums: {
