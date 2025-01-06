@@ -1,5 +1,6 @@
 import { Play } from 'lucide-react';
 import { useState } from 'react';
+import { truncateTitle } from '@/lib/utils';
 
 interface MovieThumbnailProps {
   title: string;
@@ -41,7 +42,7 @@ export const MovieThumbnail = ({ title, image, category, videoId, isHovered, isV
       />
       {isHovered && !isVideoPlaying && (
         <div className="absolute inset-0 bg-black bg-opacity-75 p-4 flex flex-col justify-end rounded-lg">
-          <h3 className="text-lg font-bold">{title}</h3>
+          <h3 className="text-lg font-bold">{truncateTitle(title)}</h3>
           <p className="text-sm text-koya-subtext mb-2">{category}</p>
           {videoId && (
             <button className="bg-koya-accent hover:bg-opacity-80 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
