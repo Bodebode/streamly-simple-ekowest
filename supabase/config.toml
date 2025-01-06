@@ -1,3 +1,7 @@
 project_id = "yuisywwlzorzdrzvjlvm"
 
 [functions.get-related-videos]
+
+[functions.get-new-releases]
+
+[functions.get-skits]
