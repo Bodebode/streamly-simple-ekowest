@@ -2,61 +2,71 @@ export const skitsMovies = [
   {
     id: 1,
     title: "Funny Moments Compilation",
-    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
-    category: "Skits"
+    image: "https://img.youtube.com/vi/UPzXAvL36Ag/maxresdefault.jpg",
+    category: "Skits",
+    videoId: "UPzXAvL36Ag"
   },
   {
     id: 2,
     title: "Stand-up Special",
-    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
-    category: "Skits"
+    image: "https://img.youtube.com/vi/2wiSLBpZpME/maxresdefault.jpg",
+    category: "Skits",
+    videoId: "2wiSLBpZpME"
   },
   {
     id: 3,
     title: "Comedy Sketch Show",
-    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
-    category: "Skits"
+    image: "https://img.youtube.com/vi/mMM8_AFwxBE/maxresdefault.jpg",
+    category: "Skits",
+    videoId: "mMM8_AFwxBE"
   },
   {
     id: 4,
     title: "Aki and Pawpaw: The Return",
-    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
-    category: "Skits"
+    image: "https://img.youtube.com/vi/wwgEkkapi-0/maxresdefault.jpg",
+    category: "Skits",
+    videoId: "wwgEkkapi-0"
   },
   {
     id: 5,
     title: "Hilarious Pranks",
-    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
-    category: "Skits"
+    image: "https://img.youtube.com/vi/GoWZfsdd1yw/maxresdefault.jpg",
+    category: "Skits",
+    videoId: "GoWZfsdd1yw"
   },
   {
     id: 6,
     title: "Comedy Central Presents",
-    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
-    category: "Skits"
+    image: "https://img.youtube.com/vi/GfF4Dz_e3P4/maxresdefault.jpg",
+    category: "Skits",
+    videoId: "GfF4Dz_e3P4"
   },
   {
     id: 7,
     title: "Late Night Comedy",
-    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
-    category: "Skits"
+    image: "https://img.youtube.com/vi/Yg9z8lv1k_4/maxresdefault.jpg",
+    category: "Skits",
+    videoId: "Yg9z8lv1k_4"
   },
   {
     id: 8,
     title: "Improv Comedy Show",
-    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
-    category: "Skits"
+    image: "https://img.youtube.com/vi/3aQFM1ZtMG0/maxresdefault.jpg",
+    category: "Skits",
+    videoId: "3aQFM1ZtMG0"
   },
   {
     id: 9,
     title: "Comedy Club Special",
-    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
-    category: "Skits"
+    image: "https://img.youtube.com/vi/pY4L5IXFXPA/maxresdefault.jpg",
+    category: "Skits",
+    videoId: "pY4L5IXFXPA"
   },
   {
     id: 10,
     title: "Best Stand-up Moments",
-    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
-    category: "Skits"
+    image: "https://img.youtube.com/vi/grDl2G_3WuY/maxresdefault.jpg",
+    category: "Skits",
+    videoId: "grDl2G_3WuY"
   }
 ];
