@@ -6,6 +6,13 @@ export interface Movie {
   videoId?: string;
 }
 
+export interface MovieData {
+  trending: Movie[];
+  highlyRated: Movie[];
+  yoruba: Movie[];
+  skits: Movie[];
+}
+
 export interface CachedMovie {
   id: string;
   title: string;

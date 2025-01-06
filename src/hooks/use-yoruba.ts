@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { MOCK_MOVIES } from '@/data/mockMovies';
+import { CachedMovie } from '@/types/movies';
 
 export const useYorubaMovies = () => {
   return useQuery({
@@ -29,9 +30,8 @@ export const useYorubaMovies = () => {
         }
 
         // Filter videos that meet the criteria
-        const validVideos = data.filter(video => {
-          const criteria = video.criteria_met;
-          return criteria && criteria.meets_criteria === true;
+        const validVideos = (data as CachedMovie[]).filter(video => {
+          return video.criteria_met?.meets_criteria === true;
         });
 
         if (validVideos.length === 0) {
