@@ -132,6 +132,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      set_category_expiration: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       validate_yoruba_criteria: {
         Args: {
           p_duration: number
