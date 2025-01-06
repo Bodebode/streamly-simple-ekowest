@@ -30,8 +30,9 @@ export const useYorubaMovies = () => {
         }
 
         // Filter videos that meet the criteria
-        const validVideos = (data as CachedMovie[]).filter(video => {
-          return video.criteria_met?.meets_criteria === true;
+        const validVideos = data.filter(video => {
+          const criteria = video.criteria_met as { meets_criteria: boolean } | null;
+          return criteria?.meets_criteria === true;
         });
 
         if (validVideos.length === 0) {
