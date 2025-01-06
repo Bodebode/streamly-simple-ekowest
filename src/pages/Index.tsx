@@ -12,6 +12,8 @@ import { MOCK_MOVIES } from '../data/mockMovies';
 import { useEffect, useRef, memo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Movie } from '../types/movies';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const transformCachedToMovie = (movies: any[]): Movie[] => {
   return movies.map(movie => ({
@@ -28,7 +30,7 @@ const Index = () => {
   const { data: highlyRatedVideos, isLoading: isLoadingHighlyRated } = useHighlyRated();
   const { data: newReleases, isLoading: isLoadingNewReleases } = useNewReleases();
   const { data: skits, isLoading: isLoadingSkits } = useSkits();
-  const { data: yorubaMovies, isLoading: isLoadingYoruba } = useYorubaMovies();
+  const { data: yorubaMovies, isLoading: isLoadingYoruba, refetch: refetchYoruba } = useYorubaMovies();
   const newReleaseRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
 
@@ -41,10 +43,38 @@ const Index = () => {
     }
   }, [location.hash]);
 
+  const populateYorubaMovies = async () => {
+    try {
+      toast.loading('Fetching Yoruba movies from YouTube...');
+      const { data, error } = await supabase.functions.invoke('populate-yoruba');
+      
+      if (error) {
+        console.error('Error populating Yoruba movies:', error);
+        toast.error('Failed to fetch Yoruba movies');
+        return;
+      }
+
+      console.log('Population response:', data);
+      toast.success('Successfully fetched Yoruba movies');
+      refetchYoruba();
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Failed to fetch Yoruba movies');
+    }
+  };
+
   return (
     <div className="min-h-screen">
       <Navbar />
-      <div className="fixed bottom-4 right-4 z-50">
+      <div className="fixed bottom-4 right-4 z-50 flex gap-2">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={populateYorubaMovies}
+          className="rounded-full w-10 h-10 bg-white dark:bg-koya-card"
+        >
+          Y
+        </Button>
         <Button
           variant="outline"
           size="icon"
