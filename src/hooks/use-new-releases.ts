@@ -82,7 +82,14 @@ export const useNewReleases = () => {
     queryKey: ['newReleases'],
     queryFn: async () => {
       try {
-        const { data, error } = await supabase.functions.invoke('get-new-releases');
+        const { data, error } = await supabase
+          .from('cached_videos')
+          .select('*')
+          .eq('category', 'New Release')
+          .eq('is_available', true)
+          .gt('expires_at', new Date().toISOString())
+          .order('cached_at', { ascending: false })
+          .limit(12);
         
         if (error) {
           console.error('Error fetching new releases:', error);
@@ -94,6 +101,11 @@ export const useNewReleases = () => {
           console.log('No new releases found, using placeholders');
           return placeholderNewReleases;
         }
+
+        // Increment access count for retrieved videos
+        data.forEach(video => {
+          supabase.rpc('increment_access_count', { video_id: video.id });
+        });
 
         // If we have data but less than 12 items, pad with placeholders
         if (data.length < 12) {
@@ -108,5 +120,8 @@ export const useNewReleases = () => {
         return placeholderNewReleases;
       }
     },
+    staleTime: 1000 * 60 * 15, // Consider data fresh for 15 minutes
+    gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
+    retry: 1,
   });
 };

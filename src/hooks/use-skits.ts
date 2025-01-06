@@ -1,26 +1,46 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { MOCK_MOVIES } from '@/data/mockMovies';
 
 export const useSkits = () => {
   return useQuery({
     queryKey: ['skits'],
     queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke('get-skits', {
-        body: {
-          min_length: 0,
-          max_length: 42,
-          min_views: 4000
+      try {
+        const { data, error } = await supabase
+          .from('cached_videos')
+          .select('*')
+          .eq('category', 'Skits')
+          .eq('is_available', true)
+          .gt('expires_at', new Date().toISOString())
+          .order('access_count', { ascending: false })
+          .limit(12);
+        
+        if (error) {
+          console.error('Error fetching skits:', error);
+          toast.error('Failed to load skits');
+          return MOCK_MOVIES.skits;
         }
-      });
-      
-      if (error) {
-        console.error('Error fetching skits:', error);
+
+        if (!data || data.length === 0) {
+          return MOCK_MOVIES.skits;
+        }
+
+        // Increment access count for retrieved videos
+        data.forEach(video => {
+          supabase.rpc('increment_access_count', { video_id: video.id });
+        });
+
+        return data;
+      } catch (error) {
+        console.error('Error in skits query:', error);
         toast.error('Failed to load skits');
-        throw error;
+        return MOCK_MOVIES.skits;
       }
-      
-      return data;
     },
+    staleTime: 1000 * 60 * 30, // Consider data fresh for 30 minutes
+    gcTime: 1000 * 60 * 60, // Keep in cache for 1 hour
+    retry: 1,
   });
 };

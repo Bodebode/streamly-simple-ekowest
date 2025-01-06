@@ -19,6 +19,8 @@ export type Database = {
           expires_at: string | null
           id: string
           image: string
+          is_available: boolean | null
+          last_availability_check: string | null
           last_error: string | null
           last_retry: string | null
           published_at: string | null
@@ -36,6 +38,8 @@ export type Database = {
           expires_at?: string | null
           id: string
           image: string
+          is_available?: boolean | null
+          last_availability_check?: string | null
           last_error?: string | null
           last_retry?: string | null
           published_at?: string | null
@@ -53,6 +57,8 @@ export type Database = {
           expires_at?: string | null
           id?: string
           image?: string
+          is_available?: boolean | null
+          last_availability_check?: string | null
           last_error?: string | null
           last_retry?: string | null
           published_at?: string | null
@@ -93,6 +99,10 @@ export type Database = {
         Args: {
           video_id: string
         }
+        Returns: undefined
+      }
+      refresh_video_cache: {
+        Args: Record<PropertyKey, never>
         Returns: undefined
       }
     }
