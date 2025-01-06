@@ -54,12 +54,20 @@ async function getVideoDetails(videoIds: string[], apiKey: string) {
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    console.log('Starting Yoruba movies population...')
-    const supabase = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!)
+    console.log('Starting Yoruba movies population...');
+    const supabase = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!);
+
+    // First, let's check what's currently in the database
+    const { data: existingVideos, error: checkError } = await supabase
+      .from('cached_videos')
+      .select('*')
+      .eq('category', 'Yoruba Movies');
+    
+    console.log('Existing Yoruba videos in database:', existingVideos?.length || 0);
 
     let searchData;
     let currentKey = PRIMARY_API_KEY;
@@ -67,34 +75,40 @@ Deno.serve(async (req) => {
     try {
       searchData = await searchYouTube(PRIMARY_API_KEY!);
       console.log('Successfully used primary API key');
+      console.log('Found videos in search:', searchData.items.length);
     } catch (error) {
       console.log('Primary API key failed, trying secondary key:', error);
       currentKey = SECONDARY_API_KEY;
       searchData = await searchYouTube(SECONDARY_API_KEY!);
       console.log('Successfully used secondary API key');
+      console.log('Found videos in search:', searchData.items.length);
     }
 
-    const videoIds = searchData.items.map((item: any) => item.id.videoId)
-    const detailsData = await getVideoDetails(videoIds, currentKey!);
+    const videoIds = searchData.items.map((item: any) => item.id.videoId);
+    console.log('Video IDs to fetch details for:', videoIds.length);
     
-    console.log(`Found ${detailsData.items.length} videos`)
+    const detailsData = await getVideoDetails(videoIds, currentKey!);
+    console.log(`Found ${detailsData.items.length} video details`);
+
+    let successCount = 0;
+    let failureCount = 0;
 
     // Process and store each video
     for (const video of detailsData.items as VideoDetails[]) {
-      const thumbnailUrl = video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url
+      const thumbnailUrl = video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url;
 
       // Parse duration string to seconds
-      const durationStr = video.contentDetails.duration
-      const matches = durationStr.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/)
-      const hours = parseInt(matches?.[1] || '0')
-      const minutes = parseInt(matches?.[2] || '0')
-      const seconds = parseInt(matches?.[3] || '0')
-      const durationInSeconds = hours * 3600 + minutes * 60 + seconds
+      const durationStr = video.contentDetails.duration;
+      const matches = durationStr.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+      const hours = parseInt(matches?.[1] || '0');
+      const minutes = parseInt(matches?.[2] || '0');
+      const seconds = parseInt(matches?.[3] || '0');
+      const durationInSeconds = hours * 3600 + minutes * 60 + seconds;
 
       // Calculate like ratio
-      const likes = parseInt(video.statistics.likeCount || '0')
-      const views = parseInt(video.statistics.viewCount || '0')
-      const likeRatio = views > 0 ? likes / views : 0
+      const likes = parseInt(video.statistics.likeCount || '0');
+      const views = parseInt(video.statistics.viewCount || '0');
+      const likeRatio = views > 0 ? likes / views : 0;
 
       const videoData = {
         id: crypto.randomUUID(),
@@ -113,39 +127,47 @@ Deno.serve(async (req) => {
         like_ratio: likeRatio,
         cultural_elements: ['yoruba'],
         storytelling_pattern: 'traditional',
-        setting_authenticity: true
-      }
+        setting_authenticity: true,
+        is_available: true,
+        cached_at: new Date().toISOString(),
+        expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days from now
+      };
 
       const { error } = await supabase
         .from('cached_videos')
-        .upsert(videoData)
+        .upsert(videoData);
 
       if (error) {
-        console.error(`Error storing video ${video.id}:`, error)
+        console.error(`Error storing video ${video.id}:`, error);
+        failureCount++;
       } else {
-        console.log(`Successfully stored video ${video.id}`)
+        console.log(`Successfully stored video ${video.id}`);
+        successCount++;
       }
     }
 
     return new Response(
       JSON.stringify({ 
         message: 'Yoruba movies population completed',
-        apiKeyUsed: currentKey === PRIMARY_API_KEY ? 'primary' : 'secondary'
+        apiKeyUsed: currentKey === PRIMARY_API_KEY ? 'primary' : 'secondary',
+        totalProcessed: detailsData.items.length,
+        successCount,
+        failureCount
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       }
-    )
+    );
 
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
       }
-    )
+    );
   }
-})
+});

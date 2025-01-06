@@ -9,7 +9,7 @@ export const useYorubaMovies = () => {
     queryKey: ['yorubaMovies'],
     queryFn: async () => {
       try {
-        console.log('Fetching Yoruba movies from database...');
+        console.log('Starting Yoruba movies fetch...');
         const { data: cachedVideos, error } = await supabase
           .from('cached_videos')
           .select('*')
@@ -23,6 +23,7 @@ export const useYorubaMovies = () => {
           return MOCK_MOVIES.yoruba;
         }
 
+        console.log('Raw cached videos count:', cachedVideos?.length);
         console.log('Raw cached videos:', cachedVideos);
         
         if (!cachedVideos || cachedVideos.length === 0) {
@@ -40,15 +41,19 @@ export const useYorubaMovies = () => {
             }
             return true;
           })
-          .map((video, index) => ({
-            id: index + 1, // Ensure unique IDs
-            title: video.title,
-            image: video.image,
-            category: video.category,
-            videoId: video.video_id
-          }));
+          .map((video, index) => {
+            console.log('Processing video:', video.title, 'with ID:', video.video_id);
+            return {
+              id: index + 1,
+              title: video.title,
+              image: video.image,
+              category: video.category,
+              videoId: video.video_id
+            };
+          });
 
-        console.log('Transformed movies:', movies);
+        console.log('Final transformed movies:', movies);
+        console.log('Final movies count:', movies.length);
 
         if (movies.length === 0) {
           console.log('No valid movies after transformation, using mock data');
