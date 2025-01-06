@@ -10,51 +10,52 @@ export const useYorubaMovies = () => {
     queryFn: async () => {
       try {
         console.log('Fetching Yoruba movies from database...');
-        const { data, error } = await supabase
+        const { data: cachedVideos, error } = await supabase
           .from('cached_videos')
           .select('*')
           .eq('category', 'Yoruba Movies')
           .eq('is_available', true)
-          .gt('expires_at', new Date().toISOString())
-          .order('access_count', { ascending: false })
-          .limit(12);
+          .gt('expires_at', new Date().toISOString());
         
         if (error) {
           console.error('Error fetching Yoruba movies:', error);
           toast.error('Failed to load Yoruba movies');
           return MOCK_MOVIES.yoruba;
         }
+
+        console.log('Raw cached videos:', cachedVideos);
         
-        console.log('Found Yoruba movies in database:', data);
-        
-        if (!data || data.length === 0) {
-          console.log('No Yoruba movies found in database, using mock data');
+        if (!cachedVideos || cachedVideos.length === 0) {
+          console.log('No cached videos found, using mock data');
           return MOCK_MOVIES.yoruba;
         }
 
-        // Filter videos that meet the criteria
-        const validVideos = data.filter(video => {
-          const criteria = video.criteria_met as { meets_criteria: boolean } | null;
-          if (!criteria?.meets_criteria) {
-            console.log('Video failed criteria:', video.title);
-            return false;
-          }
-          return true;
-        });
+        // Transform and validate the data
+        const movies = cachedVideos
+          .filter(video => {
+            const criteria = video.criteria_met as { meets_criteria: boolean } | null;
+            if (!criteria?.meets_criteria) {
+              console.log('Video failed criteria:', video.title);
+              return false;
+            }
+            return true;
+          })
+          .map(video => ({
+            id: parseInt(video.id),
+            title: video.title,
+            image: video.image,
+            category: video.category,
+            videoId: video.video_id
+          }));
 
-        if (validVideos.length === 0) {
-          console.log('No valid Yoruba movies found after criteria check, using mock data');
+        console.log('Transformed movies:', movies);
+
+        if (movies.length === 0) {
+          console.log('No valid movies after transformation, using mock data');
           return MOCK_MOVIES.yoruba;
         }
 
-        // Transform the data to match the Movie type
-        return validVideos.map(video => ({
-          id: parseInt(video.id),
-          title: video.title,
-          image: video.image,
-          category: video.category,
-          videoId: video.video_id
-        }));
+        return movies;
 
       } catch (error) {
         console.error('Error in Yoruba movies query:', error);

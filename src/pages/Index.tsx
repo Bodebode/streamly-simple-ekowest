@@ -62,11 +62,12 @@ const Index = () => {
       }
 
       console.log('Population response:', data);
-      toast.success('Successfully fetched Yoruba movies', { id: toastId });
       
-      // Invalidate and refetch the Yoruba movies query
+      // Invalidate and refetch queries
       await queryClient.invalidateQueries({ queryKey: ['yorubaMovies'] });
       await refetchYoruba();
+      
+      toast.success('Successfully fetched Yoruba movies', { id: toastId });
       
     } catch (error) {
       console.error('Error:', error);
@@ -110,7 +111,7 @@ const Index = () => {
           />
           <CategoryRow 
             title="Yoruba Movies" 
-            movies={yorubaMovies || MOCK_MOVIES.yoruba}
+            movies={yorubaMovies || []}
           />
           <CategoryRow 
             title="Skits" 
