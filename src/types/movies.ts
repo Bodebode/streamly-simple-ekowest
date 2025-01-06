@@ -1,5 +1,5 @@
 export interface Movie {
-  id: number;
+  id: string | number;  // Updated to accept both string and number
   title: string;
   image: string;
   category: string;
