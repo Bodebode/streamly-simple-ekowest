@@ -3,19 +3,16 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const API_KEY = Deno.env.get('YOUTUBE_API_KEY')
 const BASE_URL = 'https://www.googleapis.com/youtube/v3'
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-  throw new Error('Missing Supabase environment variables')
-}
-
-const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
+
+// Create Supabase client
+const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 const truncateTitle = (title: string): string => {
   const separatorIndex = title.search(/[-|(]/)
@@ -35,7 +32,7 @@ serve(async (req) => {
   try {
     // First check cache
     console.log('Checking cache for new releases')
-    const { data: cachedVideos, error: cacheError } = await supabaseAdmin
+    const { data: cachedVideos, error: cacheError } = await supabase
       .from('cached_videos')
       .select('*')
       .eq('category', 'New Release')
@@ -54,7 +51,7 @@ serve(async (req) => {
     }
 
     // If cache miss, check for expired cache as fallback
-    const { data: expiredCache } = await supabaseAdmin
+    const { data: expiredCache } = await supabase
       .from('cached_videos')
       .select('*')
       .eq('category', 'New Release')
@@ -112,7 +109,7 @@ serve(async (req) => {
           title: truncateTitle(video.snippet.title),
           image: video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url,
           category: "New Release",
-          videoId: video.id,
+          video_id: video.id,
           views: parseInt(video.statistics.viewCount),
           comments: parseInt(video.statistics.commentCount),
           cached_at: new Date().toISOString(),
@@ -122,7 +119,7 @@ serve(async (req) => {
       // Cache the results
       if (videos.length > 0) {
         console.log('Caching new videos:', videos.length)
-        const { error: insertError } = await supabaseAdmin
+        const { error: insertError } = await supabase
           .from('cached_videos')
           .upsert(videos)
 
@@ -147,10 +144,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in get-new-releases function:', error)
     return new Response(
-      JSON.stringify({ 
-        error: error.message,
-        stack: error.stack 
-      }), {
+      JSON.stringify({ error: error.message }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
