@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, memo, useCallback } from 'react';
 import { MoviePreview } from './movie/MoviePreview';
 import { MovieThumbnail } from './movie/MovieThumbnail';
+import { toast } from 'sonner';
 
 interface MovieCardProps {
   title: string;
@@ -75,12 +76,16 @@ const MovieCardComponent = ({ title, image, category, videoId, onMovieSelect, is
 
   const handleClick = useCallback(() => {
     if (videoId) {
+      console.log(`[MovieCard] Attempting to play video: ${title} (${videoId})`);
       onMovieSelect(videoId);
       setShowPreview(false);
       setShowTitle(true);
       clearTimers();
+    } else {
+      console.warn(`[MovieCard] No videoId available for: ${title}`);
+      toast.error('This video is not available for playback');
     }
-  }, [videoId, onMovieSelect, clearTimers]);
+  }, [videoId, onMovieSelect, clearTimers, title]);
 
   return (
     <div

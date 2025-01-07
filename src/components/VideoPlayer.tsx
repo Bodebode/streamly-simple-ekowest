@@ -1,80 +1,40 @@
-import { useState, useEffect } from 'react';
-import { SunDim, Maximize2, X } from 'lucide-react';
+import { X } from 'lucide-react';
+import { useEffect } from 'react';
 
 interface VideoPlayerProps {
   videoId: string | null;
-  onClose?: () => void;
+  onClose: () => void;
 }
 
 export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
-  const [isDimmed, setIsDimmed] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isExiting, setIsExiting] = useState(false);
+  useEffect(() => {
+    if (videoId) {
+      console.log(`[VideoPlayer] Attempting to play video: ${videoId}`);
+    }
+  }, [videoId]);
 
   if (!videoId) return null;
 
-  const toggleDim = () => {
-    setIsDimmed(!isDimmed);
-    document.body.classList.toggle('dimmed');
-  };
-
-  const toggleFullscreen = () => {
-    const videoContainer = document.getElementById('video-container');
-    if (!videoContainer) return;
-
-    if (!document.fullscreenElement) {
-      videoContainer.requestFullscreen();
-      setIsFullscreen(true);
-    } else {
-      document.exitFullscreen();
-      setIsFullscreen(false);
-    }
-  };
-
-  const handleClose = () => {
-    setIsExiting(true);
-    if (isDimmed) {
-      document.body.classList.remove('dimmed');
-    }
-    setTimeout(() => {
-      setIsExiting(false);
-      onClose?.();
-    }, 400);
+  const handleIframeError = () => {
+    console.error(`[VideoPlayer] Error loading video: ${videoId}`);
   };
 
   return (
-    <div className={`mt-4 md:mt-8 transition-all duration-300 w-full max-w-4xl mx-auto px-4 md:px-0 ${isExiting ? 'video-player-exit' : 'video-player-enter'}`}>
-      <div className="flex justify-between items-center mb-2 md:mb-4">
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+      <div className="relative w-full max-w-4xl aspect-video">
         <button
-          onClick={handleClose}
-          className="p-2 rounded-full hover:bg-gray-700 transition-colors"
-          title="Close"
+          onClick={onClose}
+          className="absolute -top-10 right-0 text-white hover:text-gray-300"
+          aria-label="Close video"
         >
-          <X className="w-5 h-5 md:w-6 md:h-6" />
+          <X className="w-8 h-8" />
         </button>
-        <div className="flex gap-2 md:gap-4">
-          <button
-            onClick={toggleDim}
-            className="p-2 rounded-full hover:bg-gray-700 transition-colors"
-            title="Dim lights"
-          >
-            <SunDim className="w-5 h-5 md:w-6 md:h-6" />
-          </button>
-          <button
-            onClick={toggleFullscreen}
-            className="p-2 rounded-full hover:bg-gray-700 transition-colors"
-            title="Fullscreen"
-          >
-            <Maximize2 className="w-5 h-5 md:w-6 md:h-6" />
-          </button>
-        </div>
-      </div>
-      <div id="video-container" className="relative w-full aspect-video">
         <iframe
-          src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0`}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
           className="w-full h-full rounded-lg"
+          onError={handleIframeError}
         />
       </div>
     </div>
