@@ -26,6 +26,9 @@ interface MovieCarouselProps {
 const MovieCarouselComponent = ({ movies, onMovieSelect, isVideoPlaying }: MovieCarouselProps) => {
   const isMobile = useIsMobile();
 
+  // Ensure movies array is valid and each movie has a unique id
+  const validMovies = movies.filter(movie => movie && typeof movie.id === 'number');
+
   return (
     <Carousel
       opts={{
@@ -35,9 +38,9 @@ const MovieCarouselComponent = ({ movies, onMovieSelect, isVideoPlaying }: Movie
       className="w-full"
     >
       <CarouselContent className="-ml-2 md:-ml-4">
-        {movies.map((movie) => (
+        {validMovies.map((movie) => (
           <CarouselItem 
-            key={movie.id} 
+            key={`movie-${movie.id}`}
             className="pl-2 md:pl-4 basis-[140px] md:basis-[200px] transition-transform duration-300 hover:scale-105"
           >
             <MovieCard
