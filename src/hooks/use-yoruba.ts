@@ -15,7 +15,9 @@ export const useYorubaMovies = () => {
           .select('*')
           .eq('category', 'Yoruba Movies')
           .eq('is_available', true)
-          .gt('expires_at', new Date().toISOString());
+          .gt('expires_at', new Date().toISOString())
+          .order('access_count', { ascending: false })
+          .limit(12);
         
         if (error) {
           console.error('Error fetching Yoruba movies:', error);
@@ -24,10 +26,20 @@ export const useYorubaMovies = () => {
         }
 
         console.log('Total Yoruba movies in database:', cachedVideos?.length);
-        console.log('Raw cached videos:', cachedVideos);
         
         if (!cachedVideos || cachedVideos.length === 0) {
-          console.log('No cached videos found, using mock data');
+          console.log('No cached videos found or cache expired, triggering population...');
+          
+          // Trigger population if cache is empty or expired
+          const { error: populationError } = await supabase.functions.invoke('populate-yoruba');
+          
+          if (populationError) {
+            console.error('Error triggering population:', populationError);
+            toast.error('Failed to refresh video cache');
+            return MOCK_MOVIES.yoruba;
+          }
+          
+          // Return mock data for now, the cache will be available on next query
           return MOCK_MOVIES.yoruba;
         }
 
@@ -37,7 +49,6 @@ export const useYorubaMovies = () => {
             if (typeof video.criteria_met !== 'object' || !video.criteria_met) {
               return false;
             }
-            // Safely access the meets_criteria property
             const criteriaMet = video.criteria_met as { meets_criteria?: boolean };
             return criteriaMet.meets_criteria === true;
           })
@@ -55,6 +66,13 @@ export const useYorubaMovies = () => {
           console.log('No videos passed criteria, using mock data');
           return MOCK_MOVIES.yoruba;
         }
+
+        // Increment access count for cached videos
+        movies.forEach(movie => {
+          if (movie.videoId) {
+            supabase.rpc('increment_access_count', { video_id: movie.videoId });
+          }
+        });
 
         return movies;
 

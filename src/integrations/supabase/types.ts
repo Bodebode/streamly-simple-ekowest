@@ -125,6 +125,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_expired_videos: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       increment_access_count: {
         Args: {
           video_id: string
