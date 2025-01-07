@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { AuthUI } from '@/components/AuthUI';
 import { useToast } from '@/hooks/use-toast';
 import { AuthError } from '@supabase/supabase-js';
+import { Button } from '@/components/ui/button';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -81,9 +82,38 @@ const Auth = () => {
     };
   }, [navigate, toast]);
 
+  const handleContinueAsGuest = () => {
+    toast({
+      title: "Welcome Guest!",
+      description: "You're browsing as a guest user. Some features may be limited.",
+    });
+    navigate('/');
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-koya-background py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-koya-background py-12 px-4 sm:px-6 lg:px-8">
       <AuthUI />
+      <div className="mt-8 w-full max-w-[400px]">
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-gray-50 dark:bg-koya-background text-gray-500">
+              or
+            </span>
+          </div>
+        </div>
+        <div className="mt-6">
+          <Button 
+            variant="outline" 
+            className="w-full"
+            onClick={handleContinueAsGuest}
+          >
+            Continue as Guest
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };
