@@ -30,7 +30,6 @@ export const useYorubaMovies = () => {
         if (!cachedVideos || cachedVideos.length === 0) {
           console.log('No cached videos found or cache expired, triggering population...');
           
-          // Trigger population if cache is empty or expired
           const { error: populationError } = await supabase.functions.invoke('populate-yoruba');
           
           if (populationError) {
@@ -39,31 +38,22 @@ export const useYorubaMovies = () => {
             return MOCK_MOVIES.yoruba;
           }
           
-          // Return mock data for now, the cache will be available on next query
           return MOCK_MOVIES.yoruba;
         }
 
-        // Transform and validate the data
-        const movies = cachedVideos
-          .filter(video => {
-            if (typeof video.criteria_met !== 'object' || !video.criteria_met) {
-              return false;
-            }
-            const criteriaMet = video.criteria_met as { meets_criteria?: boolean };
-            return criteriaMet.meets_criteria === true;
-          })
-          .map((video, index) => ({
-            id: index + 1,
-            title: video.title,
-            image: video.image,
-            category: video.category,
-            videoId: video.video_id
-          }));
+        // Transform the data without filtering based on criteria_met
+        const movies = cachedVideos.map((video, index) => ({
+          id: index + 1,
+          title: video.title,
+          image: video.image,
+          category: video.category,
+          videoId: video.video_id
+        }));
 
         console.log('Final valid movies count:', movies.length);
         
         if (movies.length === 0) {
-          console.log('No videos passed criteria, using mock data');
+          console.log('No videos found, using mock data');
           return MOCK_MOVIES.yoruba;
         }
 
