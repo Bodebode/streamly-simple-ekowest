@@ -15,7 +15,11 @@ export const useYorubaMovies = () => {
           .select('*')
           .eq('category', 'Yoruba Movies')
           .eq('is_available', true)  // Must be marked as available
+          .eq('is_embeddable', true)  // Must be embeddable
           .gt('expires_at', new Date().toISOString())  // Must not be expired
+          .gte('duration', 2700)  // At least 45 minutes (2700 seconds)
+          .gte('views', 100000)  // At least 100,000 views
+          .in('video_quality', ['1080p', '2160p', '1440p'])  // Must be high quality
           .order('access_count', { ascending: false })
           .limit(12);
         
