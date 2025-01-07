@@ -1,7 +1,7 @@
 import { Hero } from '../components/Hero';
 import { CategoryRow } from '../components/CategoryRow';
 import { Navbar } from '../components/Navbar';
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Sun, RefreshCw } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { useHighlyRated } from '@/hooks/use-highly-rated';
@@ -28,9 +28,9 @@ const transformCachedToMovie = (movies: any[]): Movie[] => {
 
 const Index = () => {
   const { theme, setTheme } = useTheme();
-  const { data: highlyRatedVideos, isLoading: isLoadingHighlyRated } = useHighlyRated();
-  const { data: newReleases, isLoading: isLoadingNewReleases } = useNewReleases();
-  const { data: skits, isLoading: isLoadingSkits } = useSkits();
+  const { data: highlyRatedVideos, isLoading: isLoadingHighlyRated, refetch: refetchHighlyRated } = useHighlyRated();
+  const { data: newReleases, isLoading: isLoadingNewReleases, refetch: refetchNewReleases } = useNewReleases();
+  const { data: skits, isLoading: isLoadingSkits, refetch: refetchSkits } = useSkits();
   const { data: yorubaMovies, isLoading: isLoadingYoruba, refetch: refetchYoruba } = useYorubaMovies();
   const newReleaseRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
@@ -46,32 +46,60 @@ const Index = () => {
     }
   }, [location.hash]);
 
-  const populateYorubaMovies = async () => {
+  const populateAllSections = async () => {
     if (isPopulating) return;
     
     try {
       setIsPopulating(true);
-      const toastId = toast.loading('Fetching Yoruba movies from YouTube... This may take up to 30 seconds.');
+      const toastId = toast.loading('Fetching fresh content for all sections... This may take a minute.');
       
-      const { data, error } = await supabase.functions.invoke('populate-yoruba');
-      
-      if (error) {
-        console.error('Error populating Yoruba movies:', error);
-        toast.error('Failed to fetch Yoruba movies', { id: toastId });
-        return;
-      }
+      // Fetch all sections in parallel
+      const promises = [
+        supabase.functions.invoke('populate-yoruba'),
+        supabase.functions.invoke('get-highly-rated'),
+        supabase.functions.invoke('get-new-releases'),
+        supabase.functions.invoke('get-skits')
+      ];
 
-      console.log('Population response:', data);
+      const results = await Promise.allSettled(promises);
       
-      // Invalidate and refetch queries
-      await queryClient.invalidateQueries({ queryKey: ['yorubaMovies'] });
-      await refetchYoruba();
+      let successCount = 0;
+      let errorCount = 0;
+
+      results.forEach((result, index) => {
+        if (result.status === 'fulfilled') {
+          successCount++;
+        } else {
+          console.error(`Error in promise ${index}:`, result.reason);
+          errorCount++;
+        }
+      });
+
+      // Invalidate and refetch all queries
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['yorubaMovies'] }),
+        queryClient.invalidateQueries({ queryKey: ['highlyRated'] }),
+        queryClient.invalidateQueries({ queryKey: ['newReleases'] }),
+        queryClient.invalidateQueries({ queryKey: ['skits'] })
+      ]);
+
+      // Refetch all sections
+      await Promise.all([
+        refetchYoruba(),
+        refetchHighlyRated(),
+        refetchNewReleases(),
+        refetchSkits()
+      ]);
       
-      toast.success('Successfully fetched Yoruba movies', { id: toastId });
+      if (errorCount === 0) {
+        toast.success('Successfully refreshed all sections', { id: toastId });
+      } else {
+        toast.warning(`Refreshed ${successCount} sections, ${errorCount} failed`, { id: toastId });
+      }
       
     } catch (error) {
       console.error('Error:', error);
-      toast.error('Failed to fetch Yoruba movies');
+      toast.error('Failed to refresh content');
     } finally {
       setIsPopulating(false);
     }
@@ -84,11 +112,11 @@ const Index = () => {
         <Button
           variant="outline"
           size="icon"
-          onClick={populateYorubaMovies}
+          onClick={populateAllSections}
           disabled={isPopulating}
           className="rounded-full w-10 h-10 bg-white dark:bg-koya-card"
         >
-          Y
+          <RefreshCw className={`h-5 w-5 ${isPopulating ? 'animate-spin' : ''}`} />
         </Button>
         <Button
           variant="outline"
