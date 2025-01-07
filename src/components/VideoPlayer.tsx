@@ -37,7 +37,7 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
   };
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto mt-4 mb-8">
+    <div className="relative w-full max-w-4xl mx-auto mt-8 mb-8"> {/* Increased mt-4 to mt-8 */}
       <button
         onClick={onClose}
         className="absolute -top-8 right-0 text-white hover:text-gray-300"
