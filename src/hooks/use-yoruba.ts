@@ -56,15 +56,19 @@ export const useYorubaMovies = () => {
 
             if (!criteria?.meets_criteria) {
               console.log('\nVideo failed criteria check:', video.title);
+              console.log('Essential criteria results:');
               if (criteria) {
-                console.log('Essential criteria results:');
-                console.log('- Duration:', criteria.essential.duration ? 'PASS' : 'FAIL');
-                console.log('- Quality:', criteria.essential.quality ? 'PASS' : 'FAIL');
-                console.log('- Views:', criteria.essential.views ? 'PASS' : 'FAIL');
+                console.log(`Duration (${video.duration}s): ${criteria.essential.duration ? 'PASS' : 'FAIL'} (need ≥1800s)`);
+                console.log(`Quality (${video.video_quality}): ${criteria.essential.quality ? 'PASS' : 'FAIL'} (need 1080p+)`);
+                console.log(`Views (${video.views}): ${criteria.essential.views ? 'PASS' : 'FAIL'} (need ≥400000)`);
                 
                 const passedNonEssential = Object.entries(criteria.non_essential)
                   .filter(([_, passed]) => passed).length;
                 console.log(`Non-essential criteria passed: ${passedNonEssential}/10 (need at least 4)`);
+                
+                if (video.like_ratio) {
+                  console.log(`Like ratio: ${video.like_ratio} (target: ≥0.8)`);
+                }
               }
               return false;
             }
