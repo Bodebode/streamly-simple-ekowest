@@ -37,7 +37,7 @@ const CategoryRowComponent = ({ title, movies, updateHighlyRated }: CategoryRowP
   }, [movies]);
 
   return (
-    <div className="mb-8">
+    <div className="mb-16"> {/* Changed from mb-8 to mb-16 for more vertical spacing */}
       <h2 className="text-xl md:text-2xl font-bold mb-4 px-4 md:text-center">
         {title} {isLoading && title === 'Comedy' && '(Loading...)'}
       </h2>
