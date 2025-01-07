@@ -1,8 +1,8 @@
 import { CachedMovie, Movie } from '@/types/movies';
 
 export const transformCachedToMovie = (videos: CachedMovie[] | Movie[]): Movie[] => {
-  return videos.map((video) => ({
-    id: video.id,  // No need to create a numeric id anymore
+  return videos.map((video, index) => ({
+    id: index + 1,
     title: video.title,
     image: video.image,
     category: video.category,
