@@ -64,5 +64,11 @@ export const yorubaMovies = [
     title: "Binary Force",
     image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
     category: "Yoruba Movies"
+  },
+  {
+    id: 12,
+    title: "Tech Warrior",
+    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
+    category: "Yoruba Movies"
   }
 ];
