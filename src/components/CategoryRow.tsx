@@ -36,8 +36,8 @@ const CategoryRowComponent = ({ title, movies, updateHighlyRated }: CategoryRowP
           onMovieSelect={setSelectedVideoId}
           isVideoPlaying={selectedVideoId !== null}
         />
+        {selectedVideoId && <VideoPlayer videoId={selectedVideoId} onClose={handleCloseVideo} />}
       </div>
-      <VideoPlayer videoId={selectedVideoId} onClose={handleCloseVideo} />
     </div>
   );
 };
