@@ -1,3 +1,5 @@
+import { DatabaseFunctions } from './functions';
+
 export type Json =
   | string
   | number
