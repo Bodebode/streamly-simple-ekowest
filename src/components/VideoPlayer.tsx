@@ -37,10 +37,12 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
   };
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto mt-12 mb-8"> {/* Increased mt-8 to mt-12 */}
+    // Increased top margin for better spacing
+    <div className="relative w-full max-w-4xl mx-auto mt-12 mb-8">
       <button
         onClick={onClose}
-        className="absolute -top-10 right-0 text-white hover:text-gray-300" {/* Changed -top-8 to -top-10 */}
+        // Adjusted top position for better alignment
+        className="absolute -top-10 right-0 text-white hover:text-gray-300"
         aria-label="Close video"
       >
         <X className="w-6 h-6" />
