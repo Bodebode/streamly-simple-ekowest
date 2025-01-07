@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, memo, useCallback } from 'react';
-import { MoviePreview } from './movie/MoviePreview';
-import { MovieThumbnail } from './movie/MovieThumbnail';
+import { MovieCardPreview } from './movie/MovieCardPreview';
+import { MovieCardBase } from './movie/MovieCardBase';
 import { toast } from 'sonner';
 
 interface MovieCardProps {
@@ -95,7 +95,7 @@ const MovieCardComponent = ({ title, image, category, videoId, onMovieSelect, is
       onClick={handleClick}
     >
       {showPreview && videoId && !isVideoPlaying ? (
-        <MoviePreview
+        <MovieCardPreview
           videoId={videoId}
           title={title}
           category={category}
@@ -103,7 +103,7 @@ const MovieCardComponent = ({ title, image, category, videoId, onMovieSelect, is
           onClick={handleClick}
         />
       ) : (
-        <MovieThumbnail
+        <MovieCardBase
           title={title}
           image={image}
           category={category}

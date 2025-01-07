@@ -3,7 +3,7 @@ import { useState, memo, useCallback, useEffect } from 'react';
 import { MovieCarousel } from './movie/MovieCarousel';
 import { useRelatedVideos } from '@/hooks/use-related-videos';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
+import { checkThumbnailQuality, checkVideoAvailability } from '@/utils/video-validation';
 
 interface Movie {
   id: number;
@@ -29,34 +29,6 @@ const CategoryRowComponent = ({ title, movies, updateHighlyRated }: CategoryRowP
   }, []);
 
   useEffect(() => {
-    const checkThumbnailQuality = async (movie: Movie): Promise<boolean> => {
-      if (!movie.videoId) return false;
-      
-      try {
-        const img = new Image();
-        const maxResUrl = `https://img.youtube.com/vi/${movie.videoId}/maxresdefault.jpg`;
-        
-        return new Promise((resolve) => {
-          img.onload = () => {
-            // YouTube returns a small 120x90 placeholder for non-existent maxresdefault
-            const isHighQuality = !(img.width === 120 && img.height === 90);
-            if (!isHighQuality) {
-              console.log(`[Thumbnail Quality Alert] Low quality thumbnail detected for: "${movie.title}"`);
-            }
-            resolve(isHighQuality);
-          };
-          img.onerror = () => {
-            console.log(`[Thumbnail Error] Failed to load thumbnail for: "${movie.title}"`);
-            resolve(false);
-          };
-          img.src = maxResUrl;
-        });
-      } catch (error) {
-        console.error(`[Thumbnail Error] Error checking thumbnail for: "${movie.title}"`, error);
-        return false;
-      }
-    };
-
     const filterMovies = async () => {
       const validMovies = [];
       
@@ -75,16 +47,7 @@ const CategoryRowComponent = ({ title, movies, updateHighlyRated }: CategoryRowP
       }
 
       setFilteredMovies(validMovies);
-
-      // Check video availability
-      try {
-        const { error } = await supabase.functions.invoke('check-video-availability');
-        if (error) {
-          console.error('Error checking video availability:', error);
-        }
-      } catch (error) {
-        console.error('Failed to check video availability:', error);
-      }
+      await checkVideoAvailability();
     };
 
     filterMovies();
