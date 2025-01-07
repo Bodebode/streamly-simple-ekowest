@@ -9,9 +9,9 @@ export const useYorubaMovies = () => {
     queryKey: ['yorubaMovies'],
     queryFn: async () => {
       try {
-        console.log('Starting Yoruba movies fetch with criteria validation...');
+        console.log('Starting Yoruba movies fetch with enhanced criteria validation...');
         
-        // First attempt with all criteria
+        // First attempt with all strict criteria including cultural elements
         const { data: strictVideos, error: strictError } = await supabase
           .from('cached_videos')
           .select('*')
@@ -21,6 +21,9 @@ export const useYorubaMovies = () => {
           .gt('expires_at', new Date().toISOString())
           .gte('duration', 2700)
           .gte('views', 100000)
+          .gte('like_ratio', 0.005)
+          .eq('setting_authenticity', true)
+          .not('cultural_elements', 'is', null)
           .in('video_quality', ['1080p', '2160p', '1440p'])
           .order('access_count', { ascending: false })
           .limit(12);
@@ -31,7 +34,7 @@ export const useYorubaMovies = () => {
           return MOCK_MOVIES.yoruba;
         }
 
-        console.log(`Found ${strictVideos?.length || 0} videos meeting all criteria`);
+        console.log(`Found ${strictVideos?.length || 0} videos meeting all enhanced criteria`);
 
         // If we have strict results but less than optimal, log for monitoring
         if (strictVideos && strictVideos.length > 0 && strictVideos.length < 8) {
@@ -51,6 +54,9 @@ export const useYorubaMovies = () => {
             .gt('expires_at', new Date().toISOString())
             .gte('duration', 2700)
             .gte('views', 100000)
+            .gte('like_ratio', 0.005)
+            .eq('setting_authenticity', true)
+            .not('cultural_elements', 'is', null)
             .order('access_count', { ascending: false })
             .limit(12);
 
@@ -73,6 +79,9 @@ export const useYorubaMovies = () => {
               .eq('is_embeddable', true)
               .gt('expires_at', new Date().toISOString())
               .gte('views', 100000)
+              .gte('like_ratio', 0.005)
+              .eq('setting_authenticity', true)
+              .not('cultural_elements', 'is', null)
               .order('access_count', { ascending: false })
               .limit(12);
 
