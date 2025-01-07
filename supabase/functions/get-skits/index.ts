@@ -22,9 +22,6 @@ serve(async (req) => {
   }
 
   try {
-    // Parse request body for parameters
-    const { min_length = 0, max_length = 42, min_views = 4000 } = await req.json()
-
     // First check cache
     console.log('Checking cache for skits')
     const { data: cachedVideos, error: cacheError } = await supabase
@@ -36,6 +33,7 @@ serve(async (req) => {
 
     if (cacheError) {
       console.error('Error fetching from cache:', cacheError)
+      throw cacheError
     }
 
     if (cachedVideos && cachedVideos.length > 0) {
@@ -93,7 +91,9 @@ serve(async (req) => {
         views: parseInt(video.statistics.viewCount),
         comments: parseInt(video.statistics.commentCount),
         cached_at: new Date().toISOString(),
-        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours
+        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 hours
+        is_available: true,
+        last_availability_check: new Date().toISOString()
       }))
 
     // Cache the results
