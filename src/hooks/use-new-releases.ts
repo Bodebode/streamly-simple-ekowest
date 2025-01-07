@@ -88,6 +88,8 @@ export const useNewReleases = () => {
           .eq('category', 'New Release')
           .eq('is_available', true)
           .gt('expires_at', new Date().toISOString())
+          .gte('duration', 2700) // Added duration criteria: ≥ 2700 seconds
+          .gte('views', 20000)   // Added views criteria: ≥ 20,000
           .order('cached_at', { ascending: false })
           .limit(12);
         
