@@ -8,14 +8,7 @@ import {
 import { MovieCard } from '../MovieCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { memo } from 'react';
-
-interface Movie {
-  id: string | number;
-  title: string;
-  image: string;
-  category: string;
-  videoId?: string;
-}
+import { Movie } from '@/types/movies';
 
 interface MovieCarouselProps {
   movies: Movie[];
