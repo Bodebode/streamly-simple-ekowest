@@ -14,8 +14,8 @@ export const useYorubaMovies = () => {
           .from('cached_videos')
           .select('*')
           .eq('category', 'Yoruba Movies')
-          .eq('is_available', true)
-          .gt('expires_at', new Date().toISOString())
+          .eq('is_available', true)  // Must be marked as available
+          .gt('expires_at', new Date().toISOString())  // Must not be expired
           .order('access_count', { ascending: false })
           .limit(12);
         
@@ -41,7 +41,7 @@ export const useYorubaMovies = () => {
           return MOCK_MOVIES.yoruba;
         }
 
-        // Transform the data without filtering based on criteria_met
+        // Transform the cached videos to Movie format
         const movies = cachedVideos.map((video, index) => ({
           id: index + 1,
           title: video.title,
