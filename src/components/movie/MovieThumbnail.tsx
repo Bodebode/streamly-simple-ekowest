@@ -39,9 +39,15 @@ export const MovieThumbnail = ({ title, image, category, videoId, isHovered, isV
         if (img.width === 120 && img.height === 90) {
           // YouTube returns a small placeholder for non-existent maxresdefault
           setThumbnailQuality('high');
-          console.log(`[Thumbnail] Low quality thumbnail for: ${title} (${videoId})`);
+          console.log(`[Thumbnail Quality Check] Low quality thumbnail detected for: "${title}" (${videoId})`);
+          if (category === 'Yoruba Movies') {
+            console.log(`[Yoruba Movie Quality Alert] "${title}" has a low-quality thumbnail`);
+          }
         } else {
           setThumbnailQuality('max');
+          if (category === 'Yoruba Movies') {
+            console.log(`[Yoruba Movie Quality Check] "${title}" has a high-quality thumbnail`);
+          }
         }
       };
       img.onerror = () => {
