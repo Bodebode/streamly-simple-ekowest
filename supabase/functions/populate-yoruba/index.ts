@@ -23,7 +23,7 @@ async function searchYouTube(apiKey: string) {
 async function getVideoDetails(videoIds: string[], apiKey: string) {
   console.log('Fetching video details...');
   const detailsResponse = await fetch(
-    `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${videoIds.join(',')}&key=${apiKey}`
+    `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics,status&id=${videoIds.join(',')}&key=${apiKey}`
   )
   
   if (!detailsResponse.ok) {

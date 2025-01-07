@@ -16,6 +16,9 @@ interface VideoDetails {
     likeCount: string;
     commentCount: string;
   };
+  status?: {
+    embeddable?: boolean;
+  };
 }
 
 export const validateAndTransformVideo = async (
@@ -37,7 +40,10 @@ export const validateAndTransformVideo = async (
   const views = parseInt(video.statistics.viewCount || '0');
   const likeRatio = views > 0 ? likes / views : 0;
 
-  // Call validate_yoruba_criteria function with thumbnail
+  // Check if video is embeddable
+  const isEmbeddable = video.status?.embeddable !== false;
+
+  // Call validate_yoruba_criteria function with thumbnail and embeddable status
   const { data: criteriaResult, error: criteriaError } = await supabase
     .rpc('validate_yoruba_criteria', {
       p_duration: durationInSeconds,
@@ -50,7 +56,8 @@ export const validateAndTransformVideo = async (
       p_cultural_elements: ['yoruba'],
       p_storytelling_pattern: 'traditional',
       p_setting_authenticity: true,
-      p_thumbnail_url: thumbnailUrl
+      p_thumbnail_url: thumbnailUrl,
+      p_is_embeddable: isEmbeddable
     });
 
   if (criteriaError) {
@@ -79,6 +86,7 @@ export const validateAndTransformVideo = async (
     is_available: true,
     cached_at: new Date().toISOString(),
     expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-    criteria_met: criteriaResult
+    criteria_met: criteriaResult,
+    is_embeddable: isEmbeddable
   };
 };

@@ -24,6 +24,7 @@ export type Database = {
           id: string
           image: string
           is_available: boolean | null
+          is_embeddable: boolean | null
           language_tags: string[] | null
           last_availability_check: string | null
           last_error: string | null
@@ -52,6 +53,7 @@ export type Database = {
           id: string
           image: string
           is_available?: boolean | null
+          is_embeddable?: boolean | null
           language_tags?: string[] | null
           last_availability_check?: string | null
           last_error?: string | null
@@ -80,6 +82,7 @@ export type Database = {
           id?: string
           image?: string
           is_available?: boolean | null
+          is_embeddable?: boolean | null
           language_tags?: string[] | null
           last_availability_check?: string | null
           last_error?: string | null
@@ -165,6 +168,23 @@ export type Database = {
               p_storytelling_pattern: string
               p_setting_authenticity: boolean
               p_thumbnail_url: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_duration: number
+              p_quality: string
+              p_views: number
+              p_language_tags: string[]
+              p_channel_metadata: Json
+              p_content_tags: string[]
+              p_like_ratio: number
+              p_cultural_elements: string[]
+              p_storytelling_pattern: string
+              p_setting_authenticity: boolean
+              p_thumbnail_url: string
+              p_is_embeddable: boolean
             }
             Returns: Json
           }
