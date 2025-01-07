@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { CachedMovie } from '@/types/movies';
 
 const placeholderNewReleases = [
   {
@@ -87,6 +88,8 @@ export const useNewReleases = () => {
           .select('*')
           .eq('category', 'New Release')
           .eq('is_available', true)
+          .eq('is_embeddable', true)
+          .gte('duration', 2700)
           .gt('expires_at', new Date().toISOString())
           .order('cached_at', { ascending: false })
           .limit(12);
