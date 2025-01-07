@@ -54,9 +54,6 @@ export const useYorubaMovies = () => {
             .gt('expires_at', new Date().toISOString())
             .gte('duration', 2700)
             .gte('views', 100000)
-            .gte('like_ratio', 0.005)
-            .eq('setting_authenticity', true)
-            .not('cultural_elements', 'is', null)
             .order('access_count', { ascending: false })
             .limit(12);
 
@@ -79,9 +76,6 @@ export const useYorubaMovies = () => {
               .eq('is_embeddable', true)
               .gt('expires_at', new Date().toISOString())
               .gte('views', 100000)
-              .gte('like_ratio', 0.005)
-              .eq('setting_authenticity', true)
-              .not('cultural_elements', 'is', null)
               .order('access_count', { ascending: false })
               .limit(12);
 
