@@ -27,7 +27,14 @@ const MovieCarouselComponent = ({ movies, onMovieSelect, isVideoPlaying }: Movie
   const isMobile = useIsMobile();
 
   // Ensure movies array is valid and each movie has a unique id
-  const validMovies = movies.filter(movie => movie && typeof movie.id === 'number');
+  // Remove any duplicates based on videoId
+  const uniqueMovies = movies.reduce((acc: Movie[], current) => {
+    const isDuplicate = acc.find(movie => movie.videoId === current.videoId);
+    if (!isDuplicate && current && typeof current.id === 'number') {
+      acc.push(current);
+    }
+    return acc;
+  }, []);
 
   return (
     <Carousel
@@ -38,9 +45,9 @@ const MovieCarouselComponent = ({ movies, onMovieSelect, isVideoPlaying }: Movie
       className="w-full"
     >
       <CarouselContent className="-ml-2 md:-ml-4">
-        {validMovies.map((movie) => (
+        {uniqueMovies.map((movie) => (
           <CarouselItem 
-            key={`movie-${movie.id}`}
+            key={`movie-${movie.videoId || movie.id}`}
             className="pl-2 md:pl-4 basis-[140px] md:basis-[200px] transition-transform duration-300 hover:scale-105"
           >
             <MovieCard
