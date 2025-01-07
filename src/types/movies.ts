@@ -50,7 +50,7 @@ export interface CachedMovie {
   duration?: number | null;
   video_quality?: string | null;
   language_tags?: string[] | null;
-  channel_metadata?: Json | null;  // Updated to use Json type
+  channel_metadata?: Json | null;
   content_tags?: string[] | null;
   like_ratio?: number | null;
   cultural_elements?: string[] | null;

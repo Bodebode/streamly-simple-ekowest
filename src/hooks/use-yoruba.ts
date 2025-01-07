@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { MOCK_MOVIES } from '@/data/mockMovies';
-import { CachedMovie } from '@/types/movies';
+import { CachedMovie, Movie } from '@/types/movies';
 
 export const useYorubaMovies = () => {
   return useQuery({
@@ -85,15 +85,15 @@ export const useYorubaMovies = () => {
             }
 
             toast.info('Showing available content with relaxed duration criteria');
-            return transformVideosToMovies(relaxedDurationVideos as CachedMovie[]);
+            return transformVideosToMovies(relaxedDurationVideos as unknown as CachedMovie[]);
           }
 
           toast.info('Showing available content with relaxed quality criteria');
-          return transformVideosToMovies(relaxedQualityVideos as CachedMovie[]);
+          return transformVideosToMovies(relaxedQualityVideos as unknown as CachedMovie[]);
         }
 
         // Transform and return the strict results
-        return transformVideosToMovies(strictVideos as CachedMovie[]);
+        return transformVideosToMovies(strictVideos as unknown as CachedMovie[]);
 
       } catch (error) {
         console.error('Error in Yoruba movies query:', error);
@@ -107,7 +107,7 @@ export const useYorubaMovies = () => {
   });
 };
 
-const transformVideosToMovies = (videos: CachedMovie[]) => {
+const transformVideosToMovies = (videos: CachedMovie[]): Movie[] => {
   return videos.map((video, index) => ({
     id: index + 1,
     title: video.title,
