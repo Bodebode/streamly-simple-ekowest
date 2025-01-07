@@ -33,9 +33,12 @@ export const useYorubaMovies = () => {
         // Transform and validate the data
         const movies = cachedVideos
           .filter(video => {
-            // Check if criteria_met exists and is an object
-            const criteriaMet = typeof video.criteria_met === 'object' ? video.criteria_met : null;
-            return criteriaMet?.meets_criteria === true;
+            if (typeof video.criteria_met !== 'object' || !video.criteria_met) {
+              return false;
+            }
+            // Safely access the meets_criteria property
+            const criteriaMet = video.criteria_met as { meets_criteria?: boolean };
+            return criteriaMet.meets_criteria === true;
           })
           .map((video, index) => ({
             id: index + 1,
