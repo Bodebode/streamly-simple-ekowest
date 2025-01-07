@@ -15,17 +15,24 @@ interface Movie {
 interface CategoryRowProps {
   title: string;
   movies: Movie[];
+  selectedVideoId: string | null;
+  onVideoSelect: (videoId: string | null) => void;
   updateHighlyRated?: (movies: Movie[]) => void;
 }
 
-const CategoryRowComponent = ({ title, movies, updateHighlyRated }: CategoryRowProps) => {
-  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
+const CategoryRowComponent = ({ 
+  title, 
+  movies, 
+  selectedVideoId, 
+  onVideoSelect, 
+  updateHighlyRated 
+}: CategoryRowProps) => {
   const [filteredMovies, setFilteredMovies] = useState<Movie[]>(movies);
   const { isLoading } = useRelatedVideos(selectedVideoId, title, movies);
 
   const handleCloseVideo = useCallback(() => {
-    setSelectedVideoId(null);
-  }, []);
+    onVideoSelect(null);
+  }, [onVideoSelect]);
 
   useEffect(() => {
     // Only filter out movies without videoIds
@@ -36,18 +43,22 @@ const CategoryRowComponent = ({ title, movies, updateHighlyRated }: CategoryRowP
     checkVideoAvailability();
   }, [movies]);
 
+  const isPlayingInThisRow = selectedVideoId && movies.some(movie => movie.videoId === selectedVideoId);
+
   return (
-    <div className="mb-16"> {/* Changed from mb-8 to mb-16 for more vertical spacing */}
+    <div className="mb-16">
       <h2 className="text-xl md:text-2xl font-bold mb-4 px-4 md:text-center">
         {title} {isLoading && title === 'Comedy' && '(Loading...)'}
       </h2>
       <div className="relative px-4 md:px-16">
         <MovieCarousel
           movies={filteredMovies}
-          onMovieSelect={setSelectedVideoId}
+          onMovieSelect={onVideoSelect}
           isVideoPlaying={selectedVideoId !== null}
         />
-        {selectedVideoId && <VideoPlayer videoId={selectedVideoId} onClose={handleCloseVideo} />}
+        {isPlayingInThisRow && selectedVideoId && (
+          <VideoPlayer videoId={selectedVideoId} onClose={handleCloseVideo} />
+        )}
       </div>
     </div>
   );

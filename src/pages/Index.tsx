@@ -8,7 +8,7 @@ import { useHighlyRated } from '@/hooks/use-highly-rated';
 import { useNewReleases } from '@/hooks/use-new-releases';
 import { useSkits } from '@/hooks/use-skits';
 import { useYorubaMovies } from '@/hooks/use-yoruba';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { MOCK_MOVIES } from '../data/mockMovies';
 import { usePopulateSections } from '@/hooks/use-populate-sections';
@@ -16,6 +16,7 @@ import { transformCachedToMovie } from '@/utils/movie-transforms';
 
 const Index = () => {
   const { theme, setTheme } = useTheme();
+  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
   const { data: highlyRatedVideos, isLoading: isLoadingHighlyRated, refetch: refetchHighlyRated } = useHighlyRated();
   const { data: newReleases, isLoading: isLoadingNewReleases, refetch: refetchNewReleases } = useNewReleases();
   const { data: skits, isLoading: isLoadingSkits, refetch: refetchSkits } = useSkits();
@@ -66,23 +67,36 @@ const Index = () => {
       <div className="pt-16">
         <Hero />
         <div className="pb-8">
-          <CategoryRow title="Trending Now" movies={MOCK_MOVIES.trending} />
+          <CategoryRow 
+            title="Trending Now" 
+            movies={MOCK_MOVIES.trending}
+            selectedVideoId={selectedVideoId}
+            onVideoSelect={setSelectedVideoId}
+          />
           <CategoryRow 
             title="Highly Rated" 
             movies={highlyRatedVideos ? transformCachedToMovie(highlyRatedVideos) : MOCK_MOVIES.highlyRated}
+            selectedVideoId={selectedVideoId}
+            onVideoSelect={setSelectedVideoId}
           />
           <CategoryRow 
             title="Yoruba Movies" 
             movies={yorubaMovies || []}
+            selectedVideoId={selectedVideoId}
+            onVideoSelect={setSelectedVideoId}
           />
           <CategoryRow 
             title="Skits" 
             movies={skits ? transformCachedToMovie(skits) : MOCK_MOVIES.skits}
+            selectedVideoId={selectedVideoId}
+            onVideoSelect={setSelectedVideoId}
           />
           <div ref={newReleaseRef} id="new-release">
             <CategoryRow 
               title="New Release" 
               movies={newReleases ? transformCachedToMovie(newReleases) : []}
+              selectedVideoId={selectedVideoId}
+              onVideoSelect={setSelectedVideoId}
             />
           </div>
         </div>
