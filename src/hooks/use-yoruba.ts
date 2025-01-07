@@ -33,6 +33,11 @@ export const useYorubaMovies = () => {
 
         console.log(`Found ${strictVideos?.length || 0} videos meeting all criteria`);
 
+        // If we have strict results but less than optimal, log for monitoring
+        if (strictVideos && strictVideos.length > 0 && strictVideos.length < 8) {
+          console.warn(`Only ${strictVideos.length} videos meet strict criteria. Consider content acquisition.`);
+        }
+
         // If no strict results, try with relaxed quality
         if (!strictVideos || strictVideos.length === 0) {
           console.log('No videos meet strict criteria. Attempting with relaxed quality...');
@@ -80,15 +85,21 @@ export const useYorubaMovies = () => {
 
             if (!relaxedDurationVideos || relaxedDurationVideos.length === 0) {
               console.log('No videos found with any criteria, using mock data');
-              toast.info('Showing sample content while we gather more high-quality videos');
+              toast.info('Showing sample content while we gather more high-quality videos', {
+                duration: 5000,
+              });
               return MOCK_MOVIES.yoruba;
             }
 
-            toast.info('Showing available content with relaxed duration criteria');
+            toast.info('Showing available content with relaxed duration criteria', {
+              duration: 5000,
+            });
             return transformVideosToMovies(relaxedDurationVideos as unknown as CachedMovie[]);
           }
 
-          toast.info('Showing available content with relaxed quality criteria');
+          toast.info('Showing available content with relaxed quality criteria', {
+            duration: 5000,
+          });
           return transformVideosToMovies(relaxedQualityVideos as unknown as CachedMovie[]);
         }
 
