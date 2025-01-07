@@ -30,50 +30,9 @@ export const useYorubaMovies = () => {
           return MOCK_MOVIES.yoruba;
         }
 
-        // Transform and validate the data with detailed logging
+        // Transform and validate the data
         const movies = cachedVideos
-          .filter(video => {
-            const criteria = video.criteria_met as { 
-              essential: {
-                duration: boolean;
-                quality: boolean;
-                views: boolean;
-              };
-              non_essential: {
-                title_description: boolean;
-                channel: boolean;
-                language: boolean;
-                distribution: boolean;
-                upload_date: boolean;
-                like_ratio: boolean;
-                comments: boolean;
-                cultural_elements: boolean;
-                storytelling: boolean;
-                settings: boolean;
-              };
-              meets_criteria: boolean;
-            } | null;
-
-            if (!criteria?.meets_criteria) {
-              console.log('\nVideo failed criteria check:', video.title);
-              console.log('Essential criteria results:');
-              if (criteria) {
-                console.log(`Duration (${video.duration}s): ${criteria.essential.duration ? 'PASS' : 'FAIL'} (need ≥1800s)`);
-                console.log(`Quality (${video.video_quality}): ${criteria.essential.quality ? 'PASS' : 'FAIL'} (need 1080p+)`);
-                console.log(`Views (${video.views}): ${criteria.essential.views ? 'PASS' : 'FAIL'} (need ≥400000)`);
-                
-                const passedNonEssential = Object.entries(criteria.non_essential)
-                  .filter(([_, passed]) => passed).length;
-                console.log(`Non-essential criteria passed: ${passedNonEssential}/10 (need at least 4)`);
-                
-                if (video.like_ratio) {
-                  console.log(`Like ratio: ${video.like_ratio} (target: ≥0.8)`);
-                }
-              }
-              return false;
-            }
-            return true;
-          })
+          .filter(video => video.criteria_met?.meets_criteria)
           .map((video, index) => ({
             id: index + 1,
             title: video.title,
@@ -82,11 +41,8 @@ export const useYorubaMovies = () => {
             videoId: video.video_id
           }));
 
-        console.log('\nFinal valid movies count:', movies.length);
-        if (movies.length > 0) {
-          console.log('First valid movie:', movies[0].title);
-        }
-
+        console.log('Final valid movies count:', movies.length);
+        
         if (movies.length === 0) {
           console.log('No videos passed criteria, using mock data');
           return MOCK_MOVIES.yoruba;
