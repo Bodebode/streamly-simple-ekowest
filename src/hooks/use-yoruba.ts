@@ -32,7 +32,11 @@ export const useYorubaMovies = () => {
 
         // Transform and validate the data
         const movies = cachedVideos
-          .filter(video => video.criteria_met?.meets_criteria)
+          .filter(video => {
+            // Check if criteria_met exists and is an object
+            const criteriaMet = typeof video.criteria_met === 'object' ? video.criteria_met : null;
+            return criteriaMet?.meets_criteria === true;
+          })
           .map((video, index) => ({
             id: index + 1,
             title: video.title,
