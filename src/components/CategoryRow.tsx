@@ -3,6 +3,7 @@ import { useState, memo, useCallback, useEffect } from 'react';
 import { MovieCarousel } from './movie/MovieCarousel';
 import { useRelatedVideos } from '@/hooks/use-related-videos';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Movie {
   id: number;
@@ -74,6 +75,16 @@ const CategoryRowComponent = ({ title, movies, updateHighlyRated }: CategoryRowP
       }
 
       setFilteredMovies(validMovies);
+
+      // Check video availability
+      try {
+        const { error } = await supabase.functions.invoke('check-video-availability');
+        if (error) {
+          console.error('Error checking video availability:', error);
+        }
+      } catch (error) {
+        console.error('Failed to check video availability:', error);
+      }
     };
 
     filterMovies();
