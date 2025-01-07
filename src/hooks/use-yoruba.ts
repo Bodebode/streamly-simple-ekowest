@@ -85,15 +85,15 @@ export const useYorubaMovies = () => {
             }
 
             toast.info('Showing available content with relaxed duration criteria');
-            return transformVideosToMovies(relaxedDurationVideos);
+            return transformVideosToMovies(relaxedDurationVideos as CachedMovie[]);
           }
 
           toast.info('Showing available content with relaxed quality criteria');
-          return transformVideosToMovies(relaxedQualityVideos);
+          return transformVideosToMovies(relaxedQualityVideos as CachedMovie[]);
         }
 
         // Transform and return the strict results
-        return transformVideosToMovies(strictVideos);
+        return transformVideosToMovies(strictVideos as CachedMovie[]);
 
       } catch (error) {
         console.error('Error in Yoruba movies query:', error);

@@ -50,7 +50,7 @@ export interface CachedMovie {
   duration?: number | null;
   video_quality?: string | null;
   language_tags?: string[] | null;
-  channel_metadata?: Record<string, any> | null;
+  channel_metadata?: Json | null;  // Updated to use Json type
   content_tags?: string[] | null;
   like_ratio?: number | null;
   cultural_elements?: string[] | null;
@@ -58,3 +58,6 @@ export interface CachedMovie {
   setting_authenticity?: boolean | null;
   criteria_met?: CriteriaMet | null;
 }
+
+// Import Json type from Supabase types
+import { Json } from '@/integrations/supabase/types';
