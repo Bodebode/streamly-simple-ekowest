@@ -13,7 +13,6 @@ import { useLocation } from 'react-router-dom';
 import { MOCK_MOVIES } from '../data/mockMovies';
 import { usePopulateSections } from '@/hooks/use-populate-sections';
 import { transformCachedToMovie } from '@/utils/movie-transforms';
-import { Movie, CachedMovie } from '@/types/movies';
 
 const Index = () => {
   const { theme, setTheme } = useTheme();
@@ -70,7 +69,7 @@ const Index = () => {
           <CategoryRow title="Trending Now" movies={MOCK_MOVIES.trending} />
           <CategoryRow 
             title="Highly Rated" 
-            movies={highlyRatedVideos ? transformCachedToMovie(highlyRatedVideos as CachedMovie[]) : MOCK_MOVIES.highlyRated}
+            movies={highlyRatedVideos ? transformCachedToMovie(highlyRatedVideos) : MOCK_MOVIES.highlyRated}
           />
           <CategoryRow 
             title="Yoruba Movies" 
@@ -78,12 +77,12 @@ const Index = () => {
           />
           <CategoryRow 
             title="Skits" 
-            movies={skits ? transformCachedToMovie(skits as CachedMovie[]) : MOCK_MOVIES.skits}
+            movies={skits ? transformCachedToMovie(skits) : MOCK_MOVIES.skits}
           />
           <div ref={newReleaseRef} id="new-release">
             <CategoryRow 
               title="New Release" 
-              movies={newReleases ? transformCachedToMovie(newReleases as CachedMovie[]) : []}
+              movies={newReleases ? transformCachedToMovie(newReleases) : []}
             />
           </div>
         </div>
