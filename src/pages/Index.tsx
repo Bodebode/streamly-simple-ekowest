@@ -8,23 +8,10 @@ import { useHighlyRated } from '@/hooks/use-highly-rated';
 import { useNewReleases } from '@/hooks/use-new-releases';
 import { useSkits } from '@/hooks/use-skits';
 import { useYorubaMovies } from '@/hooks/use-yoruba';
-import { MOCK_MOVIES } from '../data/mockMovies';
-import { useEffect, useRef, memo, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Movie } from '../types/movies';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { useQueryClient } from '@tanstack/react-query';
-
-const transformCachedToMovie = (movies: any[]): Movie[] => {
-  return movies.map(movie => ({
-    id: parseInt(movie.id),
-    title: movie.title,
-    image: movie.image,
-    category: movie.category,
-    videoId: movie.video_id
-  }));
-};
+import { MOCK_MOVIES } from '../data/mockMovies';
+import { usePopulateSections } from '@/hooks/use-populate-sections';
 
 const Index = () => {
   const { theme, setTheme } = useTheme();
@@ -34,8 +21,13 @@ const Index = () => {
   const { data: yorubaMovies, isLoading: isLoadingYoruba, refetch: refetchYoruba } = useYorubaMovies();
   const newReleaseRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
-  const [isPopulating, setIsPopulating] = useState(false);
-  const queryClient = useQueryClient();
+
+  const { isPopulating, populateAllSections } = usePopulateSections({
+    refetchYoruba,
+    refetchHighlyRated,
+    refetchNewReleases,
+    refetchSkits
+  });
 
   useEffect(() => {
     if (location.hash === '#new-release' && newReleaseRef.current) {
@@ -45,65 +37,6 @@ const Index = () => {
       });
     }
   }, [location.hash]);
-
-  const populateAllSections = async () => {
-    if (isPopulating) return;
-    
-    try {
-      setIsPopulating(true);
-      const toastId = toast.loading('Fetching fresh content for all sections... This may take a minute.');
-      
-      // Fetch all sections in parallel
-      const promises = [
-        supabase.functions.invoke('populate-yoruba'),
-        supabase.functions.invoke('get-highly-rated'),
-        supabase.functions.invoke('get-new-releases'),
-        supabase.functions.invoke('get-skits')
-      ];
-
-      const results = await Promise.allSettled(promises);
-      
-      let successCount = 0;
-      let errorCount = 0;
-
-      results.forEach((result, index) => {
-        if (result.status === 'fulfilled') {
-          successCount++;
-        } else {
-          console.error(`Error in promise ${index}:`, result.reason);
-          errorCount++;
-        }
-      });
-
-      // Invalidate and refetch all queries
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['yorubaMovies'] }),
-        queryClient.invalidateQueries({ queryKey: ['highlyRated'] }),
-        queryClient.invalidateQueries({ queryKey: ['newReleases'] }),
-        queryClient.invalidateQueries({ queryKey: ['skits'] })
-      ]);
-
-      // Refetch all sections
-      await Promise.all([
-        refetchYoruba(),
-        refetchHighlyRated(),
-        refetchNewReleases(),
-        refetchSkits()
-      ]);
-      
-      if (errorCount === 0) {
-        toast.success('Successfully refreshed all sections', { id: toastId });
-      } else {
-        toast.warning(`Refreshed ${successCount} sections, ${errorCount} failed`, { id: toastId });
-      }
-      
-    } catch (error) {
-      console.error('Error:', error);
-      toast.error('Failed to refresh content');
-    } finally {
-      setIsPopulating(false);
-    }
-  };
 
   return (
     <div className="min-h-screen">
@@ -157,4 +90,4 @@ const Index = () => {
   );
 };
 
-export default memo(Index);
+export default Index;
