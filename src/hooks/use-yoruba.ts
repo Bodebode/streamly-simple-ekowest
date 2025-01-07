@@ -23,7 +23,8 @@ export const useYorubaMovies = () => {
           return MOCK_MOVIES.yoruba;
         }
 
-        console.log('Raw cached videos count:', cachedVideos?.length);
+        console.log('Total Yoruba movies in database:', cachedVideos?.length);
+        console.log('Raw cached videos:', cachedVideos);
         
         if (!cachedVideos || cachedVideos.length === 0) {
           console.log('No cached videos found, using mock data');

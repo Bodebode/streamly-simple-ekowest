@@ -26,7 +26,6 @@ interface MovieCarouselProps {
 const MovieCarouselComponent = ({ movies, onMovieSelect, isVideoPlaying }: MovieCarouselProps) => {
   const isMobile = useIsMobile();
 
-  // Ensure movies array is valid and each movie has a unique id
   // Remove any duplicates based on videoId
   const uniqueMovies = movies.reduce((acc: Movie[], current) => {
     const isDuplicate = acc.find(movie => movie.videoId === current.videoId);
@@ -35,6 +34,9 @@ const MovieCarouselComponent = ({ movies, onMovieSelect, isVideoPlaying }: Movie
     }
     return acc;
   }, []);
+
+  console.log(`[MovieCarousel] Original movies count: ${movies.length}`);
+  console.log(`[MovieCarousel] Unique movies count after filtering: ${uniqueMovies.length}`);
 
   return (
     <Carousel
