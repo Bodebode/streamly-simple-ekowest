@@ -1,5 +1,5 @@
 import { VideoPlayer } from './VideoPlayer';
-import { useState, memo, useCallback, useEffect } from 'react';
+import { useState, memo, useCallback } from 'react';
 import { MovieCarousel } from './movie/MovieCarousel';
 import { useRelatedVideos } from '@/hooks/use-related-videos';
 
@@ -24,25 +24,6 @@ const CategoryRowComponent = ({ title, movies, updateHighlyRated }: CategoryRowP
   const handleCloseVideo = useCallback(() => {
     setSelectedVideoId(null);
   }, []);
-
-  // Automatically check thumbnails for Yoruba movies section
-  useEffect(() => {
-    if (title === 'Yoruba Movies') {
-      console.log(`\n[Yoruba Movies Section] Checking ${movies.length} movies for thumbnail quality...`);
-      movies.forEach(movie => {
-        if (movie.videoId) {
-          const maxResUrl = `https://img.youtube.com/vi/${movie.videoId}/maxresdefault.jpg`;
-          const img = new Image();
-          img.onload = () => {
-            if (img.width === 120 && img.height === 90) {
-              console.log(`[Yoruba Movie Quality Alert] "${movie.title}" (${movie.videoId}) has a low-quality thumbnail`);
-            }
-          };
-          img.src = maxResUrl;
-        }
-      });
-    }
-  }, [title, movies]);
 
   return (
     <div className="mb-8">
