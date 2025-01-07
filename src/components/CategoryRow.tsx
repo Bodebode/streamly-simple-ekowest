@@ -21,7 +21,7 @@ interface CategoryRowProps {
 
 const CategoryRowComponent = ({ title, movies, updateHighlyRated }: CategoryRowProps) => {
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
-  const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
+  const [filteredMovies, setFilteredMovies] = useState<Movie[]>(movies);
   const { isLoading } = useRelatedVideos(selectedVideoId, title, movies);
 
   const handleCloseVideo = useCallback(() => {
@@ -31,6 +31,7 @@ const CategoryRowComponent = ({ title, movies, updateHighlyRated }: CategoryRowP
   useEffect(() => {
     const filterMovies = async () => {
       const validMovies = [];
+      let lowQualityCount = 0;
       
       for (const movie of movies) {
         if (!movie.videoId) continue;
@@ -39,24 +40,28 @@ const CategoryRowComponent = ({ title, movies, updateHighlyRated }: CategoryRowP
         
         if (hasHighQualityThumbnail) {
           validMovies.push(movie);
+        } else {
+          lowQualityCount++;
         }
       }
 
-      if (validMovies.length === 0) {
+      // Only show toast if all videos are low quality
+      if (validMovies.length === 0 && lowQualityCount > 0) {
+        console.log(`All ${lowQualityCount} videos in ${title} category have low quality thumbnails`);
         toast.error(`No high-quality videos available in ${title} category`);
+        // Use original movies as fallback when all are filtered out
+        setFilteredMovies(movies);
+      } else {
+        setFilteredMovies(validMovies.length > 0 ? validMovies : movies);
       }
 
-      setFilteredMovies(validMovies);
       await checkVideoAvailability();
     };
 
     filterMovies();
   }, [movies, title]);
 
-  if (filteredMovies.length === 0) {
-    return null;
-  }
-
+  // Don't return null, always show the section
   return (
     <div className="mb-8">
       <h2 className="text-xl md:text-2xl font-bold mb-4 px-4 md:text-center">
