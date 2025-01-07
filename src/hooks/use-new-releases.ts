@@ -87,7 +87,6 @@ export const useNewReleases = () => {
           .select('*')
           .eq('category', 'New Release')
           .eq('is_available', true)
-          .gte('duration', 2700) // Filter for videos >= 45 minutes (2700 seconds)
           .gt('expires_at', new Date().toISOString())
           .order('cached_at', { ascending: false })
           .limit(12);

@@ -73,7 +73,7 @@ const Index = () => {
           />
           <CategoryRow 
             title="Yoruba Movies" 
-            movies={yorubaMovies ? transformCachedToMovie(yorubaMovies) : []}
+            movies={yorubaMovies || []}
           />
           <CategoryRow 
             title="Skits" 
