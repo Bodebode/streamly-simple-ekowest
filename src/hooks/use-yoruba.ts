@@ -24,39 +24,67 @@ export const useYorubaMovies = () => {
         }
 
         console.log('Raw cached videos count:', cachedVideos?.length);
-        console.log('Raw cached videos:', cachedVideos);
         
         if (!cachedVideos || cachedVideos.length === 0) {
           console.log('No cached videos found, using mock data');
           return MOCK_MOVIES.yoruba;
         }
 
-        // Transform and validate the data
+        // Transform and validate the data with detailed logging
         const movies = cachedVideos
           .filter(video => {
-            const criteria = video.criteria_met as { meets_criteria: boolean } | null;
+            const criteria = video.criteria_met as { 
+              essential: {
+                duration: boolean;
+                quality: boolean;
+                views: boolean;
+              };
+              non_essential: {
+                title_description: boolean;
+                channel: boolean;
+                language: boolean;
+                distribution: boolean;
+                upload_date: boolean;
+                like_ratio: boolean;
+                comments: boolean;
+                cultural_elements: boolean;
+                storytelling: boolean;
+                settings: boolean;
+              };
+              meets_criteria: boolean;
+            } | null;
+
             if (!criteria?.meets_criteria) {
-              console.log('Video failed criteria:', video.title);
+              console.log('\nVideo failed criteria check:', video.title);
+              if (criteria) {
+                console.log('Essential criteria results:');
+                console.log('- Duration:', criteria.essential.duration ? 'PASS' : 'FAIL');
+                console.log('- Quality:', criteria.essential.quality ? 'PASS' : 'FAIL');
+                console.log('- Views:', criteria.essential.views ? 'PASS' : 'FAIL');
+                
+                const passedNonEssential = Object.entries(criteria.non_essential)
+                  .filter(([_, passed]) => passed).length;
+                console.log(`Non-essential criteria passed: ${passedNonEssential}/10 (need at least 4)`);
+              }
               return false;
             }
             return true;
           })
-          .map((video, index) => {
-            console.log('Processing video:', video.title, 'with ID:', video.video_id);
-            return {
-              id: index + 1,
-              title: video.title,
-              image: video.image,
-              category: video.category,
-              videoId: video.video_id
-            };
-          });
+          .map((video, index) => ({
+            id: index + 1,
+            title: video.title,
+            image: video.image,
+            category: video.category,
+            videoId: video.video_id
+          }));
 
-        console.log('Final transformed movies:', movies);
-        console.log('Final movies count:', movies.length);
+        console.log('\nFinal valid movies count:', movies.length);
+        if (movies.length > 0) {
+          console.log('First valid movie:', movies[0].title);
+        }
 
         if (movies.length === 0) {
-          console.log('No valid movies after transformation, using mock data');
+          console.log('No videos passed criteria, using mock data');
           return MOCK_MOVIES.yoruba;
         }
 
