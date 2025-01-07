@@ -10,7 +10,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { memo } from 'react';
 
 interface Movie {
-  id: number;
+  id: string | number;
   title: string;
   image: string;
   category: string;
@@ -29,7 +29,7 @@ const MovieCarouselComponent = ({ movies, onMovieSelect, isVideoPlaying }: Movie
   // Remove any duplicates based on videoId and limit to 12 movies
   const uniqueMovies = movies.reduce((acc: Movie[], current) => {
     const isDuplicate = acc.find(movie => movie.videoId === current.videoId);
-    if (!isDuplicate && current && typeof current.id === 'number' && acc.length < 12) {
+    if (!isDuplicate && current && acc.length < 12) {
       acc.push(current);
     }
     return acc;
