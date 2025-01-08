@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { Play } from 'lucide-react';
 import { truncateTitle } from '@/lib/utils';
 
 interface MovieCardPreviewProps {
@@ -19,6 +20,13 @@ const MovieCardPreviewComponent = ({ videoId, title, category, showTitle, onClic
         allowFullScreen
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent rounded-lg">
+        <button 
+          onClick={onClick}
+          className="absolute top-4 left-4 bg-koya-accent hover:bg-opacity-80 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-500 transform animate-fade-in"
+        >
+          <Play className="w-4 h-4" />
+          Watch Now
+        </button>
         {showTitle && (
           <div className="absolute bottom-0 left-0 right-0 p-4">
             <h3 className="text-lg font-bold text-white">{truncateTitle(title)}</h3>
