@@ -88,7 +88,6 @@ export const useNewReleases = () => {
           .eq('category', 'New Release')
           .eq('is_available', true)
           .gt('expires_at', new Date().toISOString())
-          .gte('duration', 2400) // 40 minutes = 2400 seconds
           .order('cached_at', { ascending: false })
           .limit(12);
         
