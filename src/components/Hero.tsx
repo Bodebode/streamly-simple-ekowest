@@ -11,7 +11,7 @@ export const Hero = () => {
         playsInline
       >
         <source 
-          src="https://yuisywwlzorzdrzvjlvm.supabase.co/storage/v1/object/public/videos/[YOUR-VIDEO-FILENAME]" 
+          src="https://yuisywwlzorzdrzvjlvm.supabase.co/storage/v1/object/public/videos/wbd-hero-animation_24_0_0.mp4" 
           type="video/mp4"
         />
       </video>
