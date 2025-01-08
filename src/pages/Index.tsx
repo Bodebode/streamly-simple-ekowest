@@ -23,6 +23,7 @@ const Index = () => {
   const { data: skits, isLoading: isLoadingSkits, refetch: refetchSkits } = useSkits();
   const { data: yorubaMovies, isLoading: isLoadingYoruba, refetch: refetchYoruba } = useYorubaMovies();
   const newReleaseRef = useRef<HTMLDivElement>(null);
+  const playerRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
 
   const { isPopulating, populateAllSections } = usePopulateSections({
@@ -40,6 +41,21 @@ const Index = () => {
       });
     }
   }, [location.hash]);
+
+  // Add effect to handle scrolling when video is selected
+  useEffect(() => {
+    if (selectedVideoId && playerRef.current) {
+      const playerElement = playerRef.current;
+      const elementRect = playerElement.getBoundingClientRect();
+      const absoluteElementTop = elementRect.top + window.pageYOffset;
+      const middle = absoluteElementTop - (window.innerHeight / 2) + (elementRect.height / 2);
+      
+      window.scrollTo({
+        top: middle,
+        behavior: 'smooth'
+      });
+    }
+  }, [selectedVideoId]);
 
   return (
     <div className="min-h-screen">
@@ -68,6 +84,16 @@ const Index = () => {
       <div className="pt-16">
         <Hero />
         <div className="pb-8">
+          {selectedVideoId && (
+            <div ref={playerRef}>
+              <CategoryRow 
+                title="Now Playing"
+                movies={[]}
+                selectedVideoId={selectedVideoId}
+                onVideoSelect={setSelectedVideoId}
+              />
+            </div>
+          )}
           <CategoryRow 
             title="Trending Now" 
             movies={MOCK_MOVIES.trending}
