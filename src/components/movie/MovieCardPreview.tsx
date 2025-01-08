@@ -10,6 +10,12 @@ interface MovieCardPreviewProps {
 }
 
 const MovieCardPreviewComponent = ({ videoId, title, category, showTitle, onClick }: MovieCardPreviewProps) => {
+  // First truncate the title using the existing function
+  const truncatedTitle = truncateTitle(title);
+  
+  // Then limit to first 3 words for preview
+  const previewTitle = truncatedTitle.split(' ').slice(0, 3).join(' ');
+
   return (
     <div className="relative w-full h-full" onClick={onClick}>
       <iframe
@@ -21,7 +27,7 @@ const MovieCardPreviewComponent = ({ videoId, title, category, showTitle, onClic
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent rounded-lg">
         {showTitle && (
           <div className="absolute bottom-0 left-0 right-0 p-4">
-            <h3 className="text-lg font-bold text-white">{truncateTitle(title)}</h3>
+            <h3 className="text-lg font-bold text-white">{previewTitle}</h3>
             <p className="text-sm text-koya-subtext mb-2">{category}</p>
           </div>
         )}
