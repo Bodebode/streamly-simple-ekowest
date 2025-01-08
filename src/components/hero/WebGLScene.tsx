@@ -7,7 +7,6 @@ import type { SceneProps } from './scene/types';
 
 export const WebGLScene = ({ theme, containerRef, onError, onAnimationComplete }: SceneProps) => {
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
-  const loopCountRef = useRef(0);
   const particleSystemRef = useRef<ParticleSystem | null>(null);
 
   useEffect(() => {
@@ -43,41 +42,31 @@ export const WebGLScene = ({ theme, containerRef, onError, onAnimationComplete }
     scene.add(particleSystem.getMesh());
 
     let frame = 0;
-    const loopDuration = 4;
-    let isSecondAnimation = false;
+    const totalDuration = 6; // Total animation duration in seconds
+    const firstAnimationDuration = 5.5; // Duration of first animation
     
     const animate = () => {
-      if (!isSecondAnimation) {
-        frame = (frame + 1) % (60 * loopDuration);
-        const t = frame / (60 * loopDuration);
+      frame = (frame + 1);
+      const t = frame / (60 * totalDuration); // Normalized time over total duration
 
-        if (frame === 0) {
-          loopCountRef.current += 1;
-          if (loopCountRef.current === 2) {
-            isSecondAnimation = true;
-            particleSystem.setSecondAnimation(true);
-            onAnimationComplete?.();
-          }
-        }
-      } else {
-        // Second animation timing
-        const t = (Date.now() % 2000) / 2000; // 2-second loop
+      if (t >= 1) {
+        // Animation complete, trigger callback
+        onAnimationComplete?.();
+        return;
       }
 
-      const currentT = isSecondAnimation 
-        ? (Date.now() % 2000) / 2000 
-        : frame / (60 * loopDuration);
+      // Calculate progress for each animation phase
+      const isFirstAnimation = t < (firstAnimationDuration / totalDuration);
+      const currentT = isFirstAnimation 
+        ? (t * totalDuration) / firstAnimationDuration // Normalize time for first animation
+        : ((t * totalDuration - firstAnimationDuration) / (totalDuration - firstAnimationDuration)); // Normalize time for second animation
 
-      particleSystem.updateParticles(currentT, textParticles);
+      particleSystem.updateParticles(currentT, textParticles, isFirstAnimation);
 
-      // Subtle camera movement
-      if (isSecondAnimation) {
-        camera.position.x = Math.sin(currentT * Math.PI * 2) * 0.5;
-        camera.position.y = Math.cos(currentT * Math.PI * 2) * 0.5;
-      } else {
-        camera.position.x = Math.sin(currentT * Math.PI * 2) * 2;
-        camera.position.y = Math.cos(currentT * Math.PI * 2) * 2;
-      }
+      // Camera movement
+      const cameraAmplitude = isFirstAnimation ? 2 : 0.5;
+      camera.position.x = Math.sin(currentT * Math.PI * 2) * cameraAmplitude;
+      camera.position.y = Math.cos(currentT * Math.PI * 2) * cameraAmplitude;
       camera.lookAt(0, 0, 0);
 
       renderer.render(scene, camera);

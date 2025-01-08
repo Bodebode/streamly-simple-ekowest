@@ -5,7 +5,6 @@ export class ParticleSystem {
   private particles3D: THREE.Points;
   private particleCount: number;
   private positions: Float32Array;
-  private isSecondAnimation: boolean = false;
 
   constructor(particleCount: number, theme: string | undefined) {
     this.particleCount = particleCount;
@@ -57,26 +56,8 @@ export class ParticleSystem {
     return this.particles3D;
   }
 
-  public setSecondAnimation(value: boolean) {
-    this.isSecondAnimation = value;
-  }
-
-  public updateParticles(t: number, textParticles: TextParticle[]) {
-    if (this.isSecondAnimation) {
-      // Second animation: continuous text morphing
-      for (let i = 0; i < this.particleCount; i++) {
-        const i3 = i * 3;
-        const targetIndex = i % textParticles.length;
-        const targetX = textParticles[targetIndex]?.x || 0;
-        const targetY = textParticles[targetIndex]?.y || 0;
-        
-        // Gentle oscillation around text formation
-        const oscillation = Math.sin(t * Math.PI * 2 + i * 0.1) * 0.05;
-        this.positions[i3] += (targetX - this.positions[i3] + oscillation) * 0.1;
-        this.positions[i3 + 1] += (targetY - this.positions[i3 + 1] + oscillation) * 0.1;
-        this.positions[i3 + 2] += (oscillation - this.positions[i3 + 2]) * 0.1;
-      }
-    } else {
+  public updateParticles(t: number, textParticles: TextParticle[], isFirstAnimation: boolean) {
+    if (isFirstAnimation) {
       // First animation logic
       for (let i = 0; i < this.particleCount; i++) {
         const i3 = i * 3;
@@ -88,13 +69,26 @@ export class ParticleSystem {
           this.positions[i3] += (Math.cos(angle) * radius - this.positions[i3]) * 0.015;
           this.positions[i3 + 1] += (Math.sin(angle) * radius - this.positions[i3 + 1]) * 0.015;
           this.positions[i3 + 2] += (Math.cos(t * Math.PI * 2) * 1.5 - this.positions[i3 + 2]) * 0.015;
-        } else if (t < 0.9) {
+        } else {
           const targetX = textParticles[targetIndex]?.x || 0;
           const targetY = textParticles[targetIndex]?.y || 0;
           this.positions[i3] += (targetX - this.positions[i3]) * 0.08;
           this.positions[i3 + 1] += (targetY - this.positions[i3 + 1]) * 0.08;
           this.positions[i3 + 2] += (0 - this.positions[i3 + 2]) * 0.08;
         }
+      }
+    } else {
+      // Second animation: gentle oscillation around text formation
+      for (let i = 0; i < this.particleCount; i++) {
+        const i3 = i * 3;
+        const targetIndex = i % textParticles.length;
+        const targetX = textParticles[targetIndex]?.x || 0;
+        const targetY = textParticles[targetIndex]?.y || 0;
+        
+        const oscillation = Math.sin(t * Math.PI * 2 + i * 0.1) * 0.05;
+        this.positions[i3] += (targetX - this.positions[i3] + oscillation) * 0.1;
+        this.positions[i3 + 1] += (targetY - this.positions[i3 + 1] + oscillation) * 0.1;
+        this.positions[i3 + 2] += (oscillation - this.positions[i3 + 2]) * 0.1;
       }
     }
     this.particles3D.geometry.attributes.position.needsUpdate = true;
