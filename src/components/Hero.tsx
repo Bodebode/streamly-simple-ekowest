@@ -3,11 +3,18 @@ import { Play } from 'lucide-react';
 export const Hero = () => {
   return (
     <div className="relative h-[50vh] md:h-[80vh] mb-8">
-      <img
-        src="https://i.ytimg.com/vi/KDHhiwoP5Ng/maxresdefault.jpg"
-        alt="African Cinema"
-        className="w-full h-full object-cover object-[center_25%]"
-      />
+      <video 
+        className="w-full h-full object-cover"
+        autoPlay 
+        loop 
+        muted 
+        playsInline
+      >
+        <source 
+          src="https://yuisywwlzorzdrzvjlvm.supabase.co/storage/v1/object/public/videos/[YOUR-VIDEO-FILENAME]" 
+          type="video/mp4"
+        />
+      </video>
       <div className="absolute inset-0 bg-gradient-to-t from-koya-background via-transparent to-transparent" />
       <div className="absolute bottom-0 left-0 p-4 md:p-8 w-full">
         <h1 className="text-3xl md:text-5xl font-bold mb-2 md:mb-4 text-white">Featured Title</h1>
