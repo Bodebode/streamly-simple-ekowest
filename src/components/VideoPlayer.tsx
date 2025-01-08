@@ -12,7 +12,7 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
     if (videoId) {
       console.log(`[VideoPlayer] Attempting to play video: ${videoId}`);
       
-      // Check video availability with error handling
+      // Check video availability
       fetch(`https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v=${videoId}&format=json`)
         .then(response => {
           if (!response.ok) {
@@ -23,8 +23,7 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
         })
         .catch(error => {
           console.error(`[VideoPlayer] Error checking video availability:`, error);
-          // Don't show error toast for network issues as it might be temporary
-          // Just log it for debugging
+          toast.error('Unable to verify video availability');
         });
     }
   }, [videoId, onClose]);
@@ -38,9 +37,11 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
   };
 
   return (
+    // Increased top margin for better spacing
     <div className="relative w-full max-w-4xl mx-auto mt-12 mb-8">
       <button
         onClick={onClose}
+        // Adjusted top position for better alignment
         className="absolute -top-10 right-0 text-white hover:text-gray-300"
         aria-label="Close video"
       >

@@ -2,10 +2,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "./components/AuthProvider";
 import { useAuth } from "./components/AuthProvider";
+import Index from "./pages/Index";
+import Auth from "./pages/Auth";
+import Watch2Earn from "./pages/Watch2Earn";
+import TechStack from "./pages/TechStack";
 
 const queryClient = new QueryClient();
 
@@ -26,7 +30,21 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <Outlet />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/watch2earn" element={<Watch2Earn />} />
+              <Route path="/tech-stack" element={<TechStack />} />
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <Index />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>
