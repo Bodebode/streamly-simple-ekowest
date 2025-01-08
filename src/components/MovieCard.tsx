@@ -42,20 +42,6 @@ const MovieCardComponent = ({ title, image, category, videoId, onMovieSelect, is
     }
   }, [isVideoPlaying, clearTimers]);
 
-  useEffect(() => {
-    if (showPreview) {
-      titleTimerRef.current = setTimeout(() => {
-        setShowTitle(false);
-      }, 2000);
-    } else {
-      setShowTitle(true);
-    }
-
-    return () => {
-      if (titleTimerRef.current) clearTimeout(titleTimerRef.current);
-    };
-  }, [showPreview]);
-
   const handleMouseEnter = useCallback(() => {
     if (!isVideoPlaying) {
       setIsHovered(true);
