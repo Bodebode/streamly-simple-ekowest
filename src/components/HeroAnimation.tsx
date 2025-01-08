@@ -4,9 +4,10 @@ import { WebGLScene } from './hero/WebGLScene';
 
 interface HeroAnimationProps {
   fallback?: React.ReactNode;
+  onAnimationComplete?: () => void;
 }
 
-export const HeroAnimation = ({ fallback }: HeroAnimationProps) => {
+export const HeroAnimation = ({ fallback, onAnimationComplete }: HeroAnimationProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
   const [isWebGLAvailable, setIsWebGLAvailable] = useState(true);
@@ -29,6 +30,7 @@ export const HeroAnimation = ({ fallback }: HeroAnimationProps) => {
         theme={theme}
         containerRef={containerRef}
         onError={handleWebGLError}
+        onAnimationComplete={onAnimationComplete}
       />
     </div>
   );

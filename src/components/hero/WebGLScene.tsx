@@ -5,8 +5,9 @@ import { setupScene, handleResize } from './scene/SceneSetup';
 import { ParticleSystem } from './scene/ParticleSystem';
 import type { SceneProps } from './scene/types';
 
-export const WebGLScene = ({ theme, containerRef, onError }: SceneProps) => {
+export const WebGLScene = ({ theme, containerRef, onError, onAnimationComplete }: SceneProps) => {
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const loopCountRef = useRef(0);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -40,11 +41,19 @@ export const WebGLScene = ({ theme, containerRef, onError }: SceneProps) => {
     scene.add(particleSystem.getMesh());
 
     let frame = 0;
-    const loopDuration = 6;
+    const loopDuration = 4; // Reduced from 6 to 4 seconds
     
     const animate = () => {
       frame = (frame + 1) % (60 * loopDuration);
       const t = frame / (60 * loopDuration);
+
+      if (frame === 0) {
+        loopCountRef.current += 1;
+        if (loopCountRef.current === 2) {
+          onAnimationComplete?.();
+          loopCountRef.current = 0;
+        }
+      }
 
       particleSystem.updateParticles(t, textParticles);
 
@@ -72,7 +81,7 @@ export const WebGLScene = ({ theme, containerRef, onError }: SceneProps) => {
         rendererRef.current.dispose();
       }
     };
-  }, [theme, onError]);
+  }, [theme, onError, onAnimationComplete]);
 
   return null;
 };

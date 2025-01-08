@@ -1,17 +1,30 @@
 import { Play } from 'lucide-react';
 import { HeroAnimation } from './HeroAnimation';
+import { useState } from 'react';
+
+const heroImages = [
+  "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=2000&q=80",
+  "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2000&q=80"
+];
 
 export const Hero = () => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const handleAnimationComplete = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
+  };
+
   return (
-    <div className="relative h-[50vh] md:h-[80vh] mb-8">
+    <div className="relative h-[50vh] md:h-[80vh] mb-8 overflow-hidden">
       <HeroAnimation 
         fallback={
           <img 
-            src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=2000&q=80"
+            src={heroImages[currentImageIndex]}
             alt="Hero background"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-1000 ease-in-out"
           />
         }
+        onAnimationComplete={handleAnimationComplete}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-koya-background via-transparent to-transparent" />
       <div className="absolute bottom-0 left-0 p-4 md:p-8 w-full">
