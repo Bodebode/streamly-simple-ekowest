@@ -8,6 +8,7 @@ import type { SceneProps } from './scene/types';
 export const WebGLScene = ({ theme, containerRef, onError, onAnimationComplete }: SceneProps) => {
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const loopCountRef = useRef(0);
+  const particleSystemRef = useRef<ParticleSystem | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -38,27 +39,45 @@ export const WebGLScene = ({ theme, containerRef, onError, onAnimationComplete }
     const textParticles = sampleTextPoints(textureData);
 
     const particleSystem = new ParticleSystem(3000, theme);
+    particleSystemRef.current = particleSystem;
     scene.add(particleSystem.getMesh());
 
     let frame = 0;
-    const loopDuration = 4; // Reduced from 6 to 4 seconds
+    const loopDuration = 4;
+    let isSecondAnimation = false;
     
     const animate = () => {
-      frame = (frame + 1) % (60 * loopDuration);
-      const t = frame / (60 * loopDuration);
+      if (!isSecondAnimation) {
+        frame = (frame + 1) % (60 * loopDuration);
+        const t = frame / (60 * loopDuration);
 
-      if (frame === 0) {
-        loopCountRef.current += 1;
-        if (loopCountRef.current === 2) {
-          onAnimationComplete?.();
-          loopCountRef.current = 0;
+        if (frame === 0) {
+          loopCountRef.current += 1;
+          if (loopCountRef.current === 2) {
+            isSecondAnimation = true;
+            particleSystem.setSecondAnimation(true);
+            onAnimationComplete?.();
+          }
         }
+      } else {
+        // Second animation timing
+        const t = (Date.now() % 2000) / 2000; // 2-second loop
       }
 
-      particleSystem.updateParticles(t, textParticles);
+      const currentT = isSecondAnimation 
+        ? (Date.now() % 2000) / 2000 
+        : frame / (60 * loopDuration);
 
-      camera.position.x = Math.sin(t * Math.PI * 2) * 2;
-      camera.position.y = Math.cos(t * Math.PI * 2) * 2;
+      particleSystem.updateParticles(currentT, textParticles);
+
+      // Subtle camera movement
+      if (isSecondAnimation) {
+        camera.position.x = Math.sin(currentT * Math.PI * 2) * 0.5;
+        camera.position.y = Math.cos(currentT * Math.PI * 2) * 0.5;
+      } else {
+        camera.position.x = Math.sin(currentT * Math.PI * 2) * 2;
+        camera.position.y = Math.cos(currentT * Math.PI * 2) * 2;
+      }
       camera.lookAt(0, 0, 0);
 
       renderer.render(scene, camera);

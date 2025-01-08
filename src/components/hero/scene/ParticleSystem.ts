@@ -5,6 +5,7 @@ export class ParticleSystem {
   private particles3D: THREE.Points;
   private particleCount: number;
   private positions: Float32Array;
+  private isSecondAnimation: boolean = false;
 
   constructor(particleCount: number, theme: string | undefined) {
     this.particleCount = particleCount;
@@ -15,9 +16,9 @@ export class ParticleSystem {
 
   private createParticleSystem(theme: string | undefined) {
     const particles = Array.from({ length: this.particleCount }, () => ({
-      x: (Math.random() - 0.5) * 15, // Reduced from 20 to 15
-      y: (Math.random() - 0.5) * 15, // Reduced from 20 to 15
-      z: (Math.random() - 0.5) * 15  // Reduced from 20 to 15
+      x: (Math.random() - 0.5) * 15,
+      y: (Math.random() - 0.5) * 15,
+      z: (Math.random() - 0.5) * 15
     }));
 
     const particleGeometry = new THREE.BufferGeometry();
@@ -39,10 +40,10 @@ export class ParticleSystem {
     particleGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     const particleMaterial = new THREE.PointsMaterial({
-      size: 0.03, // Reduced from 0.05 to 0.03
+      size: 0.03,
       vertexColors: true,
       transparent: true,
-      opacity: 0.6, // Reduced from 0.8 to 0.6
+      opacity: 0.6,
       blending: THREE.AdditiveBlending
     });
 
@@ -56,24 +57,44 @@ export class ParticleSystem {
     return this.particles3D;
   }
 
-  public updateParticles(t: number, textParticles: TextParticle[]) {
-    for (let i = 0; i < this.particleCount; i++) {
-      const i3 = i * 3;
-      const targetIndex = i % textParticles.length;
+  public setSecondAnimation(value: boolean) {
+    this.isSecondAnimation = value;
+  }
 
-      // Adjusted timing: particles form text at t=0.3 and stay until t=0.9
-      if (t < 0.3) {
-        const angle = (t * Math.PI * 4) + (i / this.particleCount) * Math.PI * 2;
-        const radius = 4 + Math.sin(t * Math.PI * 6) * 1.5; // Reduced radius and oscillation
-        this.positions[i3] += (Math.cos(angle) * radius - this.positions[i3]) * 0.015; // Reduced speed
-        this.positions[i3 + 1] += (Math.sin(angle) * radius - this.positions[i3 + 1]) * 0.015;
-        this.positions[i3 + 2] += (Math.cos(t * Math.PI * 2) * 1.5 - this.positions[i3 + 2]) * 0.015;
-      } else if (t < 0.9) { // Extended text formation time
+  public updateParticles(t: number, textParticles: TextParticle[]) {
+    if (this.isSecondAnimation) {
+      // Second animation: continuous text morphing
+      for (let i = 0; i < this.particleCount; i++) {
+        const i3 = i * 3;
+        const targetIndex = i % textParticles.length;
         const targetX = textParticles[targetIndex]?.x || 0;
         const targetY = textParticles[targetIndex]?.y || 0;
-        this.positions[i3] += (targetX - this.positions[i3]) * 0.08;
-        this.positions[i3 + 1] += (targetY - this.positions[i3 + 1]) * 0.08;
-        this.positions[i3 + 2] += (0 - this.positions[i3 + 2]) * 0.08;
+        
+        // Gentle oscillation around text formation
+        const oscillation = Math.sin(t * Math.PI * 2 + i * 0.1) * 0.05;
+        this.positions[i3] += (targetX - this.positions[i3] + oscillation) * 0.1;
+        this.positions[i3 + 1] += (targetY - this.positions[i3 + 1] + oscillation) * 0.1;
+        this.positions[i3 + 2] += (oscillation - this.positions[i3 + 2]) * 0.1;
+      }
+    } else {
+      // First animation logic
+      for (let i = 0; i < this.particleCount; i++) {
+        const i3 = i * 3;
+        const targetIndex = i % textParticles.length;
+
+        if (t < 0.3) {
+          const angle = (t * Math.PI * 4) + (i / this.particleCount) * Math.PI * 2;
+          const radius = 4 + Math.sin(t * Math.PI * 6) * 1.5;
+          this.positions[i3] += (Math.cos(angle) * radius - this.positions[i3]) * 0.015;
+          this.positions[i3 + 1] += (Math.sin(angle) * radius - this.positions[i3 + 1]) * 0.015;
+          this.positions[i3 + 2] += (Math.cos(t * Math.PI * 2) * 1.5 - this.positions[i3 + 2]) * 0.015;
+        } else if (t < 0.9) {
+          const targetX = textParticles[targetIndex]?.x || 0;
+          const targetY = textParticles[targetIndex]?.y || 0;
+          this.positions[i3] += (targetX - this.positions[i3]) * 0.08;
+          this.positions[i3 + 1] += (targetY - this.positions[i3 + 1]) * 0.08;
+          this.positions[i3 + 2] += (0 - this.positions[i3 + 2]) * 0.08;
+        }
       }
     }
     this.particles3D.geometry.attributes.position.needsUpdate = true;
