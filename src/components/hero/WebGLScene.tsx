@@ -1,10 +1,9 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import { Theme } from 'next-themes';
 import { createLights, createTextCanvas, sampleTextPoints, createParticleSystem } from './animation-utils';
 
 interface WebGLSceneProps {
-  theme: Theme | undefined;
+  theme: string | undefined;
   containerRef: React.RefObject<HTMLDivElement>;
   onError: () => void;
 }
@@ -78,7 +77,7 @@ export const WebGLScene = ({ theme, containerRef, onError }: WebGLSceneProps) =>
 
     // Animation loop
     let frame = 0;
-    const loopDuration = 12; // seconds (adjusted to be between 10-14 seconds)
+    const loopDuration = 8; // Changed from 12 to 8 seconds
     const animate = () => {
       frame = (frame + 1) % (60 * loopDuration);
       const t = frame / (60 * loopDuration);

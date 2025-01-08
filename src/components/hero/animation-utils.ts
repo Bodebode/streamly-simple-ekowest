@@ -1,14 +1,13 @@
 import * as THREE from 'three';
-import { Theme } from 'next-themes';
 
-export const createLights = (theme: Theme | undefined) => {
+export const createLights = (theme: string | undefined) => {
   const ambientLight = new THREE.AmbientLight(theme === 'dark' ? 0x202020 : 0x404040);
   const directionalLight = new THREE.DirectionalLight(theme === 'dark' ? 0x22C55E : 0xffffff, 1.5);
   directionalLight.position.set(1, 1, 1);
   return { ambientLight, directionalLight };
 };
 
-export const createTextCanvas = (theme: Theme | undefined) => {
+export const createTextCanvas = (theme: string | undefined) => {
   const textCanvas = document.createElement('canvas');
   const context = textCanvas.getContext('2d');
   textCanvas.width = 1024;
@@ -44,7 +43,7 @@ export const sampleTextPoints = (textureData: ImageData | undefined) => {
   return textParticles;
 };
 
-export const createParticleSystem = (particleCount: number, theme: Theme | undefined) => {
+export const createParticleSystem = (particleCount: number, theme: string | undefined) => {
   const particles = Array.from({ length: particleCount }, () => ({
     x: (Math.random() - 0.5) * 20,
     y: (Math.random() - 0.5) * 20,
