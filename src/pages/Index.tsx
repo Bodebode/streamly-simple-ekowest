@@ -13,7 +13,6 @@ import { useLocation } from 'react-router-dom';
 import { MOCK_MOVIES } from '../data/mockMovies';
 import { usePopulateSections } from '@/hooks/use-populate-sections';
 import { transformCachedToMovie } from '@/utils/movie-transforms';
-import { Movie } from '@/types/movies';
 
 const Index = () => {
   const { theme, setTheme } = useTheme();
@@ -82,7 +81,7 @@ const Index = () => {
           />
           <CategoryRow 
             title="Yoruba Movies" 
-            movies={yorubaMovies ? transformCachedToMovie(yorubaMovies) : []}
+            movies={yorubaMovies || []}
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
           />
