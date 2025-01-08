@@ -15,7 +15,6 @@ export const HeroAnimation = ({ fallback }: HeroAnimationProps) => {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Check WebGL availability
     try {
       const canvas = document.createElement('canvas');
       const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
@@ -35,31 +34,38 @@ export const HeroAnimation = ({ fallback }: HeroAnimationProps) => {
       1000
     );
 
-    // Renderer setup
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    // Renderer setup with better quality
+    const renderer = new THREE.WebGLRenderer({ 
+      antialias: true, 
+      alpha: true,
+      powerPreference: "high-performance"
+    });
     renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0x404040);
+    // Enhanced lighting
+    const ambientLight = new THREE.AmbientLight(theme === 'dark' ? 0x202020 : 0x404040);
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(theme === 'dark' ? 0x22C55E : 0xffffff, 1);
+    const directionalLight = new THREE.DirectionalLight(theme === 'dark' ? 0x22C55E : 0xffffff, 1.5);
     directionalLight.position.set(1, 1, 1);
     scene.add(directionalLight);
 
-    // Particle system
+    // Dynamic particle system
+    const particleCount = 2000;
     const particleGeometry = new THREE.BufferGeometry();
-    const particleCount = 1000;
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
 
     for (let i = 0; i < particleCount * 3; i += 3) {
-      positions[i] = (Math.random() - 0.5) * 10;
-      positions[i + 1] = (Math.random() - 0.5) * 10;
-      positions[i + 2] = (Math.random() - 0.5) * 10;
+      // Create a spiral pattern
+      const angle = (i / 3) * 0.2;
+      const radius = Math.random() * 5 + 2;
+      positions[i] = Math.cos(angle) * radius;
+      positions[i + 1] = Math.sin(angle) * radius;
+      positions[i + 2] = (Math.random() - 0.5) * 5;
 
       const color = new THREE.Color(theme === 'dark' ? 0x22C55E : 0x000000);
       colors[i] = color.r;
@@ -75,27 +81,52 @@ export const HeroAnimation = ({ fallback }: HeroAnimationProps) => {
       vertexColors: true,
       transparent: true,
       opacity: 0.8,
+      blending: THREE.AdditiveBlending
     });
 
     const particles = new THREE.Points(particleGeometry, particleMaterial);
     scene.add(particles);
 
-    // Logo texture loader
+    // African drum logo and text
     const textureLoader = new THREE.TextureLoader();
-    const logoTexture = textureLoader.load('/favicon.svg', (texture) => {
-      const logoGeometry = new THREE.PlaneGeometry(2, 2);
+    textureLoader.load('/favicon.svg', (texture) => {
+      const logoGeometry = new THREE.PlaneGeometry(3, 3);
       const logoMaterial = new THREE.MeshBasicMaterial({
         map: texture,
         transparent: true,
-        opacity: theme === 'dark' ? 0.8 : 1,
+        opacity: theme === 'dark' ? 0.9 : 1,
       });
       const logo = new THREE.Mesh(logoGeometry, logoMaterial);
-      logo.position.z = -5;
+      logo.position.z = -3;
       scene.add(logo);
+
+      // Add text below logo
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      if (context) {
+        canvas.width = 512;
+        canvas.height = 128;
+        context.fillStyle = theme === 'dark' ? '#22C55E' : '#000000';
+        context.font = 'bold 72px Arial';
+        context.textAlign = 'center';
+        context.fillText('Ekowest TV', canvas.width / 2, canvas.height / 2);
+        
+        const textTexture = new THREE.CanvasTexture(canvas);
+        const textGeometry = new THREE.PlaneGeometry(4, 1);
+        const textMaterial = new THREE.MeshBasicMaterial({
+          map: textTexture,
+          transparent: true,
+          opacity: theme === 'dark' ? 0.9 : 1,
+        });
+        const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+        textMesh.position.y = -2;
+        textMesh.position.z = -3;
+        scene.add(textMesh);
+      }
     });
 
     // Camera position
-    camera.position.z = 5;
+    camera.position.z = 6;
 
     // Animation loop
     let frame = 0;
@@ -104,8 +135,19 @@ export const HeroAnimation = ({ fallback }: HeroAnimationProps) => {
       frame = (frame + 1) % (60 * loopDuration);
       const t = frame / (60 * loopDuration);
 
-      particles.rotation.y = t * Math.PI * 2;
-      particles.rotation.x = Math.sin(t * Math.PI * 4) * 0.3;
+      // More dynamic particle animation
+      particles.rotation.y = t * Math.PI * 4;
+      particles.rotation.x = Math.sin(t * Math.PI * 6) * 0.5;
+      particles.rotation.z = Math.cos(t * Math.PI * 4) * 0.3;
+
+      // Pulsing effect
+      const scale = 1 + Math.sin(t * Math.PI * 8) * 0.1;
+      particles.scale.set(scale, scale, scale);
+
+      // Dynamic camera movement
+      camera.position.x = Math.sin(t * Math.PI * 2) * 0.5;
+      camera.position.y = Math.cos(t * Math.PI * 2) * 0.5;
+      camera.lookAt(0, 0, 0);
 
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
@@ -124,7 +166,6 @@ export const HeroAnimation = ({ fallback }: HeroAnimationProps) => {
 
     window.addEventListener('resize', handleResize);
 
-    // Cleanup
     return () => {
       window.removeEventListener('resize', handleResize);
       if (rendererRef.current && containerRef.current) {
