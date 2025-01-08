@@ -77,7 +77,7 @@ export const WebGLScene = ({ theme, containerRef, onError }: WebGLSceneProps) =>
 
     // Animation loop
     let frame = 0;
-    const loopDuration = 8; // Changed from 12 to 8 seconds
+    const loopDuration = 6; // Changed from 8 to 6 seconds
     const animate = () => {
       frame = (frame + 1) % (60 * loopDuration);
       const t = frame / (60 * loopDuration);
