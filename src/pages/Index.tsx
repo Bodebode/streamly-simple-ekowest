@@ -14,6 +14,7 @@ import { MOCK_MOVIES } from '../data/mockMovies';
 import { usePopulateSections } from '@/hooks/use-populate-sections';
 import { transformCachedToMovie } from '@/utils/movie-transforms';
 import { Movie, CachedMovie } from '@/types/movies';
+import { VideoPlayer } from '@/components/VideoPlayer';
 
 const Index = () => {
   const { theme, setTheme } = useTheme();
@@ -23,6 +24,7 @@ const Index = () => {
   const { data: skits, isLoading: isLoadingSkits, refetch: refetchSkits } = useSkits();
   const { data: yorubaMovies, isLoading: isLoadingYoruba, refetch: refetchYoruba } = useYorubaMovies();
   const newReleaseRef = useRef<HTMLDivElement>(null);
+  const playerRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
 
   const { isPopulating, populateAllSections } = usePopulateSections({
@@ -40,6 +42,23 @@ const Index = () => {
       });
     }
   }, [location.hash]);
+
+  // Add effect to handle scrolling when video is selected
+  useEffect(() => {
+    if (selectedVideoId && playerRef.current) {
+      const playerElement = playerRef.current;
+      const viewportHeight = window.innerHeight;
+      const playerRect = playerElement.getBoundingClientRect();
+      
+      // Calculate the scroll position that would center the player
+      const scrollOffset = window.scrollY + playerRect.top - (viewportHeight - playerRect.height) / 2;
+      
+      window.scrollTo({
+        top: scrollOffset,
+        behavior: 'smooth'
+      });
+    }
+  }, [selectedVideoId]);
 
   return (
     <div className="min-h-screen">
@@ -67,6 +86,11 @@ const Index = () => {
       </div>
       <div className="pt-16">
         <Hero />
+        {selectedVideoId && (
+          <div ref={playerRef}>
+            <VideoPlayer videoId={selectedVideoId} onClose={() => setSelectedVideoId(null)} />
+          </div>
+        )}
         <div className="pb-8">
           <CategoryRow 
             title="Trending Now" 
@@ -76,7 +100,7 @@ const Index = () => {
           />
           <CategoryRow 
             title="Highly Rated" 
-            movies={highlyRatedVideos ? transformCachedToMovie(highlyRatedVideos as CachedMovie[]) : MOCK_MOVIES.highlyRated}
+            movies={highlyRatedVideos ? transformCachedToMovie(highlyRatedVideos as unknown as CachedMovie[]) : MOCK_MOVIES.highlyRated}
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
           />
@@ -88,14 +112,14 @@ const Index = () => {
           />
           <CategoryRow 
             title="Skits" 
-            movies={skits ? transformCachedToMovie(skits as CachedMovie[]) : MOCK_MOVIES.skits}
+            movies={skits ? transformCachedToMovie(skits as unknown as CachedMovie[]) : MOCK_MOVIES.skits}
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
           />
           <div ref={newReleaseRef} id="new-release">
             <CategoryRow 
               title="New Release" 
-              movies={newReleases ? transformCachedToMovie(newReleases as CachedMovie[]) : []}
+              movies={newReleases ? transformCachedToMovie(newReleases as unknown as CachedMovie[]) : []}
               selectedVideoId={selectedVideoId}
               onVideoSelect={setSelectedVideoId}
             />
