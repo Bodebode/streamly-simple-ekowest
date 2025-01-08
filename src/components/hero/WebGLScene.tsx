@@ -8,7 +8,6 @@ import type { SceneProps } from './scene/types';
 export const WebGLScene = ({ theme, containerRef, onError, onAnimationComplete }: SceneProps) => {
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const loopCountRef = useRef(0);
-  const particleSystemRef = useRef<ParticleSystem | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -39,11 +38,10 @@ export const WebGLScene = ({ theme, containerRef, onError, onAnimationComplete }
     const textParticles = sampleTextPoints(textureData);
 
     const particleSystem = new ParticleSystem(3000, theme);
-    particleSystemRef.current = particleSystem;
     scene.add(particleSystem.getMesh());
 
     let frame = 0;
-    const loopDuration = 4;
+    const loopDuration = 4; // Reduced from 6 to 4 seconds
     
     const animate = () => {
       frame = (frame + 1) % (60 * loopDuration);
@@ -53,24 +51,15 @@ export const WebGLScene = ({ theme, containerRef, onError, onAnimationComplete }
         loopCountRef.current += 1;
         if (loopCountRef.current === 2) {
           onAnimationComplete?.();
-          particleSystem.startSecondAnimation();
+          loopCountRef.current = 0;
         }
       }
 
       particleSystem.updateParticles(t, textParticles);
 
-      // Camera movement only during first animation
-      if (loopCountRef.current < 2) {
-        camera.position.x = Math.sin(t * Math.PI * 2) * 2;
-        camera.position.y = Math.cos(t * Math.PI * 2) * 2;
-        camera.lookAt(0, 0, 0);
-      } else {
-        // Subtle camera movement during second animation
-        camera.position.x = Math.sin(t * Math.PI) * 0.5;
-        camera.position.y = Math.cos(t * Math.PI) * 0.5;
-        camera.position.z = 5 + Math.sin(t * Math.PI * 2) * 0.2;
-        camera.lookAt(0, 0, 0);
-      }
+      camera.position.x = Math.sin(t * Math.PI * 2) * 2;
+      camera.position.y = Math.cos(t * Math.PI * 2) * 2;
+      camera.lookAt(0, 0, 0);
 
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
