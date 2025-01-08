@@ -9,6 +9,7 @@ export const Hero = () => {
         loop 
         muted 
         playsInline
+        poster="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=2000&q=80"
       >
         <source 
           src="https://yuisywwlzorzdrzvjlvm.supabase.co/storage/v1/object/public/videos/wbd-hero-animation_24_0_0.mp4" 
