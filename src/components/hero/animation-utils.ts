@@ -15,7 +15,7 @@ export const createTextCanvas = (theme: string | undefined) => {
   
   if (context) {
     context.fillStyle = theme === 'dark' ? '#22C55E' : '#000000';
-    context.font = 'bold 120px Arial';
+    context.font = 'bold 160px Arial'; // Increased from 120px to 160px
     context.textAlign = 'center';
     context.fillText('Ekowest TV', textCanvas.width / 2, textCanvas.height / 2);
   }

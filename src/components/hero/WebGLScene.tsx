@@ -39,19 +39,6 @@ export const WebGLScene = ({ theme, containerRef, onError }: SceneProps) => {
     const particleSystem = new ParticleSystem(3000, theme);
     scene.add(particleSystem.getMesh());
 
-    const textureLoader = new THREE.TextureLoader();
-    textureLoader.load('/favicon.svg', (texture) => {
-      const logoGeometry = new THREE.PlaneGeometry(2, 2);
-      const logoMaterial = new THREE.MeshBasicMaterial({
-        map: texture,
-        transparent: true,
-        opacity: theme === 'dark' ? 0.9 : 1,
-      });
-      const logo = new THREE.Mesh(logoGeometry, logoMaterial);
-      logo.position.z = -2;
-      scene.add(logo);
-    });
-
     let frame = 0;
     const loopDuration = 6;
     

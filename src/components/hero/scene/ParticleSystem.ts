@@ -61,13 +61,15 @@ export class ParticleSystem {
       const i3 = i * 3;
       const targetIndex = i % textParticles.length;
 
-      if (t < 0.5) {
+      // Adjusted timing: particles form text at t=0.5 and stay for 2 more seconds
+      if (t < 0.3) { // Reduced from 0.5 to 0.3 to show text earlier
         const angle = (t * Math.PI * 4) + (i / this.particleCount) * Math.PI * 2;
         const radius = 5 + Math.sin(t * Math.PI * 6) * 2;
         this.positions[i3] += (Math.cos(angle) * radius - this.positions[i3]) * 0.02;
         this.positions[i3 + 1] += (Math.sin(angle) * radius - this.positions[i3 + 1]) * 0.02;
         this.positions[i3 + 2] += (Math.cos(t * Math.PI * 2) * 2 - this.positions[i3 + 2]) * 0.02;
       } else {
+        // Text formation and hold
         const targetX = textParticles[targetIndex]?.x || 0;
         const targetY = textParticles[targetIndex]?.y || 0;
         this.positions[i3] += (targetX - this.positions[i3]) * 0.1;
