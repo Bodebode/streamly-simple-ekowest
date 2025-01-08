@@ -7,7 +7,7 @@ import type { SceneProps } from './scene/types';
 
 export const WebGLScene = ({ theme, containerRef, onError, onAnimationComplete }: SceneProps) => {
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
-  const particleSystemRef = useRef<ParticleSystem | null>(null);
+  const loopCountRef = useRef(0);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -38,35 +38,27 @@ export const WebGLScene = ({ theme, containerRef, onError, onAnimationComplete }
     const textParticles = sampleTextPoints(textureData);
 
     const particleSystem = new ParticleSystem(3000, theme);
-    particleSystemRef.current = particleSystem;
     scene.add(particleSystem.getMesh());
 
     let frame = 0;
-    const totalDuration = 6; // Total animation duration in seconds
-    const firstAnimationDuration = 5.5; // Duration of first animation
+    const loopDuration = 4; // Reduced from 6 to 4 seconds
     
     const animate = () => {
-      frame = (frame + 1);
-      const t = frame / (60 * totalDuration); // Normalized time over total duration
+      frame = (frame + 1) % (60 * loopDuration);
+      const t = frame / (60 * loopDuration);
 
-      if (t >= 1) {
-        // Animation complete, trigger callback
-        onAnimationComplete?.();
-        return;
+      if (frame === 0) {
+        loopCountRef.current += 1;
+        if (loopCountRef.current === 2) {
+          onAnimationComplete?.();
+          loopCountRef.current = 0;
+        }
       }
 
-      // Calculate progress for each animation phase
-      const isFirstAnimation = t < (firstAnimationDuration / totalDuration);
-      const currentT = isFirstAnimation 
-        ? (t * totalDuration) / firstAnimationDuration // Normalize time for first animation
-        : ((t * totalDuration - firstAnimationDuration) / (totalDuration - firstAnimationDuration)); // Normalize time for second animation
+      particleSystem.updateParticles(t, textParticles);
 
-      particleSystem.updateParticles(currentT, textParticles, isFirstAnimation);
-
-      // Camera movement
-      const cameraAmplitude = isFirstAnimation ? 2 : 0.5;
-      camera.position.x = Math.sin(currentT * Math.PI * 2) * cameraAmplitude;
-      camera.position.y = Math.cos(currentT * Math.PI * 2) * cameraAmplitude;
+      camera.position.x = Math.sin(t * Math.PI * 2) * 2;
+      camera.position.y = Math.cos(t * Math.PI * 2) * 2;
       camera.lookAt(0, 0, 0);
 
       renderer.render(scene, camera);

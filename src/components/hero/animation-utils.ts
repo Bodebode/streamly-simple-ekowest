@@ -15,9 +15,8 @@ export const createTextCanvas = (theme: string | undefined) => {
   
   if (context) {
     context.fillStyle = theme === 'dark' ? '#22C55E' : '#000000';
-    context.font = 'bold 160px Arial';
+    context.font = 'bold 160px Arial'; // Increased from 120px to 160px
     context.textAlign = 'center';
-    context.textBaseline = 'middle'; // Added to ensure vertical centering
     context.fillText('Ekowest TV', textCanvas.width / 2, textCanvas.height / 2);
   }
   
@@ -42,4 +41,40 @@ export const sampleTextPoints = (textureData: ImageData | undefined) => {
   }
   
   return textParticles;
+};
+
+export const createParticleSystem = (particleCount: number, theme: string | undefined) => {
+  const particles = Array.from({ length: particleCount }, () => ({
+    x: (Math.random() - 0.5) * 20,
+    y: (Math.random() - 0.5) * 20,
+    z: (Math.random() - 0.5) * 20
+  }));
+
+  const particleGeometry = new THREE.BufferGeometry();
+  const positions = new Float32Array(particleCount * 3);
+  const colors = new Float32Array(particleCount * 3);
+
+  particles.forEach((particle, i) => {
+    positions[i * 3] = particle.x;
+    positions[i * 3 + 1] = particle.y;
+    positions[i * 3 + 2] = particle.z;
+
+    const color = new THREE.Color(theme === 'dark' ? 0x22C55E : 0x000000);
+    colors[i * 3] = color.r;
+    colors[i * 3 + 1] = color.g;
+    colors[i * 3 + 2] = color.b;
+  });
+
+  particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  particleGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+  const particleMaterial = new THREE.PointsMaterial({
+    size: 0.05,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.8,
+    blending: THREE.AdditiveBlending
+  });
+
+  return new THREE.Points(particleGeometry, particleMaterial);
 };

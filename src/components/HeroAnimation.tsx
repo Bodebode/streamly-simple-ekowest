@@ -24,14 +24,8 @@ export const HeroAnimation = ({ fallback, onAnimationComplete }: HeroAnimationPr
     <div 
       ref={containerRef} 
       className="w-full h-full absolute top-0 left-0 z-0"
-      style={{ 
-        background: theme === 'dark' ? '#141414' : '#ffffff',
-        backgroundImage: 'url(https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=2000&q=80)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center'
-      }}
+      style={{ background: theme === 'dark' ? '#141414' : '#ffffff' }}
     >
-      <div className="absolute inset-0 bg-black bg-opacity-50" /> {/* Dark overlay */}
       <WebGLScene
         theme={theme}
         containerRef={containerRef}
