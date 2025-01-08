@@ -40,7 +40,7 @@ export const WebGLScene = ({ theme, containerRef, onError }: SceneProps) => {
     scene.add(particleSystem.getMesh());
 
     let frame = 0;
-    const loopDuration = 6;
+    const loopDuration = 4; // Reduced from 6 to 4 seconds
     
     const animate = () => {
       frame = (frame + 1) % (60 * loopDuration);
