@@ -81,7 +81,7 @@ const Index = () => {
           />
           <CategoryRow 
             title="Yoruba Movies" 
-            movies={yorubaMovies ? transformCachedToMovie(yorubaMovies) : []}
+            movies={yorubaMovies || []}
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
           />
