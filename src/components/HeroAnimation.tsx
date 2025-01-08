@@ -34,7 +34,7 @@ export const HeroAnimation = ({ fallback }: HeroAnimationProps) => {
       1000
     );
 
-    // Renderer setup with better quality
+    // Enhanced renderer setup
     const renderer = new THREE.WebGLRenderer({ 
       antialias: true, 
       alpha: true,
@@ -53,24 +53,62 @@ export const HeroAnimation = ({ fallback }: HeroAnimationProps) => {
     directionalLight.position.set(1, 1, 1);
     scene.add(directionalLight);
 
-    // Dynamic particle system
-    const particleCount = 2000;
+    // Create text geometry for particle positioning
+    const textCanvas = document.createElement('canvas');
+    const context = textCanvas.getContext('2d');
+    textCanvas.width = 1024;
+    textCanvas.height = 256;
+    
+    if (context) {
+      context.fillStyle = theme === 'dark' ? '#22C55E' : '#000000';
+      context.font = 'bold 120px Arial';
+      context.textAlign = 'center';
+      context.fillText('Ekowest TV', textCanvas.width / 2, textCanvas.height / 2);
+    }
+
+    // Sample points from the text
+    const textureData = context?.getImageData(0, 0, textCanvas.width, textCanvas.height);
+    const particles: { x: number; y: number; z: number }[] = [];
+    const particleCount = 3000;
+    const textParticles: { x: number; y: number }[] = [];
+
+    if (textureData) {
+      for (let y = 0; y < textCanvas.height; y += 4) {
+        for (let x = 0; x < textCanvas.width; x += 4) {
+          const alpha = textureData.data[(y * textCanvas.width + x) * 4 + 3];
+          if (alpha > 128) {
+            textParticles.push({
+              x: (x - textCanvas.width / 2) / 50,
+              y: -(y - textCanvas.height / 2) / 50,
+            });
+          }
+        }
+      }
+    }
+
+    // Create initial random particle positions
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        x: (Math.random() - 0.5) * 20,
+        y: (Math.random() - 0.5) * 20,
+        z: (Math.random() - 0.5) * 20
+      });
+    }
+
+    // Create particle system
     const particleGeometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
 
-    for (let i = 0; i < particleCount * 3; i += 3) {
-      // Create a spiral pattern
-      const angle = (i / 3) * 0.2;
-      const radius = Math.random() * 5 + 2;
-      positions[i] = Math.cos(angle) * radius;
-      positions[i + 1] = Math.sin(angle) * radius;
-      positions[i + 2] = (Math.random() - 0.5) * 5;
+    for (let i = 0; i < particleCount; i++) {
+      positions[i * 3] = particles[i].x;
+      positions[i * 3 + 1] = particles[i].y;
+      positions[i * 3 + 2] = particles[i].z;
 
       const color = new THREE.Color(theme === 'dark' ? 0x22C55E : 0x000000);
-      colors[i] = color.r;
-      colors[i + 1] = color.g;
-      colors[i + 2] = color.b;
+      colors[i * 3] = color.r;
+      colors[i * 3 + 1] = color.g;
+      colors[i * 3 + 2] = color.b;
     }
 
     particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -84,49 +122,25 @@ export const HeroAnimation = ({ fallback }: HeroAnimationProps) => {
       blending: THREE.AdditiveBlending
     });
 
-    const particles = new THREE.Points(particleGeometry, particleMaterial);
-    scene.add(particles);
+    const particles3D = new THREE.Points(particleGeometry, particleMaterial);
+    scene.add(particles3D);
 
-    // African drum logo and text
+    // African drum logo
     const textureLoader = new THREE.TextureLoader();
     textureLoader.load('/favicon.svg', (texture) => {
-      const logoGeometry = new THREE.PlaneGeometry(3, 3);
+      const logoGeometry = new THREE.PlaneGeometry(2, 2);
       const logoMaterial = new THREE.MeshBasicMaterial({
         map: texture,
         transparent: true,
         opacity: theme === 'dark' ? 0.9 : 1,
       });
       const logo = new THREE.Mesh(logoGeometry, logoMaterial);
-      logo.position.z = -3;
+      logo.position.z = -2;
       scene.add(logo);
-
-      // Add text below logo
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      if (context) {
-        canvas.width = 512;
-        canvas.height = 128;
-        context.fillStyle = theme === 'dark' ? '#22C55E' : '#000000';
-        context.font = 'bold 72px Arial';
-        context.textAlign = 'center';
-        context.fillText('Ekowest TV', canvas.width / 2, canvas.height / 2);
-        
-        const textTexture = new THREE.CanvasTexture(canvas);
-        const textGeometry = new THREE.PlaneGeometry(4, 1);
-        const textMaterial = new THREE.MeshBasicMaterial({
-          map: textTexture,
-          transparent: true,
-          opacity: theme === 'dark' ? 0.9 : 1,
-        });
-        const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-        textMesh.position.y = -2;
-        textMesh.position.z = -3;
-        scene.add(textMesh);
-      }
     });
 
     // Camera position
-    camera.position.z = 6;
+    camera.position.z = 10;
 
     // Animation loop
     let frame = 0;
@@ -135,18 +149,33 @@ export const HeroAnimation = ({ fallback }: HeroAnimationProps) => {
       frame = (frame + 1) % (60 * loopDuration);
       const t = frame / (60 * loopDuration);
 
-      // More dynamic particle animation
-      particles.rotation.y = t * Math.PI * 4;
-      particles.rotation.x = Math.sin(t * Math.PI * 6) * 0.5;
-      particles.rotation.z = Math.cos(t * Math.PI * 4) * 0.3;
+      // Update particle positions
+      const positions = particleGeometry.attributes.position.array as Float32Array;
+      for (let i = 0; i < particleCount; i++) {
+        const i3 = i * 3;
+        const targetIndex = i % textParticles.length;
 
-      // Pulsing effect
-      const scale = 1 + Math.sin(t * Math.PI * 8) * 0.1;
-      particles.scale.set(scale, scale, scale);
+        if (t < 0.5) {
+          // First half: Swirl around
+          const angle = (t * Math.PI * 4) + (i / particleCount) * Math.PI * 2;
+          const radius = 5 + Math.sin(t * Math.PI * 6) * 2;
+          positions[i3] += (Math.cos(angle) * radius - positions[i3]) * 0.02;
+          positions[i3 + 1] += (Math.sin(angle) * radius - positions[i3 + 1]) * 0.02;
+          positions[i3 + 2] += (Math.cos(t * Math.PI * 2) * 2 - positions[i3 + 2]) * 0.02;
+        } else {
+          // Second half: Form text
+          const targetX = textParticles[targetIndex]?.x || 0;
+          const targetY = textParticles[targetIndex]?.y || 0;
+          positions[i3] += (targetX - positions[i3]) * 0.1;
+          positions[i3 + 1] += (targetY - positions[i3 + 1]) * 0.1;
+          positions[i3 + 2] += (0 - positions[i3 + 2]) * 0.1;
+        }
+      }
+      particleGeometry.attributes.position.needsUpdate = true;
 
       // Dynamic camera movement
-      camera.position.x = Math.sin(t * Math.PI * 2) * 0.5;
-      camera.position.y = Math.cos(t * Math.PI * 2) * 0.5;
+      camera.position.x = Math.sin(t * Math.PI * 2) * 2;
+      camera.position.y = Math.cos(t * Math.PI * 2) * 2;
       camera.lookAt(0, 0, 0);
 
       renderer.render(scene, camera);
