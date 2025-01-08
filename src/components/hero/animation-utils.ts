@@ -15,15 +15,9 @@ export const createTextCanvas = (theme: string | undefined) => {
   
   if (context) {
     context.fillStyle = theme === 'dark' ? '#22C55E' : '#000000';
-    context.font = 'bold 160px Arial';
+    context.font = 'bold 160px Arial'; // Increased from 120px to 160px
     context.textAlign = 'center';
-    
-    // Draw "Ekowest" first
-    context.fillText('Ekowest', textCanvas.width / 2 - 100, textCanvas.height / 2);
-    
-    // Draw "TV" in gold color
-    context.fillStyle = theme === 'dark' ? '#FFD700' : '#DAA520';
-    context.fillText('TV', textCanvas.width / 2 + 200, textCanvas.height / 2);
+    context.fillText('Ekowest TV', textCanvas.width / 2, textCanvas.height / 2);
   }
   
   return { textCanvas, context };
