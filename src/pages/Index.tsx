@@ -94,7 +94,7 @@ const Index = () => {
           />
           <div ref={newReleaseRef} id="new-release">
             <CategoryRow 
-              title="New Release" 
+              title="New Releases" 
               movies={newReleases ? transformCachedToMovie(newReleases as unknown as CachedMovie[]) : []}
               selectedVideoId={selectedVideoId}
               onVideoSelect={setSelectedVideoId}
