@@ -1,32 +1,111 @@
-import { Play } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export const Hero = () => {
+  const slides = [
+    {
+      type: 'image',
+      src: '/videos/file-20220908-13-nwxk17.avif',
+      duration: 4000,
+    },
+    // {
+    //   type: 'image',
+    //   src: '/videos/Ijogbon.jpg',
+    //   duration: 4000,
+    // },
+    // {
+    //   type: 'image',
+    //   src: '/videos/maxresdefault.jpg',
+    //   duration: 4000,
+    // },
+    {
+      type: 'image',
+      src: '/videos/Netflix-slate-e1692222322682.jpg',
+      duration: 4000,
+    },
+    {
+      type: 'video',
+      src: '/videos/wbd-hero-animation_24_0_0.second copy.mp4',
+      duration: 10000, // 10 seconds for video
+    }
+  ];
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const currentSlide = slides[currentIndex];
+      setCurrentIndex((prevIndex) => 
+        prevIndex === slides.length - 1 ? 0 : prevIndex + 1
+      );
+    }, slides[currentIndex].duration);
+
+    return () => clearInterval(timer);
+  }, [currentIndex]);
+
+  const nextSlide = () => {
+    setCurrentIndex((prevIndex) => 
+      prevIndex === slides.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex((prevIndex) => 
+      prevIndex === 0 ? slides.length - 1 : prevIndex - 1
+    );
+  };
   return (
-    <div className="relative h-[50vh] md:h-[80vh] mb-8">
-      <video 
-        className="w-full h-full object-cover"
-        autoPlay 
-        loop 
-        muted 
-        playsInline
-        poster="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=2000&q=80"
-      >
-        <source 
-          src="https://yuisywwlzorzdrzvjlvm.supabase.co/storage/v1/object/public/videos/wbd-hero-animation_24_0_0.mp4" 
-          type="video/mp4"
-        />
-      </video>
-      <div className="absolute inset-0 bg-gradient-to-t from-koya-background via-transparent to-transparent" />
-      <div className="absolute bottom-0 left-0 p-4 md:p-8 w-full">
-        <h1 className="text-3xl md:text-5xl font-bold mb-2 md:mb-4 text-white">Featured Title</h1>
-        <p className="text-sm md:text-xl text-koya-subtext mb-4 md:mb-6 max-w-2xl">
-          Experience the latest blockbuster with stunning visuals and an engaging storyline that will keep you on the edge of your seat.
+    <div className="relative w-full h-[600px] overflow-hidden mb-16">
+      {slides.map((slide, index) => (
+        <div
+          key={index}
+          className={`absolute w-full h-full transition-opacity duration-500 ease-in-out ${
+            index === currentIndex ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          {slide.type === 'image' ? (
+            <img
+              src={slide.src}
+              alt={`Hero Slide ${index + 1}`}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <video
+              autoPlay
+              loop
+              muted
+              className="w-full h-full object-cover"
+            >
+              <source src={slide.src} type="video/mp4" />
+            </video>
+          )}
+        </div>
+      ))}
+
+      {/* Hero Text Overlay */}
+      <div className="absolute bottom-16 left-16 z-10">
+        <h1 className="text-4xl font-bold text-white mb-4">
+          Welcome to Ekowest TV
+        </h1>
+        <p className="text-xl text-white">
+          Experience the best of Nigerian entertainment
         </p>
-        <button className="bg-koya-accent hover:bg-opacity-80 text-white px-6 md:px-8 py-2 md:py-3 rounded-lg flex items-center gap-2 transition-colors text-sm md:text-base">
-          <Play className="w-4 h-4 md:w-5 md:h-5" />
-          Play Now
-        </button>
       </div>
+
+      <button
+        onClick={prevSlide}
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors duration-200 z-20"
+        aria-label="Previous slide"
+      >
+        <ChevronLeft className="w-6 h-6" />
+      </button>
+      <button
+        onClick={nextSlide}
+        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors duration-200 z-20"
+        aria-label="Next slide"
+      >
+        <ChevronRight className="w-6 h-6" />
+      </button>
     </div>
   );
 };
