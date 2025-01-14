@@ -82,12 +82,6 @@ const Index = () => {
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
           />
-          <CategoryRow 
-            title="Skits" 
-            movies={skits || MOCK_MOVIES.skits}
-            selectedVideoId={selectedVideoId}
-            onVideoSelect={setSelectedVideoId}
-          />
           <div ref={newReleaseRef}>
             <CategoryRow 
               title="New Release" 
