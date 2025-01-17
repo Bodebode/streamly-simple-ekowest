@@ -87,7 +87,7 @@ export const useYorubaMovies = () => {
         toast.error('Failed to load Yoruba movies');
         return MOCK_MOVIES.yoruba;
       }
-    },
+    }, 
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
     gcTime: 1000 * 60 * 10, // Keep in cache for 10 minutes
     retry: 1,

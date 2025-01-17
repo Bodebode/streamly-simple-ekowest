@@ -1,143 +1,183 @@
-import { Globe, Star, Calendar, Film, Drum, Search, Mail, LogOut, Menu, Coins } from 'lucide-react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from './AuthProvider';
-import { Button } from './ui/button';
 import { useState } from 'react';
+import { Drum, Coins, Search, X } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { useAuthStore } from '@/stores/auth-store';
+import { cn } from '@/lib/utils';
+interface SearchResult {
+  id: {
+    videoId: string;
+  };
+  snippet: {
+    title: string;
+    channelTitle: string;
+    thumbnails: {
+      default: {
+        url: string;
+      };
+    };
+  };
+}
 
 export const Navbar = () => {
-  const { user } = useAuth();
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, clearAuth } = useAuthStore();
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate('/auth');
+  const handleLogout = () => {
+    clearAuth();
+    navigate('/login');
   };
+  const API_KEY = 'AIzaSyDqOUX5_9QZZzrfGxWqVrqZw_R-y3hKDb8'; // New API key
 
-  const handleNewReleaseClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    // If we're not on the home page, navigate to it first
-    if (location.pathname !== '/') {
-      navigate('/#new-release');
-    } else {
-      // If we're already on the home page, just update the hash
-      window.location.hash = 'new-release';
+  const handleSearch = async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `https://youtube.googleapis.com/youtube/v3/search?` + 
+        new URLSearchParams({
+          part: 'snippet',
+          maxResults: '5',
+          q: query,
+          type: 'video',
+          key: API_KEY
+        })
+      );
+
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error.message);
+      }
+      
+      setSearchResults(data.items || []);
+    } catch (error) {
+      console.error('Search failed:', error);
+      setSearchResults([]);
+    } finally {
+      setIsLoading(false);
     }
   };
-
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-koya-background to-transparent">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center">
-            <Link to="/" className="flex items-center gap-2 text-xl md:text-2xl font-bold text-koya-accent">
-              <Drum size={24} className="text-koya-accent" />
-              <span className="hidden sm:inline">Ekowest TV</span>
-            </Link>
-          </div>
-
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden text-koya-text hover:text-koya-accent"
-          >
-            <Menu size={24} />
-          </button>
-
-          <div className="hidden md:flex items-center space-x-6">
-            <Link to="/watch2earn" className="flex items-center space-x-2 text-koya-text hover:text-koya-accent transition-colors">
-              <Coins size={20} />
-              <span>Watch2Earn</span>
-            </Link>
-            
-            <Link to="/language" className="flex items-center space-x-2 text-koya-text hover:text-koya-accent transition-colors">
-              <Globe size={20} />
-              <span>Browse by Language</span>
-            </Link>
-            
-            <Link to="/favorites" className="flex items-center space-x-2 text-koya-text hover:text-koya-accent transition-colors">
-              <Star size={20} />
-              <span>My Favourites</span>
-            </Link>
-            
-            <a
-              href="#new-release"
-              onClick={handleNewReleaseClick}
-              className="flex items-center space-x-2 text-koya-text hover:text-koya-accent transition-colors cursor-pointer"
-            >
-              <Film size={20} />
-              <span>New Release</span>
-            </a>
-
-            <button className="text-koya-text hover:text-koya-accent transition-colors">
-              <Search size={24} />
-            </button>
-            <button className="text-koya-text hover:text-koya-accent transition-colors">
-              <Mail size={24} />
-            </button>
-            {user && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleLogout}
-                className="text-koya-text hover:text-koya-accent transition-colors"
-              >
-                <LogOut size={24} />
-              </Button>
-            )}
-          </div>
-        </div>
-
-        {isMobileMenuOpen && (
-          <div className="md:hidden bg-koya-background border-t border-gray-700 py-4">
-            <div className="flex flex-col space-y-4 px-4">
-              <Link to="/watch2earn" className="flex items-center space-x-2 text-koya-text hover:text-koya-accent transition-colors">
-                <Coins size={20} />
-                <span>Watch2Earn</span>
-              </Link>
-              
-              <Link to="/language" className="flex items-center space-x-2 text-koya-text hover:text-koya-accent transition-colors">
-                <Globe size={20} />
-                <span>Browse by Language</span>
-              </Link>
-              
-              <Link to="/favorites" className="flex items-center space-x-2 text-koya-text hover:text-koya-accent transition-colors">
-                <Star size={20} />
-                <span>My Favourites</span>
-              </Link>
-              
-              <a
-                href="#new-release"
-                onClick={handleNewReleaseClick}
-                className="flex items-center space-x-2 text-koya-text hover:text-koya-accent transition-colors cursor-pointer"
-              >
-                <Film size={20} />
-                <span>New Release</span>
-              </a>
-
-              <div className="flex space-x-4">
-                <button className="text-koya-text hover:text-koya-accent transition-colors">
-                  <Search size={24} />
-                </button>
-                <button className="text-koya-text hover:text-koya-accent transition-colors">
-                  <Mail size={24} />
-                </button>
-                {user && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleLogout}
-                    className="text-koya-text hover:text-koya-accent transition-colors"
-                  >
-                    <LogOut size={24} />
-                  </Button>
+    <nav className="fixed top-0 w-full z-50 bg-white dark:bg-koya-card border-b">
+      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+        <Link to="/" className="flex items-center gap-2 text-xl md:text-2xl font-bold text-koya-accent">
+          <Drum className="lucide lucide-drum text-koya-accent" />
+          <span className="hidden sm:inline">Ekowest TV</span>
+        </Link>
+        <div className="flex items-center gap-6">
+          {user && (
+            <div className="flex items-center">
+              <div className={cn(
+                "overflow-hidden transition-all duration-300 ease-in-out",
+                isSearching ? "w-64" : "w-0"
+              )}>
+                <div className="relative min-w-64">
+                  <Input
+                    placeholder="Search videos..."
+                    className="pl-3 pr-8"
+                    autoFocus={isSearching}
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      handleSearch(e.target.value);
+                    }}
+                  />
+                  {isSearching && (
+                    <button 
+                      onClick={() => setIsSearching(false)}
+                      className="absolute right-2 top-2.5"
+                    >
+                      <X className="h-4 w-4 text-muted-foreground" />
+                    </button>
+                  )}
+                </div>
+                {isSearching && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-koya-card rounded-md shadow-lg z-50 max-h-[300px] overflow-y-auto">
+                    {isLoading ? (
+                      <div className="p-4 text-center">
+                        <span className="animate-spin inline-block mr-2">⌛</span>
+                        Searching...
+                      </div>
+                    ) : searchResults.length > 0 ? (
+                      searchResults.map((video) => (
+                        <div
+                          key={video.id.videoId}
+                          className="flex items-center gap-3 p-2 hover:bg-accent cursor-pointer"
+                          onClick={() => {
+                            navigate(`/watch/${video.id.videoId}`);
+                            setIsSearching(false);
+                            setSearchQuery('');
+                          }}
+                        >
+                          <img 
+                            src={video.snippet.thumbnails.default.url}
+                            alt={video.snippet.title}
+                            className="w-16 h-12 object-cover rounded"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">{video.snippet.title}</p>
+                            <p className="text-xs text-muted-foreground">{video.snippet.channelTitle}</p>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-4 text-center text-muted-foreground">
+                        No results found
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => setIsSearching(true)}
+              >
+                <Search className="h-5 w-5" />
+              </Button>
             </div>
-          </div>
-        )}
+          )}
+          {user ? (
+            <>
+              <Link to="/my-list" className="text-sm hover:underline">
+                My List
+              </Link>
+              <Link to="/rewards" className="flex items-center gap-1 text-sm hover:underline">
+                <Coins className="h-5 w-5" />
+                Watch2Earn
+              </Link>
+              <div className="flex items-center gap-4">
+                <span className="text-sm">{user.email}</span>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <Link to="/watch2earn" className="text-sm hover:underline">
+                Watch2Earn
+              </Link>
+              <Link to="/login" className="text-sm hover:underline">
+                Login
+              </Link>
+            </>
+          )}
+        </div>
       </div>
     </nav>
   );
-};
+}

@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button";
-import { Coins, DollarSign, PiggyBank, PlayCircle, Trophy } from "lucide-react";
-import { Link } from "react-router-dom";
+import { PlayCircle, Trophy, PiggyBank, Coins, DollarSign } from 'lucide-react';
+import { Button } from '../components/ui/button';
+import { Link } from 'react-router-dom';
 
-const Watch2Earn = () => {
+export const Watch2Earn = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-koya-background to-black text-koya-text">
       <div className="container mx-auto px-4 py-16 space-y-16">
@@ -12,7 +12,7 @@ const Watch2Earn = () => {
             Watch2Earn with Ekowest TV
           </h1>
           <p className="text-xl md:text-2xl max-w-2xl mx-auto">
-            Get paid to watch your favorite Nollywood movies. Yes, you read that right!
+          Yes, you read that right! Get paid to watch your favorite Nollywood movies.
           </p>
         </div>
 
@@ -67,5 +67,5 @@ const Watch2Earn = () => {
     </div>
   );
 };
-
 export default Watch2Earn;
+
