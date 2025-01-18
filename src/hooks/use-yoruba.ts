@@ -4,11 +4,8 @@ import { toast } from 'sonner';
 import { MOCK_MOVIES } from '@/data/mockMovies';
 import { CachedMovie, Movie } from '@/types/movies';
 import { buildYorubaQuery } from '@/utils/query-builder';
-import { 
-  STRICT_CRITERIA, 
-  RELAXED_QUALITY_CRITERIA, 
-  RELAXED_DURATION_CRITERIA 
-} from '@/constants/video-criteria';
+import { YORUBA_QUALITY_CRITERIA, YORUBA_DURATION_CRITERIA } from '@/constants/yoruba-criteria';
+import { STRICT_CRITERIA } from '@/constants/video-criteria';
 
 export const useYorubaMovies = () => {
   return useQuery({
@@ -29,57 +26,44 @@ export const useYorubaMovies = () => {
           return MOCK_MOVIES.yoruba;
         }
 
-        console.log(`Found ${strictVideos?.length || 0} videos meeting all enhanced criteria`);
-
-        if (strictVideos && strictVideos.length > 0) {
-          if (strictVideos.length < 8) {
-            console.warn(`Only ${strictVideos.length} videos meet strict criteria. Consider content acquisition.`);
-          }
+        if (strictVideos && strictVideos.length >= 8) {
           return transformVideosToMovies(strictVideos as unknown as CachedMovie[]);
         }
 
-        // Try with relaxed quality criteria
-        console.log('No videos meet strict criteria. Attempting with relaxed quality...');
-        const { data: relaxedQualityVideos, error: relaxedQualityError } = await buildYorubaQuery(
+        // Try with Yoruba quality criteria
+        const { data: qualityVideos, error: qualityError } = await buildYorubaQuery(
           supabase,
-          RELAXED_QUALITY_CRITERIA
+          YORUBA_QUALITY_CRITERIA
         );
 
-        if (relaxedQualityError) {
-          console.error('Error fetching with relaxed quality:', relaxedQualityError);
+        if (qualityError) {
+          console.error('Error fetching with quality criteria:', qualityError);
           return MOCK_MOVIES.yoruba;
         }
 
-        if (relaxedQualityVideos && relaxedQualityVideos.length > 0) {
-          toast.info('Showing available content with relaxed quality criteria', {
-            duration: 5000,
-          });
-          return transformVideosToMovies(relaxedQualityVideos as unknown as CachedMovie[]);
+        if (qualityVideos && qualityVideos.length >= 12) {
+          return transformVideosToMovies(qualityVideos as unknown as CachedMovie[]);
         }
 
-        // Try with relaxed duration criteria
-        console.log('No videos meet relaxed quality criteria. Attempting with relaxed duration...');
-        const { data: relaxedDurationVideos, error: relaxedDurationError } = await buildYorubaQuery(
+        // Try with Yoruba duration criteria
+        const { data: durationVideos, error: durationError } = await buildYorubaQuery(
           supabase,
-          RELAXED_DURATION_CRITERIA
+          YORUBA_DURATION_CRITERIA
         );
 
-        if (relaxedDurationError) {
-          console.error('Error fetching with relaxed duration:', relaxedDurationError);
+        if (durationError) {
+          console.error('Error fetching with duration criteria:', durationError);
           return MOCK_MOVIES.yoruba;
         }
 
-        if (relaxedDurationVideos && relaxedDurationVideos.length > 0) {
-          toast.info('Showing available content with relaxed duration criteria', {
+        if (durationVideos && durationVideos.length > 0) {
+          toast.info('Showing available content with relaxed criteria', {
             duration: 5000,
           });
-          return transformVideosToMovies(relaxedDurationVideos as unknown as CachedMovie[]);
+          return transformVideosToMovies(durationVideos as unknown as CachedMovie[]);
         }
 
         console.log('No videos found with any criteria, using mock data');
-        toast.info('Showing sample content while we gather more high-quality videos', {
-          duration: 5000,
-        });
         return MOCK_MOVIES.yoruba;
 
       } catch (error) {
@@ -87,9 +71,9 @@ export const useYorubaMovies = () => {
         toast.error('Failed to load Yoruba movies');
         return MOCK_MOVIES.yoruba;
       }
-    }, 
-    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
-    gcTime: 1000 * 60 * 10, // Keep in cache for 10 minutes
+    },
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
     retry: 1,
   });
 };
