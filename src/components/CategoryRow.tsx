@@ -14,7 +14,7 @@ interface Movie {
 
 interface CategoryRowProps {
   title: string;
-  movies: Movie[]
+  movies: Movie[];
   selectedVideoId: string | null;
   onVideoSelect: (videoId: string | null) => void;
   updateHighlyRated?: (movies: Movie[]) => void;
@@ -65,11 +65,3 @@ const CategoryRowComponent = ({
 };
 
 export const CategoryRow = memo(CategoryRowComponent);
-
-// Example implementation
-<CategoryRow
-  title="Your Section Title"
-  movies={sectionMovies}
-  selectedVideoId={selectedVideoId}
-  onVideoSelect={(videoId) => setSelectedVideoId(videoId)}
-/>
