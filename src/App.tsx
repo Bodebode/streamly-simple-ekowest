@@ -13,7 +13,8 @@ import { Login } from './pages/Login';
 import Watch from './pages/Watch';
 import RewardsDashboard from './pages/RewardsDashboard';
 import { Watch2Earn } from './pages/Watch2Earn';  // Add this import
-
+import Profile from "./pages/Profile";
+import Community from "./pages/Community";
 
 const queryClient = new QueryClient();
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -40,9 +41,8 @@ const App = () => {
                 <Route path="/watch2earn" element={<Watch2Earn />} />
                 <Route path="/rewards" element={<Watch2Earn />} />
                 <Route path="/watch/:videoId" element={<Watch />} />
-                <Route path="/rewards" element={<Watch2Earn />} />
-
-                
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/community" element={<Community />} />
                 <Route 
                   path="/" 
                   element={

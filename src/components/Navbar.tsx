@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { useAuthStore } from '@/stores/auth-store';
 import { cn } from '@/lib/utils';
+
 interface SearchResult {
   id: {
     videoId: string;
@@ -151,12 +152,17 @@ export const Navbar = () => {
               <Link to="/my-list" className="text-sm hover:underline">
                 My List
               </Link>
+              <Link to="/community" className="text-sm hover:underline">
+                Community
+              </Link>
               <Link to="/rewards" className="flex items-center gap-1 text-sm hover:underline">
                 <Coins className="h-5 w-5" />
                 Watch2Earn
               </Link>
               <div className="flex items-center gap-4">
-                <span className="text-sm">{user.email}</span>
+                <Link to="/profile" className="text-sm hover:underline">
+                  {user.email}
+                </Link>
                 <Button 
                   variant="ghost" 
                   size="sm"
