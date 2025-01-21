@@ -2,8 +2,8 @@ import { Toast } from "@/types/Toast";
 import { CheckCircle } from "lucide-react";
 
 const myToast: Toast = {
-  message: "Success!",
-  type: "success",
+  title: "Success!",
+  description: "Operation completed successfully",
   icon: <CheckCircle className="h-4 w-4" />
 };
 

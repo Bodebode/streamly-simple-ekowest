@@ -1,22 +1,20 @@
 import { useState, useEffect } from 'react';
 import { MovieCard } from './MovieCard';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Movie } from '@/types/movies';
 
-interface Movie {
-  id: string | number;
-  title: string;
-  image: string;
-  category: string;
-  videoId?: string;
+interface MovieCarouselProps {
+  title?: string;
+  movies: Movie[];
+  onRefresh?: () => void;
 }
 
-export const MovieCarousel = ({ title, movies, onRefresh }) => {
+export const MovieCarousel = ({ title, movies, onRefresh }: MovieCarouselProps) => {
   const [displayedMovies, setDisplayedMovies] = useState<Movie[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const moviesPerPage = 6;
 
   useEffect(() => {
-    // Remove overly restrictive filtering
     const uniqueMovies = movies.filter((movie, index, self) =>
       index === self.findIndex((m) => m.id === movie.id)
     );
@@ -46,7 +44,7 @@ export const MovieCarousel = ({ title, movies, onRefresh }) => {
 
   return (
     <div className="relative">
-      <h2 className="text-2xl font-bold mb-4">{title}</h2>
+      {title && <h2 className="text-2xl font-bold mb-4">{title}</h2>}
       <div className="flex overflow-hidden">
         <div className="flex gap-4 transition-transform duration-300">
           {visibleMovies.map((movie) => (
@@ -78,12 +76,14 @@ export const MovieCarousel = ({ title, movies, onRefresh }) => {
           </button>
         </>
       )}
-      <button
-        onClick={onRefresh}
-        className="absolute bottom-0 right-0 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-      >
-        Refresh
-      </button>
+      {onRefresh && (
+        <button
+          onClick={onRefresh}
+          className="absolute bottom-0 right-0 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          Refresh
+        </button>
+      )}
     </div>
   );
 };

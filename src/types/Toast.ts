@@ -1,6 +1,8 @@
-import { Toast as ShadcnToast } from "@/components/ui/toast"
+import { ToastProps } from "@/components/ui/toast"
 
-export interface CustomToast extends ShadcnToast {
+export interface CustomToast extends ToastProps {
+  title?: string;
+  description?: string;
   icon?: React.ReactNode;
 }
 

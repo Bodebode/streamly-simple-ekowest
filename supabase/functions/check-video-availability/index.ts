@@ -6,7 +6,6 @@ const corsHeaders = {
 };
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -29,11 +28,14 @@ Deno.serve(async (req) => {
       `https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v=${videoId}&format=json`
     );
 
+    const result = {
+      available: response.ok,
+      status: response.status,
+      videoId
+    };
+
     return new Response(
-      JSON.stringify({ 
-        available: response.ok,
-        status: response.status
-      }),
+      JSON.stringify(result),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200 
