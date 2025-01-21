@@ -1,4 +1,4 @@
-import { X, Maximize, Sun, Moon } from 'lucide-react';
+import { X, Maximize, Minimize, Sun, Moon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -31,6 +31,22 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
         });
     }
   }, [videoId, onClose]);
+
+  useEffect(() => {
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && document.fullscreenElement) {
+        document.exitFullscreen()
+          .then(() => setIsFullscreen(false))
+          .catch(err => {
+            console.error(`[VideoPlayer] Error exiting fullscreen:`, err);
+            toast.error('Unable to exit fullscreen mode');
+          });
+      }
+    };
+
+    document.addEventListener('keydown', handleEscKey);
+    return () => document.removeEventListener('keydown', handleEscKey);
+  }, []);
 
   const handleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -82,7 +98,7 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
           className="text-white hover:text-gray-300 transition-colors"
           aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
         >
-          <Maximize className="w-6 h-6" />
+          {isFullscreen ? <Minimize className="w-6 h-6" /> : <Maximize className="w-6 h-6" />}
         </button>
         <button
           onClick={onClose}
