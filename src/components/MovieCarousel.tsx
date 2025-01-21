@@ -2,8 +2,16 @@ import { useState, useEffect } from 'react';
 import { MovieCard } from './MovieCard';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
+interface Movie {
+  id: string | number;
+  title: string;
+  image: string;
+  category: string;
+  videoId?: string;
+}
+
 export const MovieCarousel = ({ title, movies, onRefresh }) => {
-  const [displayedMovies, setDisplayedMovies] = useState([]);
+  const [displayedMovies, setDisplayedMovies] = useState<Movie[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const moviesPerPage = 6;
 
@@ -42,7 +50,15 @@ export const MovieCarousel = ({ title, movies, onRefresh }) => {
       <div className="flex overflow-hidden">
         <div className="flex gap-4 transition-transform duration-300">
           {visibleMovies.map((movie) => (
-            <MovieCard key={movie.id} movie={movie} />
+            <MovieCard 
+              key={movie.id}
+              title={movie.title}
+              image={movie.image}
+              category={movie.category}
+              videoId={movie.videoId}
+              onMovieSelect={() => {}}
+              isVideoPlaying={false}
+            />
           ))}
         </div>
       </div>

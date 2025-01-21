@@ -1,5 +1,7 @@
-import { Toast as LibraryToast } from 'toast-library';
+import { Toast as ShadcnToast } from "@/components/ui/toast"
 
-interface CustomToast extends LibraryToast {
+export interface CustomToast extends ShadcnToast {
   icon?: React.ReactNode;
 }
+
+export type Toast = CustomToast;

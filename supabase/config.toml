@@ -5,3 +5,5 @@ project_id = "yuisywwlzorzdrzvjlvm"
 [functions.get-new-releases]
 
 [functions.get-skits]
+
+[functions.check-video-availability]
