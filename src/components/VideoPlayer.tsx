@@ -68,7 +68,7 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
   if (!videoId) return null;
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto mt-12 mb-8" ref={containerRef}>
+    <div className="relative w-full max-w-4xl mx-auto mt-24 mb-8" ref={containerRef}>
       <div className="absolute -top-10 right-0 flex items-center gap-4">
         <button
           onClick={toggleDimming}
