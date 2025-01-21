@@ -1,4 +1,4 @@
-import { X, Maximize } from 'lucide-react';
+import { X, Maximize, Sun, Moon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -9,12 +9,12 @@ interface VideoPlayerProps {
 
 export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isDimmed, setIsDimmed] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (videoId) {
       console.log(`[VideoPlayer] Attempting to play video: ${videoId}`);
-      document.body.classList.add('dimmed');
       
       // Check video availability
       fetch(`https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v=${videoId}&format=json`)
@@ -29,10 +29,6 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
           console.error(`[VideoPlayer] Error checking video availability:`, error);
           toast.error('Unable to verify video availability');
         });
-
-      return () => {
-        document.body.classList.remove('dimmed');
-      };
     }
   }, [videoId, onClose]);
 
@@ -54,6 +50,15 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
     }
   };
 
+  const toggleDimming = () => {
+    setIsDimmed(!isDimmed);
+    if (!isDimmed) {
+      document.body.classList.add('dimmed');
+    } else {
+      document.body.classList.remove('dimmed');
+    }
+  };
+
   const handleIframeError = () => {
     console.error(`[VideoPlayer] Error loading video: ${videoId}`);
     toast.error('Error loading video');
@@ -65,6 +70,13 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
   return (
     <div className="relative w-full max-w-4xl mx-auto mt-12 mb-8" ref={containerRef}>
       <div className="absolute -top-10 right-0 flex items-center gap-4">
+        <button
+          onClick={toggleDimming}
+          className="text-white hover:text-gray-300 transition-colors"
+          aria-label={isDimmed ? "Brighten screen" : "Dim screen"}
+        >
+          {isDimmed ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
+        </button>
         <button
           onClick={handleFullscreen}
           className="text-white hover:text-gray-300 transition-colors"
