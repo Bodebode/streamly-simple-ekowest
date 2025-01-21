@@ -23,7 +23,8 @@
   
   body.dimmed .movie-card,
   body.dimmed .navbar,
-  body.dimmed h2 {
+  body.dimmed h2,
+  body.dimmed footer {
     opacity: 0.1;
     transition: opacity 0.3s ease;
   }
