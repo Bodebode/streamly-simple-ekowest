@@ -14,6 +14,7 @@ import { MOCK_MOVIES } from '../data/mockMovies';
 import { usePopulateSections } from '@/hooks/use-populate-sections';
 import { transformCachedToMovie } from '@/utils/movie-transforms';
 import { CachedMovie, Movie } from '@/types/movies';
+import { toast } from 'sonner';
 
 const Index = () => {
   const { theme, setTheme } = useTheme();
@@ -23,7 +24,6 @@ const Index = () => {
   const { data: skits, isLoading: isLoadingSkits, refetch: refetchSkits } = useSkits();
   const { data: yorubaMovies, isLoading: isLoadingYoruba, refetch: refetchYoruba } = useYorubaMovies();
   const newReleaseRef = useRef<HTMLDivElement>(null);
-  const location = useLocation();
 
   const { isPopulating, populateAllSections } = usePopulateSections({
     refetchYoruba,
@@ -31,6 +31,13 @@ const Index = () => {
     refetchNewReleases,
     refetchSkits
   });
+
+  const handleVideoSelect = (videoId: string | null) => {
+    setSelectedVideoId(videoId);
+    if (videoId) {
+      console.log('Selected video ID:', videoId);
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -61,34 +68,34 @@ const Index = () => {
         <div className="pb-8">
           <CategoryRow 
             title="Trending Now" 
-            movies={MOCK_MOVIES.trending}
+            movies={transformCachedToMovie(MOCK_MOVIES.trending)}
             selectedVideoId={selectedVideoId}
-            onVideoSelect={setSelectedVideoId}
+            onVideoSelect={handleVideoSelect}
           />
           <CategoryRow 
             title="Highly Rated" 
-            movies={highlyRatedVideos ? transformCachedToMovie(highlyRatedVideos as CachedMovie[]) : MOCK_MOVIES.highlyRated}
+            movies={highlyRatedVideos ? transformCachedToMovie(highlyRatedVideos as CachedMovie[]) : transformCachedToMovie(MOCK_MOVIES.highlyRated)}
             selectedVideoId={selectedVideoId}
-            onVideoSelect={setSelectedVideoId}
+            onVideoSelect={handleVideoSelect}
           />
           <CategoryRow 
             title="Yoruba Movies" 
-            movies={yorubaMovies || []}
+            movies={yorubaMovies ? transformCachedToMovie(yorubaMovies as CachedMovie[]) : []}
             selectedVideoId={selectedVideoId}
-            onVideoSelect={setSelectedVideoId}
+            onVideoSelect={handleVideoSelect}
           />
           <CategoryRow 
             title="Skits" 
-            movies={skits ? transformCachedToMovie(skits as CachedMovie[]) : MOCK_MOVIES.skits}
+            movies={skits ? transformCachedToMovie(skits as CachedMovie[]) : transformCachedToMovie(MOCK_MOVIES.skits)}
             selectedVideoId={selectedVideoId}
-            onVideoSelect={setSelectedVideoId}
+            onVideoSelect={handleVideoSelect}
           />
           <div ref={newReleaseRef}>
             <CategoryRow 
               title="New Release" 
-              movies={newReleases ? transformCachedToMovie(newReleases as CachedMovie[]) : MOCK_MOVIES.highlyRated}
+              movies={newReleases ? transformCachedToMovie(newReleases as CachedMovie[]) : transformCachedToMovie(MOCK_MOVIES.highlyRated)}
               selectedVideoId={selectedVideoId}
-              onVideoSelect={setSelectedVideoId}
+              onVideoSelect={handleVideoSelect}
             />
           </div>
         </div>
