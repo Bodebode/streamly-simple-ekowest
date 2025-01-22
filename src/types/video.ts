@@ -7,6 +7,7 @@ export interface CachedVideo {
   views?: number;
   comments?: number;
   duration?: number;
+  published_at?: string;
   cached_at?: string;
   expires_at?: string;
   access_count?: number;

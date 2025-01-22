@@ -1,18 +1,10 @@
 import { supabase } from '@/integrations/supabase/client';
-import { CachedVideo } from '@/types/video';
-
-export const isValidNewRelease = (video: CachedVideo): boolean => {
-  const MINIMUM_DURATION = 45 * 60; // 45 minutes in seconds
-  
-  return (
-    video.video_id !== undefined &&
-    video.duration !== undefined &&
-    video.duration >= MINIMUM_DURATION
-  );
-};
 
 export const checkVideoAvailability = async (videoId?: string): Promise<boolean> => {
-  if (!videoId) return false;
+  if (!videoId) {
+    console.warn('[checkVideoAvailability] No videoId provided');
+    return false;
+  }
   
   try {
     console.log('[checkVideoAvailability] Checking video:', videoId);

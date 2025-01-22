@@ -1,5 +1,4 @@
-import { CachedVideo } from '@/types/video';
-import { Movie } from '@/types/movies';
+import { CachedVideo, Movie } from '@/types/movies';
 
 export const transformCachedToMovie = (videos: CachedVideo[]): Movie[] => {
   return videos.map((video) => ({

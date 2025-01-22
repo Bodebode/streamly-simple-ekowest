@@ -15,4 +15,4 @@ export interface MovieData {
   skits: Movie[];
 }
 
-export type CachedMovie = CachedVideo;
+export type { CachedVideo };
