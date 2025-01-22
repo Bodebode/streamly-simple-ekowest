@@ -3,7 +3,14 @@ import { useState, memo, useCallback, useEffect } from 'react';
 import { MovieCarousel } from './movie/MovieCarousel';
 import { useRelatedVideos } from '@/hooks/use-related-videos';
 import { checkVideoAvailability } from '@/utils/video-validation';
-import { Movie } from '@/types/movies';
+
+interface Movie {
+  id: number;
+  title: string;
+  image: string;
+  category: string;
+  videoId?: string;
+}
 
 interface CategoryRowProps {
   title: string;
@@ -32,12 +39,8 @@ const CategoryRowComponent = ({
     const validMovies = movies.filter(movie => movie.videoId);
     setFilteredMovies(validMovies.length > 0 ? validMovies : movies);
     
-    // Check video availability for each movie with a videoId
-    validMovies.forEach(async (movie) => {
-      if (movie.videoId) {
-        await checkVideoAvailability(movie.videoId);
-      }
-    });
+    // Still check video availability in the background
+    checkVideoAvailability();
   }, [movies]);
 
   const isPlayingInThisRow = selectedVideoId && movies.some(movie => movie.videoId === selectedVideoId);
