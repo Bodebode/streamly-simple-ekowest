@@ -26,3 +26,10 @@ export interface CachedVideo {
   criteria_met?: Record<string, any>;
   is_embeddable?: boolean;
 }
+
+export interface PlaceholderVideo {
+  id: string;
+  title: string;
+  image: string;
+  category: string;
+}

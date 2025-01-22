@@ -1,3 +1,5 @@
+import { CachedVideo } from './video';
+
 export interface Movie {
   id: string | number;
   title: string;

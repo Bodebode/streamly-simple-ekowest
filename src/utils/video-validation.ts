@@ -26,7 +26,7 @@ export const checkVideoAvailability = async (videoId?: string): Promise<boolean>
     }
 
     console.log('[checkVideoAvailability] Result:', data);
-    return data.available;
+    return data?.available ?? false;
   } catch (error) {
     console.error('[checkVideoAvailability] Unexpected error:', error);
     return false;
