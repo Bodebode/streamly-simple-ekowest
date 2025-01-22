@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 
-export const checkVideoAvailability = async (videoId?: string): Promise<boolean> => {
+export const checkVideoAvailability = async (videoId: string): Promise<boolean> => {
   if (!videoId) {
     console.warn('[checkVideoAvailability] No videoId provided');
     return false;
