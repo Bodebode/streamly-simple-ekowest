@@ -13,7 +13,6 @@ import { useLocation } from 'react-router-dom';
 import { MOCK_MOVIES } from '../data/mockMovies';
 import { usePopulateSections } from '@/hooks/use-populate-sections';
 import { transformCachedToMovie } from '@/utils/movie-transforms';
-import { Movie } from '@/types/movies';
 
 const Index = () => {
   const { theme, setTheme } = useTheme();
@@ -61,13 +60,13 @@ const Index = () => {
         <div className="pb-8">
           <CategoryRow 
             title="Trending Now" 
-            movies={MOCK_MOVIES.trending as Movie[]}
+            movies={MOCK_MOVIES.trending}
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
           />
           <CategoryRow 
             title="Highly Rated" 
-            movies={highlyRatedVideos ? transformCachedToMovie(highlyRatedVideos) : MOCK_MOVIES.highlyRated as Movie[]}
+            movies={highlyRatedVideos ? transformCachedToMovie(highlyRatedVideos as unknown as CachedMovie[]) : MOCK_MOVIES.highlyRated}
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
           />
@@ -79,14 +78,14 @@ const Index = () => {
           />
           <CategoryRow 
             title="Skits" 
-            movies={skits ? transformCachedToMovie(skits) : MOCK_MOVIES.skits as Movie[]}
+            movies={skits ? transformCachedToMovie(skits as unknown as CachedMovie[]) : MOCK_MOVIES.skits}
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
           />
           <div ref={newReleaseRef}>
             <CategoryRow 
               title="New Release" 
-              movies={newReleases ? transformCachedToMovie(newReleases) : MOCK_MOVIES.highlyRated as Movie[]}
+              movies={newReleases ? transformCachedToMovie(newReleases as unknown as CachedMovie[]) : MOCK_MOVIES.highlyRated}
               selectedVideoId={selectedVideoId}
               onVideoSelect={setSelectedVideoId}
             />
