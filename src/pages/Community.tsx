@@ -8,18 +8,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Send, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/AuthProvider';
+import { Database } from '@/integrations/supabase/types';
 
-interface ChatMessage {
-  id: string;
-  content: string;
-  created_at: string;
-  user_id: string;
-  username: string;
-}
+type Message = Database['public']['Tables']['messages']['Row'];
 
 const Community = () => {
   const { user } = useAuth();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [channel, setChannel] = useState('general');
 
@@ -37,7 +32,7 @@ const Community = () => {
           table: 'messages',
         },
         (payload) => {
-          const newMessage = payload.new as ChatMessage;
+          const newMessage = payload.new as Message;
           setMessages((prev) => [...prev, newMessage]);
         }
       )
@@ -70,13 +65,15 @@ const Community = () => {
     e.preventDefault();
     if (!newMessage.trim() || !user) return;
 
-    const { error } = await supabase.from('messages').insert([
-      {
-        content: newMessage,
-        user_id: user.id,
-        channel,
-      },
-    ]);
+    const { error } = await supabase
+      .from('messages')
+      .insert([
+        {
+          content: newMessage,
+          user_id: user.id,
+          channel,
+        },
+      ]);
 
     if (error) {
       console.error('Error sending message:', error);
@@ -126,7 +123,7 @@ const Community = () => {
                         : 'bg-muted'
                     }`}
                   >
-                    <p className="text-sm font-medium mb-1">{message.username}</p>
+                    <p className="text-sm font-medium mb-1">{message.username || 'Anonymous'}</p>
                     <p className="text-sm">{message.content}</p>
                   </div>
                 </div>
