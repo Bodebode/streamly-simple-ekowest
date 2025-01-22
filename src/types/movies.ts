@@ -12,3 +12,5 @@ export interface MovieData {
   yoruba: Movie[];
   skits: Movie[];
 }
+
+export type CachedMovie = CachedVideo;

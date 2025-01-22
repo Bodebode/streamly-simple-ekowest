@@ -5,14 +5,15 @@ export const isValidNewRelease = (video: CachedVideo): boolean => {
   const MINIMUM_DURATION = 45 * 60; // 45 minutes in seconds
   
   return (
-    video.is_available === true &&
     video.video_id !== undefined &&
     video.duration !== undefined &&
     video.duration >= MINIMUM_DURATION
   );
 };
 
-export const checkVideoAvailability = async (videoId: string): Promise<boolean> => {
+export const checkVideoAvailability = async (videoId?: string): Promise<boolean> => {
+  if (!videoId) return false;
+  
   try {
     console.log('[checkVideoAvailability] Checking video:', videoId);
     const { data, error } = await supabase.functions.invoke('check-video-availability', {

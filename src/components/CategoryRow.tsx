@@ -5,7 +5,7 @@ import { useRelatedVideos } from '@/hooks/use-related-videos';
 import { checkVideoAvailability } from '@/utils/video-validation';
 
 interface Movie {
-  id: number;
+  id: string | number;
   title: string;
   image: string;
   category: string;
@@ -39,8 +39,12 @@ const CategoryRowComponent = ({
     const validMovies = movies.filter(movie => movie.videoId);
     setFilteredMovies(validMovies.length > 0 ? validMovies : movies);
     
-    // Still check video availability in the background
-    checkVideoAvailability();
+    // Check video availability for each movie with a videoId
+    validMovies.forEach(async (movie) => {
+      if (movie.videoId) {
+        await checkVideoAvailability(movie.videoId);
+      }
+    });
   }, [movies]);
 
   const isPlayingInThisRow = selectedVideoId && movies.some(movie => movie.videoId === selectedVideoId);
