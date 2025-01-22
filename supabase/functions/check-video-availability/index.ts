@@ -11,8 +11,22 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { videoId } = await req.json();
-    
+    // Parse request body
+    let videoId;
+    try {
+      const body = await req.json();
+      videoId = body.videoId;
+    } catch (error) {
+      console.error('Error parsing request body:', error);
+      return new Response(
+        JSON.stringify({ error: 'Invalid request body' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400 
+        }
+      );
+    }
+
     if (!videoId) {
       return new Response(
         JSON.stringify({ error: 'Video ID is required' }),
@@ -22,6 +36,8 @@ Deno.serve(async (req) => {
         }
       );
     }
+
+    console.log('Checking availability for video:', videoId);
 
     // Try to fetch video info from YouTube's oembed endpoint
     const response = await fetch(
@@ -33,6 +49,8 @@ Deno.serve(async (req) => {
       status: response.status,
       videoId
     };
+
+    console.log('Availability check result:', result);
 
     return new Response(
       JSON.stringify(result),
