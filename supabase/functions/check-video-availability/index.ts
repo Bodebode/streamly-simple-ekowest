@@ -11,15 +11,28 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // No need to parse request body if we're just checking general availability
-    console.log('Checking video availability...');
+    const { videoId } = await req.json();
+    
+    if (!videoId) {
+      return new Response(
+        JSON.stringify({ error: 'Video ID is required' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400 
+        }
+      );
+    }
+
+    // Try to fetch video info from YouTube's oembed endpoint
+    const response = await fetch(
+      `https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v=${videoId}&format=json`
+    );
 
     const result = {
-      available: true,
-      status: 200,
+      available: response.ok,
+      status: response.status,
+      videoId
     };
-
-    console.log('Availability check result:', result);
 
     return new Response(
       JSON.stringify(result),

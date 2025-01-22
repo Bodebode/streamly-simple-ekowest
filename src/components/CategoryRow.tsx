@@ -3,7 +3,14 @@ import { useState, memo, useCallback, useEffect } from 'react';
 import { MovieCarousel } from './movie/MovieCarousel';
 import { useRelatedVideos } from '@/hooks/use-related-videos';
 import { checkVideoAvailability } from '@/utils/video-validation';
-import { Movie } from '@/types/movies';
+
+interface Movie {
+  id: number;
+  title: string;
+  image: string;
+  category: string;
+  videoId?: string;
+}
 
 interface CategoryRowProps {
   title: string;

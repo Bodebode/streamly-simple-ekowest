@@ -16,7 +16,7 @@ export interface CachedMovie {
 }
 
 export interface Movie {
-  id: number;  // Changed back to number only
+  id: string | number;
   title: string;
   image: string;
   category: string;
