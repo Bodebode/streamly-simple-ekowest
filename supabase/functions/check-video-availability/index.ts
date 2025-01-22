@@ -6,14 +6,34 @@ const corsHeaders = {
 };
 
 Deno.serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { videoId } = await req.json();
-    
+    // Parse the request body
+    let videoId;
+    try {
+      const body = await req.json();
+      videoId = body.videoId;
+      console.log('[check-video-availability] Received request for videoId:', videoId);
+    } catch (error) {
+      console.error('[check-video-availability] Error parsing request body:', error);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid request body',
+          details: error.message 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400 
+        }
+      );
+    }
+
     if (!videoId) {
+      console.error('[check-video-availability] No videoId provided');
       return new Response(
         JSON.stringify({ error: 'Video ID is required' }),
         { 
@@ -24,6 +44,7 @@ Deno.serve(async (req) => {
     }
 
     // Try to fetch video info from YouTube's oembed endpoint
+    console.log('[check-video-availability] Checking video availability on YouTube:', videoId);
     const response = await fetch(
       `https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v=${videoId}&format=json`
     );
@@ -31,8 +52,36 @@ Deno.serve(async (req) => {
     const result = {
       available: response.ok,
       status: response.status,
-      videoId
+      videoId,
+      checkedAt: new Date().toISOString()
     };
+
+    console.log('[check-video-availability] Check result:', result);
+
+    // Update the video availability in the database
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    if (response.ok) {
+      await supabaseAdmin
+        .from('cached_videos')
+        .update({ 
+          is_available: true,
+          last_availability_check: new Date().toISOString()
+        })
+        .eq('video_id', videoId);
+    } else {
+      await supabaseAdmin
+        .from('cached_videos')
+        .update({ 
+          is_available: false,
+          last_availability_check: new Date().toISOString(),
+          last_error: `Video not available (HTTP ${response.status})`
+        })
+        .eq('video_id', videoId);
+    }
 
     return new Response(
       JSON.stringify(result),
@@ -43,9 +92,12 @@ Deno.serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Error checking video availability:', error);
+    console.error('[check-video-availability] Unexpected error:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: 'Internal server error',
+        details: error.message
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500
