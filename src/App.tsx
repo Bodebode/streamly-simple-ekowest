@@ -12,8 +12,7 @@ import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { Login } from './pages/Login';
 import Watch from './pages/Watch';
 import RewardsDashboard from './pages/RewardsDashboard';
-import { Watch2Earn } from './pages/Watch2Earn';  // Add this import
-
+import { Watch2Earn } from './pages/Watch2Earn';
 
 const queryClient = new QueryClient();
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -25,6 +24,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   return <>{children}</>;
 };
+
 const App = () => {
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
@@ -40,9 +40,6 @@ const App = () => {
                 <Route path="/watch2earn" element={<Watch2Earn />} />
                 <Route path="/rewards" element={<Watch2Earn />} />
                 <Route path="/watch/:videoId" element={<Watch />} />
-                <Route path="/rewards" element={<Watch2Earn />} />
-
-                
                 <Route 
                   path="/" 
                   element={
@@ -59,4 +56,5 @@ const App = () => {
     </ThemeProvider>
   );
 };
+
 export default App;
