@@ -11,10 +11,10 @@ export const ContactInformation = () => {
             <li>
               <span className="font-semibold">Email:</span>{" "}
               <a 
-                href="mailto:contact@ekowest.tv"
+                href="mailto:nathan_oj@outlook.com"
                 className="text-blue-500 hover:underline"
               >
-                contact@ekowest.tv
+                nathan_oj@outlook.com
               </a>
             </li>
             <li>
