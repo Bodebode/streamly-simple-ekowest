@@ -19,7 +19,13 @@ interface MovieCarouselProps {
 const MovieCarouselComponent = ({ movies, onMovieSelect, isVideoPlaying }: MovieCarouselProps) => {
   const isMobile = useIsMobile();
 
+  // Filter out duplicates based on videoId
+  const uniqueMovies = movies.filter((movie, index, self) =>
+    index === self.findIndex((m) => m.videoId === movie.videoId)
+  );
+
   console.log(`[MovieCarousel] Original movies count: ${movies.length}`);
+  console.log(`[MovieCarousel] Unique movies count: ${uniqueMovies.length}`);
 
   return (
     <Carousel
@@ -30,7 +36,7 @@ const MovieCarouselComponent = ({ movies, onMovieSelect, isVideoPlaying }: Movie
       className="w-full"
     >
       <CarouselContent className="-ml-2 md:-ml-4">
-        {movies.map((movie) => (
+        {uniqueMovies.map((movie) => (
           <CarouselItem 
             key={`movie-${movie.videoId || movie.id}`}
             className="pl-2 md:pl-4 basis-[140px] md:basis-[200px] transition-transform duration-300 hover:scale-105"
