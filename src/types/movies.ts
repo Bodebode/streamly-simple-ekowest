@@ -3,7 +3,7 @@ export interface CachedMovie {
   title: string;
   image: string;
   category: string;
-  video_id?: string;
+  video_id: string;
   views?: number;
   comments?: number;
   duration?: number;
@@ -16,7 +16,7 @@ export interface CachedMovie {
 }
 
 export interface Movie {
-  id: string | number;
+  id: number;
   title: string;
   image: string;
   category: string;
