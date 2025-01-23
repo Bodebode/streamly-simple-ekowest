@@ -10,7 +10,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { memo } from 'react';
 
 interface Movie {
-  id: string | number;
+  id: string;
   title: string;
   image: string;
   category: string;
@@ -53,6 +53,7 @@ const MovieCarouselComponent = ({ movies, onMovieSelect, isVideoPlaying }: Movie
             className="pl-2 md:pl-4 basis-[140px] md:basis-[200px] transition-transform duration-300 hover:scale-105"
           >
             <MovieCard
+              id={movie.id}
               title={movie.title}
               image={movie.image}
               category={movie.category}

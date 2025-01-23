@@ -1,9 +1,13 @@
 import { useState, useRef, useEffect, memo, useCallback } from 'react';
 import { MovieCardPreview } from './movie/MovieCardPreview';
 import { MovieCardBase } from './movie/MovieCardBase';
+import { Plus, Check } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/stores/auth-store';
 
 interface MovieCardProps {
+  id: string;
   title: string;
   image: string;
   category: string;
@@ -12,12 +16,15 @@ interface MovieCardProps {
   isVideoPlaying: boolean;
 }
 
-const MovieCardComponent = ({ title, image, category, videoId, onMovieSelect, isVideoPlaying }: MovieCardProps) => {
+const MovieCardComponent = ({ id, title, image, category, videoId, onMovieSelect, isVideoPlaying }: MovieCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [showTitle, setShowTitle] = useState(true);
+  const [isInList, setIsInList] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
   const titleTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const { user } = useAuthStore();
 
   const clearTimers = useCallback(() => {
     if (hoverTimerRef.current) {
@@ -34,6 +41,24 @@ const MovieCardComponent = ({ title, image, category, videoId, onMovieSelect, is
     return clearTimers;
   }, [clearTimers]);
 
+  // Check if movie is in user's list on mount
+  useEffect(() => {
+    const checkIfInList = async () => {
+      if (!user) return;
+      
+      const { data } = await supabase
+        .from('user_movie_lists')
+        .select('movie_id')
+        .eq('user_id', user.id)
+        .eq('movie_id', id)
+        .single();
+      
+      setIsInList(!!data);
+    };
+
+    checkIfInList();
+  }, [user, id]);
+
   // Clear preview when video is playing anywhere
   useEffect(() => {
     if (isVideoPlaying) {
@@ -47,7 +72,6 @@ const MovieCardComponent = ({ title, image, category, videoId, onMovieSelect, is
     if (!isVideoPlaying) {
       setIsHovered(true);
       if (videoId) {
-        // Only start preview timer if no other video is playing
         hoverTimerRef.current = setTimeout(() => {
           const previewElements = document.querySelectorAll('iframe[src*="youtube.com"]');
           if (previewElements.length === 0) {
@@ -78,13 +102,66 @@ const MovieCardComponent = ({ title, image, category, videoId, onMovieSelect, is
     }
   }, [videoId, onMovieSelect, clearTimers, title]);
 
+  const toggleMyList = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent video from playing when clicking the plus/check icon
+    
+    if (!user) {
+      toast.error('Please login to add movies to your list');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      if (isInList) {
+        await supabase
+          .from('user_movie_lists')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('movie_id', id);
+        
+        setIsInList(false);
+        toast.success('Removed from My List');
+      } else {
+        await supabase
+          .from('user_movie_lists')
+          .insert([{ user_id: user.id, movie_id: id }]);
+        
+        setIsInList(true);
+        toast.success('Added to My List');
+      }
+    } catch (error) {
+      console.error('Error toggling movie in list:', error);
+      toast.error('Failed to update My List');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div
-      className={`relative movie-card w-full h-[210px] md:h-[300px] rounded-lg cursor-pointer ${isVideoPlaying ? 'pointer-events-none opacity-50' : ''}`}
+      className="relative movie-card w-full h-[210px] md:h-[300px] rounded-lg cursor-pointer group"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
     >
+      {user && (
+        <button
+          onClick={toggleMyList}
+          disabled={isLoading}
+          className={`absolute top-2 right-2 z-10 p-1.5 rounded-full 
+            transition-all duration-200 
+            ${isHovered || isInList ? 'opacity-100' : 'opacity-0'} 
+            ${isInList ? 'bg-green-500 hover:bg-green-600' : 'bg-black/50 hover:bg-black/70'}
+            ${isLoading ? 'cursor-not-allowed' : ''}`}
+        >
+          {isInList ? (
+            <Check className="w-4 h-4 text-white" />
+          ) : (
+            <Plus className="w-4 h-4 text-white" />
+          )}
+        </button>
+      )}
+      
       {showPreview && videoId && !isVideoPlaying ? (
         <MovieCardPreview
           videoId={videoId}
