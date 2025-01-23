@@ -50,6 +50,7 @@ export const MovieCarousel = ({ title, movies, onRefresh }: MovieCarouselProps) 
           {visibleMovies.map((movie) => (
             <MovieCard 
               key={movie.id}
+              id={movie.id}
               title={movie.title}
               image={movie.image}
               category={movie.category}

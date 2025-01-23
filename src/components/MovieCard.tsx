@@ -44,7 +44,7 @@ const MovieCardComponent = ({ id, title, image, category, videoId, onMovieSelect
   // Check if movie is in user's list on mount
   useEffect(() => {
     const checkIfInList = async () => {
-      if (!user) return;
+      if (!user?.id) return;
       
       const { data } = await supabase
         .from('user_movie_lists')
@@ -57,7 +57,7 @@ const MovieCardComponent = ({ id, title, image, category, videoId, onMovieSelect
     };
 
     checkIfInList();
-  }, [user, id]);
+  }, [user?.id, id]);
 
   // Clear preview when video is playing anywhere
   useEffect(() => {
@@ -105,7 +105,7 @@ const MovieCardComponent = ({ id, title, image, category, videoId, onMovieSelect
   const toggleMyList = async (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent video from playing when clicking the plus/check icon
     
-    if (!user) {
+    if (!user?.id) {
       toast.error('Please login to add movies to your list');
       return;
     }

@@ -13,6 +13,7 @@ import { Login } from './pages/Login';
 import Watch from './pages/Watch';
 import { Watch2Earn } from './pages/Watch2Earn';
 import RewardsDashboard from './pages/RewardsDashboard';
+import MyList from './pages/MyList';
 
 const queryClient = new QueryClient();
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -38,6 +39,14 @@ const App = () => {
                 <Route path="/login" element={<Login />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/watch2earn" element={<Watch2Earn />} />
+                <Route 
+                  path="/my-list" 
+                  element={
+                    <ProtectedRoute>
+                      <MyList />
+                    </ProtectedRoute>
+                  } 
+                />
                 <Route 
                   path="/rewards" 
                   element={
