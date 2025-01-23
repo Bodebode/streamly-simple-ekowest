@@ -19,13 +19,16 @@ interface MovieCarouselProps {
 const MovieCarouselComponent = ({ movies, onMovieSelect, isVideoPlaying }: MovieCarouselProps) => {
   const isMobile = useIsMobile();
 
-  // Filter out duplicates based on id and ensure movies have videoIds
-  const uniqueMovies = movies
-    .filter((movie, index, self) => 
-      movie.videoId && // Ensure movie has videoId
-      index === self.findIndex((m) => m.id === movie.id) // Keep only first occurrence
-    )
-    .slice(0, 12); // Limit to 12 movies
+  // Create a Map to track unique movies by ID
+  const uniqueMoviesMap = new Map();
+  movies.forEach(movie => {
+    if (movie.videoId && !uniqueMoviesMap.has(movie.id)) {
+      uniqueMoviesMap.set(movie.id, movie);
+    }
+  });
+
+  // Convert Map values to array and limit to 12 movies
+  const uniqueMovies = Array.from(uniqueMoviesMap.values()).slice(0, 12);
 
   console.log(`[MovieCarousel] Total movies received: ${movies.length}`);
   console.log(`[MovieCarousel] Unique movies to display: ${uniqueMovies.length}`);
