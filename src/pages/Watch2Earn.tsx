@@ -1,4 +1,4 @@
-import { PlayCircle, Trophy, PiggyBank, Coins, DollarSign } from 'lucide-react';
+import { PlayCircle, Trophy, PiggyBank, Coins, DollarSign, Home } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Link } from 'react-router-dom';
 
@@ -6,13 +6,23 @@ export const Watch2Earn = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-koya-background to-black text-koya-text">
       <div className="container mx-auto px-4 py-16 space-y-16">
+        {/* Back to Home Button */}
+        <div className="flex justify-end pt-4">
+          <Button variant="outline" size="sm" asChild>
+            <Link to="/" className="flex items-center gap-2">
+              <Home className="h-4 w-4" />
+              Back to Home
+            </Link>
+          </Button>
+        </div>
+
         {/* Hero Section */}
-        <div className="text-center space-y-6 pt-20">
+        <div className="text-center space-y-6 pt-12">
           <h1 className="text-4xl md:text-6xl font-bold text-koya-accent">
             Watch2Earn with Ekowest TV
           </h1>
           <p className="text-xl md:text-2xl max-w-2xl mx-auto">
-          Yes, you read that right! Get paid to watch your favorite Nollywood movies.
+            Yes, you read that right! Get paid to watch your favorite Nollywood movies.
           </p>
         </div>
 
@@ -67,5 +77,5 @@ export const Watch2Earn = () => {
     </div>
   );
 };
-export default Watch2Earn;
 
+export default Watch2Earn;

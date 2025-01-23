@@ -1,6 +1,7 @@
 import { useRewardsStore } from '@/stores/rewards-store';
 import { Button } from '@/components/ui/button';
-import { Trophy, Clock, Gift } from 'lucide-react';
+import { Trophy, Clock, Gift, Home } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export const RewardsDashboard = () => {
   const { points, watchTime } = useRewardsStore();
@@ -14,7 +15,15 @@ export const RewardsDashboard = () => {
   return (
     <div className="min-h-screen pt-20 px-4">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Your Rewards Dashboard</h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold">Your Rewards Dashboard</h1>
+          <Button variant="outline" size="sm" asChild>
+            <Link to="/" className="flex items-center gap-2">
+              <Home className="h-4 w-4" />
+              Back to Home
+            </Link>
+          </Button>
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="bg-white dark:bg-koya-card rounded-lg p-6">
