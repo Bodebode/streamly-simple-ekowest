@@ -17,6 +17,7 @@ export type Database = {
           channel_metadata: Json | null
           comments: number | null
           content_tags: string[] | null
+          creator_name: string | null
           criteria_met: Json | null
           cultural_elements: string[] | null
           duration: number | null
@@ -25,6 +26,7 @@ export type Database = {
           image: string
           is_available: boolean | null
           is_embeddable: boolean | null
+          is_verified_creator: boolean | null
           language_tags: string[] | null
           last_availability_check: string | null
           last_error: string | null
@@ -46,6 +48,7 @@ export type Database = {
           channel_metadata?: Json | null
           comments?: number | null
           content_tags?: string[] | null
+          creator_name?: string | null
           criteria_met?: Json | null
           cultural_elements?: string[] | null
           duration?: number | null
@@ -54,6 +57,7 @@ export type Database = {
           image: string
           is_available?: boolean | null
           is_embeddable?: boolean | null
+          is_verified_creator?: boolean | null
           language_tags?: string[] | null
           last_availability_check?: string | null
           last_error?: string | null
@@ -75,6 +79,7 @@ export type Database = {
           channel_metadata?: Json | null
           comments?: number | null
           content_tags?: string[] | null
+          creator_name?: string | null
           criteria_met?: Json | null
           cultural_elements?: string[] | null
           duration?: number | null
@@ -83,6 +88,7 @@ export type Database = {
           image?: string
           is_available?: boolean | null
           is_embeddable?: boolean | null
+          is_verified_creator?: boolean | null
           language_tags?: string[] | null
           last_availability_check?: string | null
           last_error?: string | null

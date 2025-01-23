@@ -17,12 +17,19 @@ export const useSkits = () => {
     queryKey: ['skits'],
     queryFn: async () => {
       try {
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
         const { data, error } = await supabase
           .from('cached_videos')
           .select('*')
           .eq('category', 'Skits')
           .eq('is_available', true)
           .gt('expires_at', new Date().toISOString())
+          .gt('duration', 151) // More than 2 minutes 31 seconds
+          .lt('duration', 2400) // Less than 40 minutes
+          .gt('published_at', oneMonthAgo.toISOString())
+          .order('is_verified_creator', { ascending: false }) // Prioritize verified creators
           .order('access_count', { ascending: false })
           .limit(24); // Increased limit to ensure enough unique videos
         
