@@ -7,9 +7,17 @@ interface MovieCarouselProps {
   title?: string;
   movies: Movie[];
   onRefresh?: () => void;
+  onMovieSelect: (videoId: string) => void;
+  isVideoPlaying: boolean;
 }
 
-export const MovieCarousel = ({ title, movies, onRefresh }: MovieCarouselProps) => {
+export const MovieCarousel = ({ 
+  title, 
+  movies, 
+  onRefresh,
+  onMovieSelect,
+  isVideoPlaying 
+}: MovieCarouselProps) => {
   const [displayedMovies, setDisplayedMovies] = useState<Movie[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const moviesPerPage = 6;
@@ -50,12 +58,13 @@ export const MovieCarousel = ({ title, movies, onRefresh }: MovieCarouselProps) 
           {visibleMovies.map((movie) => (
             <MovieCard 
               key={movie.id}
+              id={movie.id.toString()}
               title={movie.title}
               image={movie.image}
               category={movie.category}
               videoId={movie.videoId}
-              onMovieSelect={() => {}}
-              isVideoPlaying={false}
+              onMovieSelect={onMovieSelect}
+              isVideoPlaying={isVideoPlaying}
             />
           ))}
         </div>

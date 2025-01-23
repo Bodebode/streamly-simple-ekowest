@@ -2,6 +2,8 @@ import { useState, useRef, useEffect, memo, useCallback } from 'react';
 import { MovieCardPreview } from './movie/MovieCardPreview';
 import { MovieCardBase } from './movie/MovieCardBase';
 import { toast } from 'sonner';
+import { useAuth } from './AuthProvider';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MovieCardProps {
   title: string;
@@ -10,14 +12,43 @@ interface MovieCardProps {
   videoId?: string;
   onMovieSelect: (videoId: string) => void;
   isVideoPlaying: boolean;
+  id: string;
 }
 
-const MovieCardComponent = ({ title, image, category, videoId, onMovieSelect, isVideoPlaying }: MovieCardProps) => {
+const MovieCardComponent = ({ 
+  title, 
+  image, 
+  category, 
+  videoId, 
+  onMovieSelect, 
+  isVideoPlaying,
+  id 
+}: MovieCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [showTitle, setShowTitle] = useState(true);
+  const [isInList, setIsInList] = useState(false);
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
   const titleTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      // Check if movie is in user's list
+      const checkMyList = async () => {
+        const { data } = await supabase
+          .from('user_movie_lists')
+          .select('movie_id')
+          .eq('user_id', user.id)
+          .eq('movie_id', id)
+          .single();
+        
+        setIsInList(!!data);
+      };
+      
+      checkMyList();
+    }
+  }, [user, id]);
 
   const clearTimers = useCallback(() => {
     if (hoverTimerRef.current) {
@@ -34,7 +65,6 @@ const MovieCardComponent = ({ title, image, category, videoId, onMovieSelect, is
     return clearTimers;
   }, [clearTimers]);
 
-  // Clear preview when video is playing anywhere
   useEffect(() => {
     if (isVideoPlaying) {
       setShowPreview(false);
@@ -47,7 +77,6 @@ const MovieCardComponent = ({ title, image, category, videoId, onMovieSelect, is
     if (!isVideoPlaying) {
       setIsHovered(true);
       if (videoId) {
-        // Only start preview timer if no other video is playing
         hoverTimerRef.current = setTimeout(() => {
           const previewElements = document.querySelectorAll('iframe[src*="youtube.com"]');
           if (previewElements.length === 0) {
@@ -101,6 +130,9 @@ const MovieCardComponent = ({ title, image, category, videoId, onMovieSelect, is
           videoId={videoId}
           isHovered={isHovered}
           isVideoPlaying={isVideoPlaying}
+          movieId={id}
+          isInList={isInList}
+          onListChange={setIsInList}
         />
       )}
     </div>
