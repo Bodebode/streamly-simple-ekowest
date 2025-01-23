@@ -12,29 +12,9 @@ export const useYorubaMovies = () => {
     queryKey: ['yorubaMovies'],
     queryFn: async () => {
       try {
-        console.log('Starting Yoruba movies fetch with criteria validation...');
-        console.log('Trying STRICT criteria first:', STRICT_CRITERIA);
+        console.log('Starting Yoruba movies fetch with updated criteria...');
         
-        // Try with strict criteria first
-        const { data: strictVideos, error: strictError } = await buildYorubaQuery(
-          supabase,
-          STRICT_CRITERIA
-        );
-
-        if (strictError) {
-          console.error('Error fetching Yoruba movies:', strictError);
-          toast.error('Failed to load Yoruba movies');
-          return MOCK_MOVIES.yoruba;
-        }
-
-        if (strictVideos && strictVideos.length >= 8) {
-          console.log('✅ Using STRICT criteria - found', strictVideos.length, 'videos');
-          console.log('Sample video stats:', strictVideos[0]);
-          return transformVideosToMovies(strictVideos as unknown as CachedMovie[]);
-        }
-
-        console.log('Strict criteria not met, trying QUALITY criteria:', YORUBA_QUALITY_CRITERIA);
-        // Try with Yoruba quality criteria
+        // Try with quality criteria first (more lenient now)
         const { data: qualityVideos, error: qualityError } = await buildYorubaQuery(
           supabase,
           YORUBA_QUALITY_CRITERIA
@@ -45,14 +25,14 @@ export const useYorubaMovies = () => {
           return MOCK_MOVIES.yoruba;
         }
 
-        if (qualityVideos && qualityVideos.length >= 12) {
+        if (qualityVideos && qualityVideos.length >= 8) {
           console.log('✅ Using QUALITY criteria - found', qualityVideos.length, 'videos');
           console.log('Sample video stats:', qualityVideos[0]);
           return transformVideosToMovies(qualityVideos as unknown as CachedMovie[]);
         }
 
         console.log('Quality criteria not met, trying DURATION criteria:', YORUBA_DURATION_CRITERIA);
-        // Try with Yoruba duration criteria
+        // Try with duration criteria
         const { data: durationVideos, error: durationError } = await buildYorubaQuery(
           supabase,
           YORUBA_DURATION_CRITERIA
@@ -66,7 +46,7 @@ export const useYorubaMovies = () => {
         if (durationVideos && durationVideos.length > 0) {
           console.log('✅ Using DURATION criteria - found', durationVideos.length, 'videos');
           console.log('Sample video stats:', durationVideos[0]);
-          toast.info('Showing available content with relaxed criteria', {
+          toast.info('Showing available Yoruba content', {
             duration: 5000,
           });
           return transformVideosToMovies(durationVideos as unknown as CachedMovie[]);
@@ -81,8 +61,8 @@ export const useYorubaMovies = () => {
         return MOCK_MOVIES.yoruba;
       }
     },
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 10,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
     retry: 1,
   });
 };

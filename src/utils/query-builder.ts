@@ -36,5 +36,6 @@ export const buildYorubaQuery = (
     query = query.in('video_quality', criteria.videoQualities);
   }
 
+  console.log('[Query Builder] Building query with criteria:', criteria);
   return query;
 };
