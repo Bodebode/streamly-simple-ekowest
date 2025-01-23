@@ -17,6 +17,7 @@ export const useSkits = () => {
     queryKey: ['skits'],
     queryFn: async () => {
       try {
+        console.log('[useSkits] Fetching skits...');
         const oneMonthAgo = new Date();
         oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
@@ -34,21 +35,22 @@ export const useSkits = () => {
           .limit(24); // Increased limit to ensure enough unique videos
         
         if (error) {
-          console.error('Error fetching skits:', error);
+          console.error('[useSkits] Error fetching skits:', error);
           toast.error('Failed to load skits');
           return MOCK_MOVIES.skits;
         }
 
         if (!data || data.length === 0) {
-          console.log('No skits found, using mock data');
+          console.log('[useSkits] No skits found, using mock data');
           return MOCK_MOVIES.skits;
         }
 
         // Filter for unique videos and ensure minimum count
         const uniqueVideos = removeDuplicates(data);
+        console.log('[useSkits] Found unique videos:', uniqueVideos.length);
         
         if (uniqueVideos.length < 12) {
-          console.log('Not enough unique skits, using mock data');
+          console.log('[useSkits] Not enough unique skits, using mock data');
           return MOCK_MOVIES.skits;
         }
 
@@ -59,7 +61,7 @@ export const useSkits = () => {
 
         return uniqueVideos;
       } catch (error) {
-        console.error('Error in skits query:', error);
+        console.error('[useSkits] Error in skits query:', error);
         toast.error('Failed to load skits');
         return MOCK_MOVIES.skits;
       }
