@@ -14,7 +14,7 @@ export const Footer = () => {
 
           {/* Data Collection Notice */}
           <div className="text-sm text-gray-600 dark:text-gray-400">
-            This site uses YouTube API Services. By using our service, you agree to our data collection practices in accordance with 
+            This site uses YouTube API Services. By using our service, you agree to our data collection practices in accordance with{" "}
             <a 
               href="https://policies.google.com/privacy" 
               target="_blank" 
