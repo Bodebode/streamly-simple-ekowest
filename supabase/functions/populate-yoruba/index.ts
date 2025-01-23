@@ -9,6 +9,7 @@ const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
 async function searchYouTube(apiKey: string) {
   console.log('Attempting YouTube search with API key...');
+  // Increase maxResults to ensure we get enough unique videos
   const searchResponse = await fetch(
     `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=yoruba+movie+2024&type=video&videoDuration=long&key=${apiKey}`
   )
@@ -60,9 +61,16 @@ Deno.serve(async (req) => {
 
     let successCount = 0;
     let failureCount = 0;
+    const processedVideoIds = new Set(); // Track processed videos to avoid duplicates
 
     // Process and store each video
     for (const video of detailsData.items) {
+      // Skip if we already have 12 successful videos
+      if (successCount >= 12) break;
+
+      // Skip if we've already processed this video
+      if (processedVideoIds.has(video.id)) continue;
+
       const videoData = await validateAndTransformVideo(supabase, video);
       
       if (!videoData) {
@@ -79,7 +87,27 @@ Deno.serve(async (req) => {
         failureCount++;
       } else {
         console.log(`Successfully stored video ${video.id}`);
+        processedVideoIds.add(video.id);
         successCount++;
+      }
+    }
+
+    // Delete any excess videos beyond the first 12
+    if (successCount === 12) {
+      const { data: existingVideos } = await supabase
+        .from('cached_videos')
+        .select('id')
+        .eq('category', 'Yoruba Movies')
+        .order('cached_at', { ascending: false })
+        .limit(100);
+
+      if (existingVideos && existingVideos.length > 12) {
+        const videosToKeep = existingVideos.slice(0, 12).map(v => v.id);
+        await supabase
+          .from('cached_videos')
+          .delete()
+          .eq('category', 'Yoruba Movies')
+          .not('id', 'in', `(${videosToKeep.join(',')})`);
       }
     }
 
@@ -89,7 +117,8 @@ Deno.serve(async (req) => {
         apiKeyUsed: currentKey === PRIMARY_API_KEY ? 'primary' : 'secondary',
         totalProcessed: detailsData.items.length,
         successCount,
-        failureCount
+        failureCount,
+        uniqueVideos: processedVideoIds.size
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
