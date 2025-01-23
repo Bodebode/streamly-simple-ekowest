@@ -49,14 +49,17 @@ const MovieCardComponent = ({ title, image, category, videoId, onMovieSelect, is
       if (videoId) {
         // Only start preview timer if no other video is playing
         hoverTimerRef.current = setTimeout(() => {
-          const previewElements = document.querySelectorAll('iframe[src*="youtube.com"]');
-          if (previewElements.length === 0) {
-            setShowPreview(true);
+          // Double check we're still hovering before showing preview
+          if (isHovered) {
+            const previewElements = document.querySelectorAll('iframe[src*="youtube.com"]');
+            if (previewElements.length === 0) {
+              setShowPreview(true);
+            }
           }
         }, 1400);
       }
     }
-  }, [isVideoPlaying, videoId]);
+  }, [isVideoPlaying, videoId, isHovered]);
 
   const handleMouseLeave = useCallback(() => {
     setIsHovered(false);
