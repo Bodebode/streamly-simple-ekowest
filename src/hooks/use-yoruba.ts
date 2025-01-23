@@ -12,7 +12,8 @@ export const useYorubaMovies = () => {
     queryKey: ['yorubaMovies'],
     queryFn: async () => {
       try {
-        console.log('Starting Yoruba movies fetch with enhanced criteria validation...');
+        console.log('Starting Yoruba movies fetch with criteria validation...');
+        console.log('Trying STRICT criteria first:', STRICT_CRITERIA);
         
         // Try with strict criteria first
         const { data: strictVideos, error: strictError } = await buildYorubaQuery(
@@ -27,9 +28,12 @@ export const useYorubaMovies = () => {
         }
 
         if (strictVideos && strictVideos.length >= 8) {
+          console.log('✅ Using STRICT criteria - found', strictVideos.length, 'videos');
+          console.log('Sample video stats:', strictVideos[0]);
           return transformVideosToMovies(strictVideos as unknown as CachedMovie[]);
         }
 
+        console.log('Strict criteria not met, trying QUALITY criteria:', YORUBA_QUALITY_CRITERIA);
         // Try with Yoruba quality criteria
         const { data: qualityVideos, error: qualityError } = await buildYorubaQuery(
           supabase,
@@ -42,9 +46,12 @@ export const useYorubaMovies = () => {
         }
 
         if (qualityVideos && qualityVideos.length >= 12) {
+          console.log('✅ Using QUALITY criteria - found', qualityVideos.length, 'videos');
+          console.log('Sample video stats:', qualityVideos[0]);
           return transformVideosToMovies(qualityVideos as unknown as CachedMovie[]);
         }
 
+        console.log('Quality criteria not met, trying DURATION criteria:', YORUBA_DURATION_CRITERIA);
         // Try with Yoruba duration criteria
         const { data: durationVideos, error: durationError } = await buildYorubaQuery(
           supabase,
@@ -57,13 +64,15 @@ export const useYorubaMovies = () => {
         }
 
         if (durationVideos && durationVideos.length > 0) {
+          console.log('✅ Using DURATION criteria - found', durationVideos.length, 'videos');
+          console.log('Sample video stats:', durationVideos[0]);
           toast.info('Showing available content with relaxed criteria', {
             duration: 5000,
           });
           return transformVideosToMovies(durationVideos as unknown as CachedMovie[]);
         }
 
-        console.log('No videos found with any criteria, using mock data');
+        console.log('❌ No videos found with any criteria, using mock data');
         return MOCK_MOVIES.yoruba;
 
       } catch (error) {
