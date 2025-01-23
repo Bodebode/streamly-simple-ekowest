@@ -11,8 +11,8 @@ import TechStack from "./pages/TechStack";
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { Login } from './pages/Login';
 import Watch from './pages/Watch';
-import RewardsDashboard from './pages/RewardsDashboard';
 import { Watch2Earn } from './pages/Watch2Earn';
+import RewardsDashboard from './pages/RewardsDashboard';
 
 const queryClient = new QueryClient();
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -38,7 +38,14 @@ const App = () => {
                 <Route path="/login" element={<Login />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/watch2earn" element={<Watch2Earn />} />
-                <Route path="/rewards" element={<Watch2Earn />} />
+                <Route 
+                  path="/rewards" 
+                  element={
+                    <ProtectedRoute>
+                      <RewardsDashboard />
+                    </ProtectedRoute>
+                  } 
+                />
                 <Route path="/watch/:videoId" element={<Watch />} />
                 <Route 
                   path="/" 
