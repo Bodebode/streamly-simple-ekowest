@@ -11,6 +11,17 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // If no body is provided, return 400
+    if (req.method !== 'POST') {
+      return new Response(
+        JSON.stringify({ error: 'Method not allowed' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 405 
+        }
+      );
+    }
+
     const { videoId } = await req.json();
     
     if (!videoId) {
@@ -23,6 +34,8 @@ Deno.serve(async (req) => {
       );
     }
 
+    console.log(`Checking availability for video: ${videoId}`);
+
     // Try to fetch video info from YouTube's oembed endpoint
     const response = await fetch(
       `https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v=${videoId}&format=json`
@@ -33,6 +46,32 @@ Deno.serve(async (req) => {
       status: response.status,
       videoId
     };
+
+    // Update video availability in the database
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    if (response.ok) {
+      console.log(`Video ${videoId} is available`);
+      await supabase
+        .from('cached_videos')
+        .update({ 
+          is_available: true,
+          last_availability_check: new Date().toISOString()
+        })
+        .eq('video_id', videoId);
+    } else {
+      console.log(`Video ${videoId} is not available (status: ${response.status})`);
+      await supabase
+        .from('cached_videos')
+        .update({ 
+          is_available: false,
+          last_availability_check: new Date().toISOString(),
+          last_error: `YouTube returned status ${response.status}`
+        })
+        .eq('video_id', videoId);
+    }
 
     return new Response(
       JSON.stringify(result),
