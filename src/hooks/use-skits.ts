@@ -2,8 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { MOCK_MOVIES } from '@/data/mockMovies';
+import { CachedMovie } from '@/types/movies';
 
-const removeDuplicates = (videos: any[]): any[] => {
+const removeDuplicates = (videos: CachedMovie[]): CachedMovie[] => {
   const seen = new Set<string>();
   return videos.filter(video => {
     const duplicate = seen.has(video.video_id);
@@ -26,13 +27,14 @@ export const useSkits = () => {
           .select('*')
           .eq('category', 'Skits')
           .eq('is_available', true)
+          .eq('is_embeddable', true)
           .gt('expires_at', new Date().toISOString())
           .gt('duration', 151) // More than 2 minutes 31 seconds
           .lt('duration', 2400) // Less than 40 minutes
           .gt('published_at', oneMonthAgo.toISOString())
-          .order('is_verified_creator', { ascending: false }) // Prioritize verified creators
+          .order('is_verified_creator', { ascending: false })
           .order('access_count', { ascending: false })
-          .limit(24); // Increased limit to ensure enough unique videos
+          .limit(24);
         
         if (error) {
           console.error('[useSkits] Error fetching skits:', error);

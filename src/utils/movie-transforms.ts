@@ -6,6 +6,6 @@ export const transformCachedToMovie = (videos: CachedMovie[] | Movie[]): Movie[]
     title: video.title,
     image: video.image,
     category: video.category,
-    videoId: 'video_id' in video ? video.video_id : undefined
+    videoId: 'video_id' in video ? video.video_id : video.videoId
   }));
 };

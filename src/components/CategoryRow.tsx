@@ -28,15 +28,26 @@ const CategoryRowComponent = ({
   }, [onVideoSelect]);
 
   useEffect(() => {
+    console.log(`[CategoryRow] Processing ${movies.length} movies for category: ${title}`);
     // Only filter out movies without videoIds
-    const validMovies = movies.filter(movie => movie.videoId);
+    const validMovies = movies.filter(movie => {
+      const hasVideoId = movie.videoId || (movie as any).video_id;
+      if (!hasVideoId) {
+        console.log(`[CategoryRow] Movie "${movie.title}" has no video ID`);
+      }
+      return hasVideoId;
+    });
+    
+    console.log(`[CategoryRow] Found ${validMovies.length} valid movies for category: ${title}`);
     setFilteredMovies(validMovies.length > 0 ? validMovies : movies);
     
     // Still check video availability in the background
     checkVideoAvailability();
-  }, [movies]);
+  }, [movies, title]);
 
-  const isPlayingInThisRow = selectedVideoId && movies.some(movie => movie.videoId === selectedVideoId);
+  const isPlayingInThisRow = selectedVideoId && movies.some(movie => 
+    movie.videoId === selectedVideoId || (movie as any).video_id === selectedVideoId
+  );
 
   return (
     <div className="mb-16">
