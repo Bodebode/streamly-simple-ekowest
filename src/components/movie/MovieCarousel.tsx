@@ -26,10 +26,10 @@ interface MovieCarouselProps {
 const MovieCarouselComponent = ({ movies, onMovieSelect, isVideoPlaying }: MovieCarouselProps) => {
   const isMobile = useIsMobile();
 
-  // Remove any duplicates based on videoId and limit to 12 movies
+  // Remove any duplicates based on videoId and ensure we have valid videos
   const uniqueMovies = movies.reduce((acc: Movie[], current) => {
-    const isDuplicate = acc.find(movie => movie.videoId === current.videoId);
-    if (!isDuplicate && current && acc.length < 12) {
+    const isDuplicate = acc.some(movie => movie.videoId === current.videoId);
+    if (!isDuplicate && current.videoId && acc.length < 12) {
       acc.push(current);
     }
     return acc;

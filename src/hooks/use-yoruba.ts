@@ -17,7 +17,7 @@ export const useYorubaMovies = () => {
         // Try with strict criteria first
         const { data: strictVideos, error: strictError } = await buildYorubaQuery(
           supabase,
-          STRICT_CRITERIA
+          { ...STRICT_CRITERIA, limit: 24 } // Increased limit to ensure we get enough unique videos
         );
 
         if (strictError) {
@@ -26,14 +26,18 @@ export const useYorubaMovies = () => {
           return MOCK_MOVIES.yoruba;
         }
 
-        if (strictVideos && strictVideos.length >= 8) {
-          return transformVideosToMovies(strictVideos as unknown as CachedMovie[]);
+        if (strictVideos && strictVideos.length >= 12) {
+          const uniqueVideos = removeDuplicates(strictVideos as unknown as CachedMovie[]);
+          if (uniqueVideos.length >= 12) {
+            console.log(`Found ${uniqueVideos.length} unique videos with strict criteria`);
+            return transformVideosToMovies(uniqueVideos);
+          }
         }
 
         // Try with Yoruba quality criteria
         const { data: qualityVideos, error: qualityError } = await buildYorubaQuery(
           supabase,
-          YORUBA_QUALITY_CRITERIA
+          { ...YORUBA_QUALITY_CRITERIA, limit: 24 }
         );
 
         if (qualityError) {
@@ -41,14 +45,18 @@ export const useYorubaMovies = () => {
           return MOCK_MOVIES.yoruba;
         }
 
-        if (qualityVideos && qualityVideos.length >= 12) {
-          return transformVideosToMovies(qualityVideos as unknown as CachedMovie[]);
+        if (qualityVideos) {
+          const uniqueQualityVideos = removeDuplicates(qualityVideos as unknown as CachedMovie[]);
+          if (uniqueQualityVideos.length >= 12) {
+            console.log(`Found ${uniqueQualityVideos.length} unique videos with quality criteria`);
+            return transformVideosToMovies(uniqueQualityVideos);
+          }
         }
 
         // Try with Yoruba duration criteria
         const { data: durationVideos, error: durationError } = await buildYorubaQuery(
           supabase,
-          YORUBA_DURATION_CRITERIA
+          { ...YORUBA_DURATION_CRITERIA, limit: 24 }
         );
 
         if (durationError) {
@@ -56,11 +64,17 @@ export const useYorubaMovies = () => {
           return MOCK_MOVIES.yoruba;
         }
 
-        if (durationVideos && durationVideos.length > 0) {
-          toast.info('Showing available content with relaxed criteria', {
-            duration: 5000,
-          });
-          return transformVideosToMovies(durationVideos as unknown as CachedMovie[]);
+        if (durationVideos) {
+          const uniqueDurationVideos = removeDuplicates(durationVideos as unknown as CachedMovie[]);
+          if (uniqueDurationVideos.length > 0) {
+            console.log(`Found ${uniqueDurationVideos.length} unique videos with duration criteria`);
+            if (uniqueDurationVideos.length < 12) {
+              toast.info('Showing available content with relaxed criteria', {
+                duration: 5000,
+              });
+            }
+            return transformVideosToMovies(uniqueDurationVideos);
+          }
         }
 
         console.log('No videos found with any criteria, using mock data');
@@ -76,6 +90,15 @@ export const useYorubaMovies = () => {
     gcTime: 1000 * 60 * 10,
     retry: 1,
   });
+};
+
+const removeDuplicates = (videos: CachedMovie[]): CachedMovie[] => {
+  const seen = new Set<string>();
+  return videos.filter(video => {
+    const duplicate = seen.has(video.video_id);
+    seen.add(video.video_id);
+    return !duplicate && video.video_id && video.is_available;
+  }).slice(0, 12); // Ensure we only return up to 12 videos
 };
 
 const transformVideosToMovies = (videos: CachedMovie[]): Movie[] => {
