@@ -1,83 +1,82 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTheme } from 'next-themes';
 
 export const Hero = () => {
+  const { theme } = useTheme();
+  const [currentIndex, setCurrentIndex] = useState(0);
+
   const slides = [
     {
-      type: 'image',
-      src: '/videos/file-20220908-13-nwxk17.avif',
-      duration: 4000,
-    },
-    // {
-    //   type: 'image',
-    //   src: '/videos/Ijogbon.jpg',
-    //   duration: 4000,
-    // },
-    // {
-    //   type: 'image',
-    //   src: '/videos/maxresdefault.jpg',
-    //   duration: 4000,
-    // },
-    {
-      type: 'image',
-      src: '/videos/Netflix-slate-e1692222322682.jpg',
-      duration: 4000,
+      type: 'video',
+      src: '/videos/Ekowest Hero vid - Dark.mp4',
+      darkOnly: true,
+      duration: 10000,
     },
     {
       type: 'video',
-      src: '/videos/wbd-hero-animation_24_0_0.second copy.mp4',
-      duration: 10000, // 10 seconds for video
+      src: '/videos/Ekowest Hero vid - White.mp4',
+      lightOnly: true,
+      duration: 10000,
     }
   ];
 
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const filteredSlides = slides.filter(slide => {
+    if (theme === 'dark') {
+      return !slide.lightOnly;
+    }
+    return !slide.darkOnly;
+  });
 
   useEffect(() => {
     const timer = setInterval(() => {
-      const currentSlide = slides[currentIndex];
       setCurrentIndex((prevIndex) => 
-        prevIndex === slides.length - 1 ? 0 : prevIndex + 1
+        prevIndex === filteredSlides.length - 1 ? 0 : prevIndex + 1
       );
-    }, slides[currentIndex].duration);
+    }, filteredSlides[currentIndex]?.duration || 10000);
 
     return () => clearInterval(timer);
-  }, [currentIndex]);
+  }, [currentIndex, filteredSlides]);
 
   const nextSlide = () => {
     setCurrentIndex((prevIndex) => 
-      prevIndex === slides.length - 1 ? 0 : prevIndex + 1
+      prevIndex === filteredSlides.length - 1 ? 0 : prevIndex + 1
     );
   };
 
   const prevSlide = () => {
     setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? slides.length - 1 : prevIndex - 1
+      prevIndex === 0 ? filteredSlides.length - 1 : prevIndex - 1
     );
   };
+
   return (
     <div className="relative w-full h-[600px] overflow-hidden mb-16">
-      {slides.map((slide, index) => (
+      {filteredSlides.map((slide, index) => (
         <div
-          key={index}
+          key={`${index}-${theme}`}
           className={`absolute w-full h-full transition-opacity duration-500 ease-in-out ${
             index === currentIndex ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          {slide.type === 'image' ? (
+          {slide.type === 'video' ? (
+            <video
+              key={`video-${theme}-${index}`}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            >
+              <source src={slide.src} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          ) : (
             <img
               src={slide.src}
               alt={`Hero Slide ${index + 1}`}
               className="w-full h-full object-cover"
             />
-          ) : (
-            <video
-              autoPlay
-              loop
-              muted
-              className="w-full h-full object-cover"
-            >
-              <source src={slide.src} type="video/mp4" />
-            </video>
           )}
         </div>
       ))}
@@ -92,20 +91,24 @@ export const Hero = () => {
         </p>
       </div>
 
-      <button
-        onClick={prevSlide}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors duration-200 z-20"
-        aria-label="Previous slide"
-      >
-        <ChevronLeft className="w-6 h-6" />
-      </button>
-      <button
-        onClick={nextSlide}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors duration-200 z-20"
-        aria-label="Next slide"
-      >
-        <ChevronRight className="w-6 h-6" />
-      </button>
+      {filteredSlides.length > 1 && (
+        <>
+          <button
+            onClick={prevSlide}
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors duration-200 z-20"
+            aria-label="Previous slide"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <button
+            onClick={nextSlide}
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors duration-200 z-20"
+            aria-label="Next slide"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
+        </>
+      )}
     </div>
   );
 };
