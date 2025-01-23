@@ -283,42 +283,6 @@ export type Database = {
         }
         Relationships: []
       }
-      user_movie_lists: {
-        Row: {
-          added_at: string
-          id: string
-          movie_id: string
-          user_id: string
-        }
-        Insert: {
-          added_at?: string
-          id?: string
-          movie_id: string
-          user_id: string
-        }
-        Update: {
-          added_at?: string
-          id?: string
-          movie_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_movie_lists_movie_id_fkey"
-            columns: ["movie_id"]
-            isOneToOne: false
-            referencedRelation: "cached_videos"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_movie_lists_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
     }
     Views: {
       [_ in never]: never
