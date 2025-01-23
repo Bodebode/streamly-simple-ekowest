@@ -13,8 +13,6 @@ export interface CachedMovie {
   access_count?: number;
   is_available?: boolean;
   video_quality?: string;
-  creator_name?: string;
-  is_verified_creator?: boolean;
 }
 
 export interface Movie {

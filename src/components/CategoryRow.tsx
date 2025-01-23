@@ -3,7 +3,14 @@ import { useState, memo, useCallback, useEffect } from 'react';
 import { MovieCarousel } from './movie/MovieCarousel';
 import { useRelatedVideos } from '@/hooks/use-related-videos';
 import { checkVideoAvailability } from '@/utils/video-validation';
-import { Movie } from '@/types/movies';
+
+interface Movie {
+  id: number;
+  title: string;
+  image: string;
+  category: string;
+  videoId?: string;
+}
 
 interface CategoryRowProps {
   title: string;
@@ -28,26 +35,15 @@ const CategoryRowComponent = ({
   }, [onVideoSelect]);
 
   useEffect(() => {
-    console.log(`[CategoryRow] Processing ${movies.length} movies for category: ${title}`);
     // Only filter out movies without videoIds
-    const validMovies = movies.filter(movie => {
-      const hasVideoId = movie.videoId || (movie as any).video_id;
-      if (!hasVideoId) {
-        console.log(`[CategoryRow] Movie "${movie.title}" has no video ID`);
-      }
-      return hasVideoId;
-    });
-    
-    console.log(`[CategoryRow] Found ${validMovies.length} valid movies for category: ${title}`);
+    const validMovies = movies.filter(movie => movie.videoId);
     setFilteredMovies(validMovies.length > 0 ? validMovies : movies);
     
     // Still check video availability in the background
     checkVideoAvailability();
-  }, [movies, title]);
+  }, [movies]);
 
-  const isPlayingInThisRow = selectedVideoId && movies.some(movie => 
-    movie.videoId === selectedVideoId || (movie as any).video_id === selectedVideoId
-  );
+  const isPlayingInThisRow = selectedVideoId && movies.some(movie => movie.videoId === selectedVideoId);
 
   return (
     <div className="mb-16">
