@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { useAuthStore } from '@/stores/auth-store';
 import { cn } from '@/lib/utils';
+
 interface SearchResult {
   id: {
     videoId: string;
@@ -32,7 +33,7 @@ export const Navbar = () => {
     clearAuth();
     navigate('/login');
   };
-  const API_KEY = 'AIzaSyDqOUX5_9QZZzrfGxWqVrqZw_R-y3hKDb8'; // New API key
+  const API_KEY = 'AIzaSyDqOUX5_9QZZzrfGxWqVrqZw_R-y3hKDb8';
 
   const handleSearch = async (query: string) => {
     if (!query.trim()) {
@@ -66,6 +67,7 @@ export const Navbar = () => {
       setIsLoading(false);
     }
   };
+
   return (
     <nav className="fixed top-0 w-full z-50 bg-white dark:bg-koya-card border-b">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
@@ -155,6 +157,9 @@ export const Navbar = () => {
                 <Coins className="h-5 w-5" />
                 Watch2Earn
               </Link>
+              <Link to="/privacy-policy" className="text-sm hover:underline">
+                Privacy Policy
+              </Link>
               <div className="flex items-center gap-4">
                 <span className="text-sm">{user.email}</span>
                 <Button 
@@ -171,6 +176,9 @@ export const Navbar = () => {
               <Link to="/watch2earn" className="text-sm hover:underline">
                 Watch2Earn
               </Link>
+              <Link to="/privacy-policy" className="text-sm hover:underline">
+                Privacy Policy
+              </Link>
               <Link to="/login" className="text-sm hover:underline">
                 Login
               </Link>
@@ -180,4 +188,4 @@ export const Navbar = () => {
       </div>
     </nav>
   );
-}
+};
