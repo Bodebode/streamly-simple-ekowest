@@ -13,6 +13,7 @@ import { Login } from './pages/Login';
 import Watch from './pages/Watch';
 import { Watch2Earn } from './pages/Watch2Earn';
 import RewardsDashboard from './pages/RewardsDashboard';
+import CommunityHub from './pages/CommunityHub';
 
 const queryClient = new QueryClient();
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -47,6 +48,14 @@ const App = () => {
                   } 
                 />
                 <Route path="/watch/:videoId" element={<Watch />} />
+                <Route 
+                  path="/community" 
+                  element={
+                    <ProtectedRoute>
+                      <CommunityHub />
+                    </ProtectedRoute>
+                  } 
+                />
                 <Route 
                   path="/" 
                   element={
