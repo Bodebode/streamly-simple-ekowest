@@ -19,26 +19,26 @@ interface MovieCarouselProps {
 const MovieCarouselComponent = ({ movies, onMovieSelect, isVideoPlaying }: MovieCarouselProps) => {
   const isMobile = useIsMobile();
 
-  // Filter out duplicates based on videoId and ensure exactly 12 movies
-  const uniqueMovies = movies.filter((movie, index, self) =>
-    index === self.findIndex((m) => m.videoId === movie.videoId)
-  ).slice(0, 12); // Ensure exactly 12 movies are shown
+  // Only filter out movies without videoIds, but keep duplicates based on id
+  const validMovies = movies
+    .filter(movie => movie.videoId)
+    .slice(0, 12); // Ensure exactly 12 movies are shown
 
-  console.log(`[MovieCarousel] Original movies count: ${movies.length}`);
-  console.log(`[MovieCarousel] Unique movies count: ${uniqueMovies.length}`);
+  console.log(`[MovieCarousel] Total movies received: ${movies.length}`);
+  console.log(`[MovieCarousel] Valid movies to display: ${validMovies.length}`);
 
   return (
     <Carousel
       opts={{
         align: "start",
-        loop: true, // Enable loop for better UX
+        loop: true,
       }}
       className="w-full"
     >
       <CarouselContent className="-ml-2 md:-ml-4">
-        {uniqueMovies.map((movie, index) => (
+        {validMovies.map((movie, index) => (
           <CarouselItem 
-            key={`movie-${movie.videoId || movie.id}-${index}`}
+            key={`${movie.id}-${index}`}
             className="pl-2 md:pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/6 transition-transform duration-300 hover:scale-105"
           >
             <MovieCard
