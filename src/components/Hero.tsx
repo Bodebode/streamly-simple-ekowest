@@ -1,15 +1,23 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useTheme } from 'next-themes';
 
 export const Hero = () => {
-  const { theme } = useTheme();
   const slides = [
     {
       type: 'image',
       src: '/videos/file-20220908-13-nwxk17.avif',
       duration: 4000,
     },
+    // {
+    //   type: 'image',
+    //   src: '/videos/Ijogbon.jpg',
+    //   duration: 4000,
+    // },
+    // {
+    //   type: 'image',
+    //   src: '/videos/maxresdefault.jpg',
+    //   duration: 4000,
+    // },
     {
       type: 'image',
       src: '/videos/Netflix-slate-e1692222322682.jpg',
@@ -17,10 +25,8 @@ export const Hero = () => {
     },
     {
       type: 'video',
-      src: theme === 'dark' 
-        ? '/videos/Ekowest%20Hero%20vid%20-%20Dark.mp4'
-        : '/videos/Ekowest%20Hero%20vid%20-%20White.mp4',
-      duration: 10000,
+      src: '/videos/wbd-hero-animation_24_0_0.second copy.mp4',
+      duration: 10000, // 10 seconds for video
     }
   ];
 
@@ -48,18 +54,6 @@ export const Hero = () => {
       prevIndex === 0 ? slides.length - 1 : prevIndex - 1
     );
   };
-
-  const handleVideoError = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
-    console.error('Video error:', e);
-    const video = e.target as HTMLVideoElement;
-    console.log('Video source:', video.src);
-    console.log('Video error message:', video.error?.message);
-  };
-
-  const handleVideoPlay = () => {
-    console.log('Video started playing');
-  };
-
   return (
     <div className="relative w-full h-[600px] overflow-hidden mb-16">
       {slides.map((slide, index) => (
@@ -77,17 +71,12 @@ export const Hero = () => {
             />
           ) : (
             <video
-              key={`${slide.src}-${theme}`}
               autoPlay
               loop
               muted
-              playsInline
-              onError={handleVideoError}
-              onPlay={handleVideoPlay}
               className="w-full h-full object-cover"
             >
               <source src={slide.src} type="video/mp4" />
-              Your browser does not support the video tag.
             </video>
           )}
         </div>
