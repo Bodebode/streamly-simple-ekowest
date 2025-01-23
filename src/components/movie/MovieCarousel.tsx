@@ -8,7 +8,14 @@ import {
 import { MovieCard } from '../MovieCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { memo } from 'react';
-import { Movie } from '@/types/movies';
+
+interface Movie {
+  id: string | number;
+  title: string;
+  image: string;
+  category: string;
+  videoId?: string;
+}
 
 interface MovieCarouselProps {
   movies: Movie[];
@@ -19,33 +26,31 @@ interface MovieCarouselProps {
 const MovieCarouselComponent = ({ movies, onMovieSelect, isVideoPlaying }: MovieCarouselProps) => {
   const isMobile = useIsMobile();
 
-  // Create a Map to track unique movies by ID
-  const uniqueMoviesMap = new Map();
-  movies.forEach(movie => {
-    if (movie.videoId && !uniqueMoviesMap.has(movie.id)) {
-      uniqueMoviesMap.set(movie.id, movie);
+  // Remove any duplicates based on videoId and limit to 12 movies
+  const uniqueMovies = movies.reduce((acc: Movie[], current) => {
+    const isDuplicate = acc.find(movie => movie.videoId === current.videoId);
+    if (!isDuplicate && current && acc.length < 12) {
+      acc.push(current);
     }
-  });
+    return acc;
+  }, []);
 
-  // Convert Map values to array and limit to 12 movies
-  const uniqueMovies = Array.from(uniqueMoviesMap.values()).slice(0, 12);
-
-  console.log(`[MovieCarousel] Total movies received: ${movies.length}`);
-  console.log(`[MovieCarousel] Unique movies to display: ${uniqueMovies.length}`);
+  console.log(`[MovieCarousel] Original movies count: ${movies.length}`);
+  console.log(`[MovieCarousel] Unique movies count after filtering: ${uniqueMovies.length}`);
 
   return (
     <Carousel
       opts={{
         align: "start",
-        loop: true,
+        loop: false,
       }}
       className="w-full"
     >
       <CarouselContent className="-ml-2 md:-ml-4">
         {uniqueMovies.map((movie) => (
           <CarouselItem 
-            key={movie.id}
-            className="pl-2 md:pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/6 transition-transform duration-300 hover:scale-105"
+            key={`movie-${movie.videoId || movie.id}`}
+            className="pl-2 md:pl-4 basis-[140px] md:basis-[200px] transition-transform duration-300 hover:scale-105"
           >
             <MovieCard
               title={movie.title}
