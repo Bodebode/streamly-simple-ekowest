@@ -49,6 +49,17 @@ export const Hero = () => {
     );
   };
 
+  const handleVideoError = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+    console.error('Video error:', e);
+    const video = e.target as HTMLVideoElement;
+    console.log('Video source:', video.src);
+    console.log('Video error message:', video.error?.message);
+  };
+
+  const handleVideoPlay = () => {
+    console.log('Video started playing');
+  };
+
   return (
     <div className="relative w-full h-[600px] overflow-hidden mb-16">
       {slides.map((slide, index) => (
@@ -66,11 +77,13 @@ export const Hero = () => {
             />
           ) : (
             <video
-              key={slide.src}
+              key={`${slide.src}-${theme}`}
               autoPlay
               loop
               muted
               playsInline
+              onError={handleVideoError}
+              onPlay={handleVideoPlay}
               className="w-full h-full object-cover"
             >
               <source src={slide.src} type="video/mp4" />
