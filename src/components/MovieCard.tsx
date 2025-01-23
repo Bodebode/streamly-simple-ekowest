@@ -34,6 +34,7 @@ const MovieCardComponent = ({ title, image, category, videoId, onMovieSelect, is
     return clearTimers;
   }, [clearTimers]);
 
+  // Clear preview when video is playing anywhere
   useEffect(() => {
     if (isVideoPlaying) {
       setShowPreview(false);
@@ -46,8 +47,12 @@ const MovieCardComponent = ({ title, image, category, videoId, onMovieSelect, is
     if (!isVideoPlaying) {
       setIsHovered(true);
       if (videoId) {
+        // Only start preview timer if no other video is playing
         hoverTimerRef.current = setTimeout(() => {
-          setShowPreview(true);
+          const previewElements = document.querySelectorAll('iframe[src*="youtube.com"]');
+          if (previewElements.length === 0) {
+            setShowPreview(true);
+          }
         }, 1400);
       }
     }
