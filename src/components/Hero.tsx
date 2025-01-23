@@ -18,8 +18,8 @@ export const Hero = () => {
     {
       type: 'video',
       src: theme === 'dark' 
-        ? '/videos/Ekowest Hero vid - Dark.mp4'
-        : '/videos/Ekowest Hero vid - White.mp4',
+        ? '/videos/Ekowest%20Hero%20vid%20-%20Dark.mp4'
+        : '/videos/Ekowest%20Hero%20vid%20-%20White.mp4',
       duration: 10000,
     }
   ];
@@ -66,13 +66,15 @@ export const Hero = () => {
             />
           ) : (
             <video
-              key={slide.src} // Add key to force video reload when theme changes
+              key={slide.src}
               autoPlay
               loop
               muted
+              playsInline
               className="w-full h-full object-cover"
             >
               <source src={slide.src} type="video/mp4" />
+              Your browser does not support the video tag.
             </video>
           )}
         </div>
