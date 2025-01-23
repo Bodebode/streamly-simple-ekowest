@@ -13,6 +13,7 @@ import { useLocation } from 'react-router-dom';
 import { MOCK_MOVIES } from '../data/mockMovies';
 import { usePopulateSections } from '@/hooks/use-populate-sections';
 import { transformCachedToMovie } from '@/utils/movie-transforms';
+import { Movie, CachedMovie } from '@/types/movies';
 
 const Index = () => {
   const { theme, setTheme } = useTheme();
@@ -30,6 +31,8 @@ const Index = () => {
     refetchNewReleases,
     refetchSkits
   });
+
+  console.log('Yoruba movies count:', yorubaMovies?.length || 0);
 
   return (
     <div className="min-h-screen">
@@ -66,26 +69,26 @@ const Index = () => {
           />
           <CategoryRow 
             title="Highly Rated" 
-            movies={highlyRatedVideos ? transformCachedToMovie(highlyRatedVideos as unknown as CachedMovie[]) : MOCK_MOVIES.highlyRated}
+            movies={highlyRatedVideos ? transformCachedToMovie(highlyRatedVideos as CachedMovie[]) : MOCK_MOVIES.highlyRated}
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
           />
           <CategoryRow 
             title="Yoruba Movies" 
-            movies={yorubaMovies || []}
+            movies={yorubaMovies || MOCK_MOVIES.yoruba}
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
           />
           <CategoryRow 
             title="Skits" 
-            movies={skits ? transformCachedToMovie(skits as unknown as CachedMovie[]) : MOCK_MOVIES.skits}
+            movies={skits ? transformCachedToMovie(skits as CachedMovie[]) : MOCK_MOVIES.skits}
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
           />
           <div ref={newReleaseRef}>
             <CategoryRow 
               title="New Release" 
-              movies={newReleases ? transformCachedToMovie(newReleases as unknown as CachedMovie[]) : MOCK_MOVIES.highlyRated}
+              movies={newReleases ? transformCachedToMovie(newReleases as CachedMovie[]) : MOCK_MOVIES.highlyRated}
               selectedVideoId={selectedVideoId}
               onVideoSelect={setSelectedVideoId}
             />
