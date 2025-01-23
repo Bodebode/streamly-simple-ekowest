@@ -157,7 +157,7 @@ export const Navbar = () => {
                 <Coins className="h-5 w-5" />
                 Watch2Earn
               </Link>
-              <Link to="/privacy-policy" className="text-sm hover:underline">
+              <Link to="/privacy" className="text-sm hover:underline">
                 Privacy Policy
               </Link>
               <div className="flex items-center gap-4">
@@ -176,7 +176,7 @@ export const Navbar = () => {
               <Link to="/watch2earn" className="text-sm hover:underline">
                 Watch2Earn
               </Link>
-              <Link to="/privacy-policy" className="text-sm hover:underline">
+              <Link to="/privacy" className="text-sm hover:underline">
                 Privacy Policy
               </Link>
               <Link to="/login" className="text-sm hover:underline">
