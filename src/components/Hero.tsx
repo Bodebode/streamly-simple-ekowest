@@ -4,6 +4,9 @@ import { useTheme } from 'next-themes';
 
 export const Hero = () => {
   const { theme } = useTheme();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [key, setKey] = useState(0); // Add key to force video remount
+
   const videoUrl = theme === 'light' 
     ? 'https://yuisywwlzorzdrzvjlvm.supabase.co/storage/v1/object/public/videos/Ekowest_Hero_Vid_White.mp4'
     : 'https://yuisywwlzorzdrzvjlvm.supabase.co/storage/v1/object/public/videos/Ekowest_Hero_Vid_Dark.mp4';
@@ -26,8 +29,6 @@ export const Hero = () => {
     }
   ];
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-
   useEffect(() => {
     const timer = setInterval(() => {
       const currentSlide = slides[currentIndex];
@@ -38,6 +39,11 @@ export const Hero = () => {
 
     return () => clearInterval(timer);
   }, [currentIndex]);
+
+  // Force video remount when theme changes
+  useEffect(() => {
+    setKey(prev => prev + 1);
+  }, [theme]);
 
   const nextSlide = () => {
     setCurrentIndex((prevIndex) => 
@@ -55,7 +61,7 @@ export const Hero = () => {
     <div className="relative w-full h-[600px] overflow-hidden mb-16">
       {slides.map((slide, index) => (
         <div
-          key={index}
+          key={`${index}-${key}`}
           className={`absolute w-full h-full transition-opacity duration-500 ease-in-out ${
             index === currentIndex ? 'opacity-100' : 'opacity-0'
           }`}
@@ -68,6 +74,7 @@ export const Hero = () => {
             />
           ) : (
             <video
+              key={key} // Force remount when theme changes
               autoPlay
               loop
               muted
