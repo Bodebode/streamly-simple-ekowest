@@ -13,6 +13,7 @@ import { MOCK_MOVIES } from '../data/mockMovies';
 import { usePopulateSections } from '@/hooks/use-populate-sections';
 import { transformCachedToMovie } from '@/utils/movie-transforms';
 import { CachedMovie } from '@/types/movies';
+import { useLocation } from 'react-router-dom';
 
 const Index = () => {
   const { theme, setTheme } = useTheme();
@@ -135,3 +136,4 @@ const Index = () => {
 };
 
 export default Index;
+

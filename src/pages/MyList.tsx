@@ -14,7 +14,7 @@ const MyList = () => {
 
   useEffect(() => {
     const fetchMyList = async () => {
-      if (!user) return;
+      if (!user?.id) return;
 
       try {
         const { data: userMovies, error } = await supabase
@@ -51,7 +51,7 @@ const MyList = () => {
     };
 
     fetchMyList();
-  }, [user]);
+  }, [user?.id]);
 
   return (
     <div className="min-h-screen bg-background">
