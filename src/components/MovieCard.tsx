@@ -4,7 +4,7 @@ import { MovieCardBase } from './movie/MovieCardBase';
 import { Plus, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuthStore } from '@/stores/auth-store';
+import { useAuth } from '@/components/AuthProvider';
 
 interface MovieCardProps {
   id: string;
@@ -24,7 +24,7 @@ const MovieCardComponent = ({ id, title, image, category, videoId, onMovieSelect
   const [isLoading, setIsLoading] = useState(false);
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
   const titleTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const { user } = useAuthStore();
+  const { user } = useAuth();
 
   const clearTimers = useCallback(() => {
     if (hoverTimerRef.current) {
