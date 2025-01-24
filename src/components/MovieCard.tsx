@@ -103,7 +103,7 @@ const MovieCardComponent = ({ id, title, image, category, videoId, onMovieSelect
   }, [videoId, onMovieSelect, clearTimers, title]);
 
   const toggleMyList = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent video from playing when clicking the plus/check icon
+    e.stopPropagation();
     
     if (!user?.id) {
       toast.error('Please login to add movies to your list');
@@ -144,21 +144,23 @@ const MovieCardComponent = ({ id, title, image, category, videoId, onMovieSelect
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
     >
-      <button
-        onClick={toggleMyList}
-        disabled={isLoading}
-        className={`absolute top-2 right-2 z-10 p-1.5 rounded-full 
-          transition-all duration-200 
-          ${isHovered ? 'opacity-100' : 'opacity-0'} 
-          ${isInList ? 'bg-green-500 hover:bg-green-600' : 'bg-black/50 hover:bg-black/70'}
-          ${isLoading ? 'cursor-not-allowed' : ''}`}
-      >
-        {isInList ? (
-          <Check className="w-4 h-4 text-white" />
-        ) : (
-          <Plus className="w-4 h-4 text-white" />
-        )}
-      </button>
+      {user && (
+        <button
+          onClick={toggleMyList}
+          disabled={isLoading}
+          className={`absolute top-2 right-2 z-10 p-1.5 rounded-full 
+            transition-all duration-200 
+            ${isInList ? 'opacity-100' : isHovered ? 'opacity-100' : 'opacity-0'} 
+            ${isInList ? 'bg-green-500 hover:bg-green-600' : 'bg-black/50 hover:bg-black/70'}
+            ${isLoading ? 'cursor-not-allowed' : ''}`}
+        >
+          {isInList ? (
+            <Check className="w-4 h-4 text-white" />
+          ) : (
+            <Plus className="w-4 h-4 text-white" />
+          )}
+        </button>
+      )}
       
       {showPreview && videoId && !isVideoPlaying ? (
         <MovieCardPreview
