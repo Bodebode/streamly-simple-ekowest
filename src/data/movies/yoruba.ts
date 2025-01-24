@@ -1,6 +1,6 @@
 export const yorubaMovies = [
   {
-    id: 1,
+    id: "1",
     title: "Digital Storm",
     image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
     category: "Yoruba Movies"

@@ -1,6 +1,6 @@
 export const trendingMovies = [
   {
-    id: 1,
+    id: "1",
     title: "Do you Wanna Japa",
     image: "https://img.youtube.com/vi/Yg9z8lv1k_4/maxresdefault.jpg",
     category: "Trending",

@@ -1,6 +1,6 @@
 export const highlyRatedMovies = [
   {
-    id: 1,
+    id: "1",
     title: "The Matrix Code",
     image: "https://img.youtube.com/vi/pY4L5IXFXPA/maxresdefault.jpg",
     category: "Highly Rated",
