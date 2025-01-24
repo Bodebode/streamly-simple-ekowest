@@ -147,7 +147,6 @@ const MovieCardComponent = ({ id, title, image, category, videoId, onMovieSelect
           onClick={toggleMyList}
           disabled={isLoading}
           className={`absolute top-2 right-2 z-10 p-1.5 rounded-full 
-            transition-colors duration-200
             ${isInList ? 'bg-green-500 hover:bg-green-600' : 'bg-black/50 hover:bg-black/70'}
             ${isLoading ? 'cursor-not-allowed opacity-50' : ''}`}
         >
