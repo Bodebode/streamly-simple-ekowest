@@ -4,6 +4,11 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 export const Hero = () => {
   const slides = [
     {
+      type: 'video',
+      src: 'https://yuisywwlzorzdrzvjlvm.supabase.co/storage/v1/object/public/videos/Ekowest_Hero_Vid_Dark.mp4',
+      duration: 39000, // 39 seconds
+    },
+    {
       type: 'image',
       src: '/videos/file-20220908-13-nwxk17.avif',
       duration: 4000,
@@ -12,11 +17,6 @@ export const Hero = () => {
       type: 'image',
       src: '/videos/Netflix-slate-e1692222322682.jpg',
       duration: 4000,
-    },
-    {
-      type: 'video',
-      src: 'https://yuisywwlzorzdrzvjlvm.supabase.co/storage/v1/object/public/videos/Ekowest_Hero_Vid_Dark.mp4',
-      duration: 10000, // 10 seconds for video
     }
   ];
 
