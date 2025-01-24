@@ -41,7 +41,6 @@ const MovieCardComponent = ({ id, title, image, category, videoId, onMovieSelect
     return clearTimers;
   }, [clearTimers]);
 
-  // Check if movie is in user's list on mount
   useEffect(() => {
     const checkIfInList = async () => {
       if (!user?.id) return;
@@ -59,7 +58,6 @@ const MovieCardComponent = ({ id, title, image, category, videoId, onMovieSelect
     checkIfInList();
   }, [user?.id, id]);
 
-  // Clear preview when video is playing anywhere
   useEffect(() => {
     if (isVideoPlaying) {
       setShowPreview(false);
@@ -149,10 +147,9 @@ const MovieCardComponent = ({ id, title, image, category, videoId, onMovieSelect
           onClick={toggleMyList}
           disabled={isLoading}
           className={`absolute top-2 right-2 z-10 p-1.5 rounded-full 
-            transition-all duration-200 
-            ${isInList ? 'opacity-100' : isHovered ? 'opacity-100' : 'opacity-0'} 
+            transition-colors duration-200
             ${isInList ? 'bg-green-500 hover:bg-green-600' : 'bg-black/50 hover:bg-black/70'}
-            ${isLoading ? 'cursor-not-allowed' : ''}`}
+            ${isLoading ? 'cursor-not-allowed opacity-50' : ''}`}
         >
           {isInList ? (
             <Check className="w-4 h-4 text-white" />

@@ -7,7 +7,7 @@ export const trendingMovies = [
     videoId: "Yg9z8lv1k_4"
   },
   {
-    id: 12,
+    id: "12",
     title: "The Ghost Chase",
     image: "https://img.youtube.com/vi/3aQFM1ZtMG0/maxresdefault.jpg",
     category: "Trending",
