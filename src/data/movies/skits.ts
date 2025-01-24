@@ -1,6 +1,6 @@
 export const skitsMovies = [
   {
-    id: "1",
+    id: 1,
     title: "Funny Moments Compilation",
     image: "https://img.youtube.com/vi/3aQFM1ZtMG0/maxresdefault.jpg",
     category: "Skits",

@@ -42,10 +42,6 @@
   @apply transform scale-105 z-10;
 }
 
-.movie-card button {
-  @apply opacity-100;
-}
-
 .category-row {
   @apply px-16;
   overflow-x: auto;

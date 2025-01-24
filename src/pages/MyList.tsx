@@ -2,16 +2,14 @@ import { useEffect, useState } from 'react';
 import { Navbar } from '../components/Navbar';
 import { MovieCard } from '../components/MovieCard';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/components/AuthProvider';
+import { useAuthStore } from '@/stores/auth-store';
 import { toast } from 'sonner';
 import { Movie } from '@/types/movies';
-import { Link } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
 
 const MyList = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -59,17 +57,7 @@ const MyList = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 pt-24">
-        <div className="flex items-center gap-4 mb-8">
-          <Link 
-            to="/" 
-            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            Back to Home
-          </Link>
-          <h1 className="text-3xl font-bold">My List</h1>
-        </div>
-        
+        <h1 className="text-3xl font-bold mb-8">My List</h1>
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>

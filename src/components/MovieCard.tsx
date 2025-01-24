@@ -4,7 +4,7 @@ import { MovieCardBase } from './movie/MovieCardBase';
 import { Plus, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/components/AuthProvider';
+import { useAuthStore } from '@/stores/auth-store';
 
 interface MovieCardProps {
   id: string;
@@ -24,7 +24,7 @@ const MovieCardComponent = ({ id, title, image, category, videoId, onMovieSelect
   const [isLoading, setIsLoading] = useState(false);
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
   const titleTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const { user } = useAuth();
+  const { user } = useAuthStore();
 
   const clearTimers = useCallback(() => {
     if (hoverTimerRef.current) {
@@ -41,6 +41,7 @@ const MovieCardComponent = ({ id, title, image, category, videoId, onMovieSelect
     return clearTimers;
   }, [clearTimers]);
 
+  // Check if movie is in user's list on mount
   useEffect(() => {
     const checkIfInList = async () => {
       if (!user?.id) return;
@@ -58,6 +59,7 @@ const MovieCardComponent = ({ id, title, image, category, videoId, onMovieSelect
     checkIfInList();
   }, [user?.id, id]);
 
+  // Clear preview when video is playing anywhere
   useEffect(() => {
     if (isVideoPlaying) {
       setShowPreview(false);
@@ -101,7 +103,7 @@ const MovieCardComponent = ({ id, title, image, category, videoId, onMovieSelect
   }, [videoId, onMovieSelect, clearTimers, title]);
 
   const toggleMyList = async (e: React.MouseEvent) => {
-    e.stopPropagation();
+    e.stopPropagation(); // Prevent video from playing when clicking the plus/check icon
     
     if (!user?.id) {
       toast.error('Please login to add movies to your list');
@@ -147,8 +149,10 @@ const MovieCardComponent = ({ id, title, image, category, videoId, onMovieSelect
           onClick={toggleMyList}
           disabled={isLoading}
           className={`absolute top-2 right-2 z-10 p-1.5 rounded-full 
+            transition-all duration-200 
+            ${isHovered || isInList ? 'opacity-100' : 'opacity-0'} 
             ${isInList ? 'bg-green-500 hover:bg-green-600' : 'bg-black/50 hover:bg-black/70'}
-            ${isLoading ? 'cursor-not-allowed opacity-50' : ''}`}
+            ${isLoading ? 'cursor-not-allowed' : ''}`}
         >
           {isInList ? (
             <Check className="w-4 h-4 text-white" />

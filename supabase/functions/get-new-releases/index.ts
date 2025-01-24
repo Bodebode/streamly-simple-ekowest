@@ -23,6 +23,7 @@ const truncateTitle = (title: string): string => {
   return title
 }
 
+// Convert ISO 8601 duration to seconds
 const parseDuration = (duration: string): number => {
   const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/)
   const hours = parseInt(match?.[1] || '0')
@@ -112,25 +113,25 @@ serve(async (req) => {
 
       const videoData = await videoResponse.json()
 
-    // Transform and filter videos
-    const videos = videoData.items
-      .filter((video: any) => {
-        const duration = parseDuration(video.contentDetails.duration)
-        return duration >= MIN_DURATION_SECONDS
-      })
-      .slice(0, 12)
-      .map((video: any) => ({
-        id: video.id,
-        title: truncateTitle(video.snippet.title),
-        image: video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url,
-        category: "New Release",
-        video_id: video.id,
-        views: parseInt(video.statistics.viewCount),
-        comments: parseInt(video.statistics.commentCount),
-        duration: parseDuration(video.contentDetails.duration),
-        cached_at: new Date().toISOString(),
-        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours
-      }))
+      // Transform and filter videos
+      const videos = videoData.items
+        .filter((video: any) => {
+          const duration = parseDuration(video.contentDetails.duration)
+          return duration >= MIN_DURATION_SECONDS
+        })
+        .slice(0, 12)
+        .map((video: any) => ({
+          id: video.id,
+          title: truncateTitle(video.snippet.title),
+          image: video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url,
+          category: "New Release",
+          video_id: video.id,
+          views: parseInt(video.statistics.viewCount),
+          comments: parseInt(video.statistics.commentCount),
+          duration: parseDuration(video.contentDetails.duration),
+          cached_at: new Date().toISOString(),
+          expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours
+        }))
 
       // Cache the results
       if (videos.length > 0) {
@@ -157,7 +158,6 @@ serve(async (req) => {
       }
       throw error
     }
-
   } catch (error) {
     console.error('Error in get-new-releases function:', error)
     return new Response(

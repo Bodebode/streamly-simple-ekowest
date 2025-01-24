@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Movie } from '@/types/movies';
-import { MIN_DURATION_SECONDS, isValidDuration } from '@/utils/video-duration';
 
 const placeholderNewReleases = [
   {
@@ -79,19 +78,13 @@ const placeholderNewReleases = [
   }
 ];
 
-const filterValidVideos = (videos: any[]): any[] => {
+const removeDuplicates = (videos: any[]): any[] => {
   const seen = new Set<string>();
-  return videos
-    .filter(video => {
-      const isDuplicate = seen.has(video.video_id);
-      const hasValidDuration = isValidDuration(video.duration);
-      seen.add(video.video_id);
-      return !isDuplicate && 
-             video.video_id && 
-             video.is_available && 
-             hasValidDuration;
-    })
-    .slice(0, 12);
+  return videos.filter(video => {
+    const duplicate = seen.has(video.video_id);
+    seen.add(video.video_id);
+    return !duplicate && video.video_id && video.is_available;
+  }).slice(0, 12);
 };
 
 export const useNewReleases = () => {
@@ -99,16 +92,14 @@ export const useNewReleases = () => {
     queryKey: ['newReleases'],
     queryFn: async () => {
       try {
-        console.log('Fetching new releases from cache');
         const { data, error } = await supabase
           .from('cached_videos')
           .select('*')
           .eq('category', 'New Release')
           .eq('is_available', true)
-          .gte('duration', MIN_DURATION_SECONDS)
           .gt('expires_at', new Date().toISOString())
           .order('cached_at', { ascending: false })
-          .limit(24);
+          .limit(24); // Increased limit to ensure enough unique videos
         
         if (error) {
           console.error('Error fetching new releases:', error);
@@ -121,21 +112,21 @@ export const useNewReleases = () => {
           return placeholderNewReleases;
         }
 
-        // Filter for unique videos and ensure minimum duration
-        const validVideos = filterValidVideos(data);
+        // Filter for unique videos and ensure minimum count
+        const uniqueVideos = removeDuplicates(data);
         
-        if (validVideos.length < 12) {
-          console.log('Not enough valid videos, padding with placeholders');
-          const neededPlaceholders = 12 - validVideos.length;
-          return [...validVideos, ...placeholderNewReleases.slice(0, neededPlaceholders)];
+        if (uniqueVideos.length < 12) {
+          console.log('Not enough unique videos, padding with placeholders');
+          const neededPlaceholders = 12 - uniqueVideos.length;
+          return [...uniqueVideos, ...placeholderNewReleases.slice(0, neededPlaceholders)];
         }
 
         // Increment access count for retrieved videos
-        validVideos.forEach(video => {
+        uniqueVideos.forEach(video => {
           supabase.rpc('increment_access_count', { video_id: video.id });
         });
 
-        return validVideos;
+        return uniqueVideos;
       } catch (error) {
         console.error('Error in new releases query:', error);
         toast.error('Failed to load new releases, showing placeholders');

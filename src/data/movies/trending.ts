@@ -1,13 +1,13 @@
 export const trendingMovies = [
   {
-    id: "1",
+    id: 1,
     title: "Do you Wanna Japa",
     image: "https://img.youtube.com/vi/Yg9z8lv1k_4/maxresdefault.jpg",
     category: "Trending",
     videoId: "Yg9z8lv1k_4"
   },
   {
-    id: "12",
+    id: 12,
     title: "The Ghost Chase",
     image: "https://img.youtube.com/vi/3aQFM1ZtMG0/maxresdefault.jpg",
     category: "Trending",
