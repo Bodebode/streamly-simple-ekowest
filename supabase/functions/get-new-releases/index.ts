@@ -3,6 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const API_KEY = Deno.env.get('YOUTUBE_API_KEY')
 const BASE_URL = 'https://www.googleapis.com/youtube/v3'
+const MIN_DURATION_SECONDS = 150 // 2 minutes and 30 seconds
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -22,6 +23,15 @@ const truncateTitle = (title: string): string => {
   return title
 }
 
+// Convert ISO 8601 duration to seconds
+const parseDuration = (duration: string): number => {
+  const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/)
+  const hours = parseInt(match?.[1] || '0')
+  const minutes = parseInt(match?.[2] || '0')
+  const seconds = parseInt(match?.[3] || '0')
+  return hours * 3600 + minutes * 60 + seconds
+}
+
 serve(async (req) => {
   console.log('Processing request to get-new-releases function')
   
@@ -37,6 +47,7 @@ serve(async (req) => {
       .select('*')
       .eq('category', 'New Release')
       .gt('expires_at', new Date().toISOString())
+      .gte('duration', MIN_DURATION_SECONDS)
       .limit(12)
 
     if (cacheError) {
@@ -56,6 +67,7 @@ serve(async (req) => {
       .select('*')
       .eq('category', 'New Release')
       .lt('expires_at', new Date().toISOString())
+      .gte('duration', MIN_DURATION_SECONDS)
       .order('cached_at', { ascending: false })
       .limit(12)
 
@@ -88,7 +100,7 @@ serve(async (req) => {
       // Get video IDs
       const videoIds = searchData.items.map((item: any) => item.id.videoId).join(',')
 
-      // Get detailed video information
+      // Get detailed video information including contentDetails for duration
       console.log('Fetching video details')
       const videoResponse = await fetch(
         `${BASE_URL}/videos?part=snippet,statistics,contentDetails&id=${videoIds}&key=${API_KEY}`
@@ -101,8 +113,12 @@ serve(async (req) => {
 
       const videoData = await videoResponse.json()
 
-      // Transform videos
+      // Transform and filter videos
       const videos = videoData.items
+        .filter((video: any) => {
+          const duration = parseDuration(video.contentDetails.duration)
+          return duration >= MIN_DURATION_SECONDS
+        })
         .slice(0, 12)
         .map((video: any) => ({
           id: video.id,
@@ -112,6 +128,7 @@ serve(async (req) => {
           video_id: video.id,
           views: parseInt(video.statistics.viewCount),
           comments: parseInt(video.statistics.commentCount),
+          duration: parseDuration(video.contentDetails.duration),
           cached_at: new Date().toISOString(),
           expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours
         }))
