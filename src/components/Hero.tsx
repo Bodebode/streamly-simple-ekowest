@@ -1,11 +1,17 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTheme } from 'next-themes';
 
 export const Hero = () => {
+  const { theme } = useTheme();
+  const videoUrl = theme === 'light' 
+    ? 'https://yuisywwlzorzdrzvjlvm.supabase.co/storage/v1/object/public/videos/Ekowest_Hero_Vid_White.mp4'
+    : 'https://yuisywwlzorzdrzvjlvm.supabase.co/storage/v1/object/public/videos/Ekowest_Hero_Vid_Dark.mp4';
+
   const slides = [
     {
       type: 'video',
-      src: 'https://yuisywwlzorzdrzvjlvm.supabase.co/storage/v1/object/public/videos/Ekowest_Hero_Vid_Dark.mp4',
+      src: videoUrl,
       duration: 39000, // 39 seconds
     },
     {
