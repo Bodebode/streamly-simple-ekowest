@@ -15,7 +15,7 @@ export const Hero = () => {
     },
     {
       type: 'video',
-      src: 'https://yuisywwlzorzdrzvjlvm.supabase.co/storage/v1/object/public/videos/Ekowest%20Hero%20Vid%20-%20Dark.mp4?t=2025-01-24T04%3A41%3A05.088Z',
+      src: 'https://yuisywwlzorzdrzvjlvm.supabase.co/storage/v1/object/public/hero_videos/hero-video.mp4',
       duration: 10000, // 10 seconds for video
     }
   ];
