@@ -144,23 +144,21 @@ const MovieCardComponent = ({ id, title, image, category, videoId, onMovieSelect
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
     >
-      {user && (
-        <button
-          onClick={toggleMyList}
-          disabled={isLoading}
-          className={`absolute top-2 right-2 z-10 p-1.5 rounded-full 
-            transition-all duration-200 
-            ${isHovered || isInList ? 'opacity-100' : 'opacity-0'} 
-            ${isInList ? 'bg-green-500 hover:bg-green-600' : 'bg-black/50 hover:bg-black/70'}
-            ${isLoading ? 'cursor-not-allowed' : ''}`}
-        >
-          {isInList ? (
-            <Check className="w-4 h-4 text-white" />
-          ) : (
-            <Plus className="w-4 h-4 text-white" />
-          )}
-        </button>
-      )}
+      <button
+        onClick={toggleMyList}
+        disabled={isLoading}
+        className={`absolute top-2 right-2 z-10 p-1.5 rounded-full 
+          transition-all duration-200 
+          ${isHovered ? 'opacity-100' : 'opacity-0'} 
+          ${isInList ? 'bg-green-500 hover:bg-green-600' : 'bg-black/50 hover:bg-black/70'}
+          ${isLoading ? 'cursor-not-allowed' : ''}`}
+      >
+        {isInList ? (
+          <Check className="w-4 h-4 text-white" />
+        ) : (
+          <Plus className="w-4 h-4 text-white" />
+        )}
+      </button>
       
       {showPreview && videoId && !isVideoPlaying ? (
         <MovieCardPreview
