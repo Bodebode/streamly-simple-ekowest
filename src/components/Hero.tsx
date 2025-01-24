@@ -8,16 +8,6 @@ export const Hero = () => {
       src: '/videos/file-20220908-13-nwxk17.avif',
       duration: 4000,
     },
-    // {
-    //   type: 'image',
-    //   src: '/videos/Ijogbon.jpg',
-    //   duration: 4000,
-    // },
-    // {
-    //   type: 'image',
-    //   src: '/videos/maxresdefault.jpg',
-    //   duration: 4000,
-    // },
     {
       type: 'image',
       src: '/videos/Netflix-slate-e1692222322682.jpg',
@@ -26,7 +16,12 @@ export const Hero = () => {
     {
       type: 'video',
       src: '/videos/wbd-hero-animation_24_0_0.second copy.mp4',
-      duration: 10000, // 10 seconds for video
+      duration: 10000,
+    },
+    {
+      type: 'video',
+      src: '/videos/wbd-hero-animation_24_0_0.second copy.mp4',
+      duration: 10000,
     }
   ];
 
@@ -54,6 +49,7 @@ export const Hero = () => {
       prevIndex === 0 ? slides.length - 1 : prevIndex - 1
     );
   };
+
   return (
     <div className="relative w-full h-[600px] overflow-hidden mb-16">
       {slides.map((slide, index) => (
