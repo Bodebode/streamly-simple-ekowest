@@ -102,8 +102,8 @@ const removeDuplicates = (videos: CachedMovie[]): CachedMovie[] => {
 };
 
 const transformVideosToMovies = (videos: CachedMovie[]): Movie[] => {
-  return videos.map((video, index) => ({
-    id: index + 1,
+  return videos.map((video) => ({
+    id: video.id,
     title: video.title,
     image: video.image,
     category: video.category,

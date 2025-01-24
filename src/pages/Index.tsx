@@ -9,10 +9,10 @@ import { useNewReleases } from '@/hooks/use-new-releases';
 import { useSkits } from '@/hooks/use-skits';
 import { useYorubaMovies } from '@/hooks/use-yoruba';
 import { useEffect, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import { MOCK_MOVIES } from '../data/mockMovies';
 import { usePopulateSections } from '@/hooks/use-populate-sections';
 import { transformCachedToMovie } from '@/utils/movie-transforms';
+import { CachedMovie } from '@/types/movies';
 
 const Index = () => {
   const { theme, setTheme } = useTheme();
