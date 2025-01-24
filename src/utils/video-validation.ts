@@ -3,12 +3,20 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const checkVideoAvailability = async () => {
   try {
-    const { error } = await supabase.functions.invoke('check-video-availability');
+    const { data, error } = await supabase.functions.invoke('check-video-availability', {
+      body: { videoId: 'test' } // We'll just do a test check since this is called without params
+    });
+
     if (error) {
-      console.error('Error checking video availability:', error);
+      console.error('[checkVideoAvailability] Error:', error);
+      return false;
     }
+
+    console.log('[checkVideoAvailability] Response:', data);
+    return data?.available || false;
   } catch (error) {
-    console.error('Failed to check video availability:', error);
+    console.error('[checkVideoAvailability] Failed to check video availability:', error);
+    return false;
   }
 };
 

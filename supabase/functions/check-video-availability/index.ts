@@ -6,14 +6,19 @@ const corsHeaders = {
 };
 
 Deno.serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { videoId } = await req.json();
+    // Get video ID from request body
+    const { videoId } = await req.json().catch(() => ({}));
     
+    console.log(`[check-video-availability] Checking availability for video: ${videoId}`);
+
     if (!videoId) {
+      console.log('[check-video-availability] No videoId provided');
       return new Response(
         JSON.stringify({ error: 'Video ID is required' }),
         { 
@@ -34,6 +39,8 @@ Deno.serve(async (req) => {
       videoId
     };
 
+    console.log(`[check-video-availability] Result for ${videoId}:`, result);
+
     return new Response(
       JSON.stringify(result),
       { 
@@ -43,7 +50,7 @@ Deno.serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Error checking video availability:', error);
+    console.error('[check-video-availability] Error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
