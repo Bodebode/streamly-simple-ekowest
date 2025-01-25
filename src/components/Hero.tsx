@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { HeroSlide } from './hero/HeroSlide';
+import { HeroControls } from './hero/HeroControls';
 
 export const Hero = () => {
   const { theme } = useTheme();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [key, setKey] = useState(0); // Add key to force video remount
+  const [key, setKey] = useState(0);
 
   const videoUrl = theme === 'light' 
     ? 'https://yuisywwlzorzdrzvjlvm.supabase.co/storage/v1/object/public/videos/Ekowest_Hero_Vid_White.mp4'
@@ -13,17 +14,17 @@ export const Hero = () => {
 
   const slides = [
     {
-      type: 'video',
+      type: 'video' as const,
       src: videoUrl,
-      duration: 39000, // 39 seconds
+      duration: 39000,
     },
     {
-      type: 'image',
+      type: 'image' as const,
       src: '/videos/file-20220908-13-nwxk17.avif',
       duration: 4000,
     },
     {
-      type: 'image',
+      type: 'image' as const,
       src: '/videos/Netflix-slate-e1692222322682.jpg',
       duration: 4000,
     }
@@ -40,7 +41,6 @@ export const Hero = () => {
     return () => clearInterval(timer);
   }, [currentIndex]);
 
-  // Force video remount when theme changes
   useEffect(() => {
     setKey(prev => prev + 1);
   }, [theme]);
@@ -60,33 +60,16 @@ export const Hero = () => {
   return (
     <div className="relative w-full h-[600px] overflow-hidden mb-16">
       {slides.map((slide, index) => (
-        <div
-          key={`${index}-${key}`}
-          className={`absolute w-full h-full transition-opacity duration-500 ease-in-out ${
-            index === currentIndex ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          {slide.type === 'image' ? (
-            <img
-              src={slide.src}
-              alt={`Hero Slide ${index + 1}`}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <video
-              key={key} // Force remount when theme changes
-              autoPlay
-              loop
-              muted
-              className="w-full h-full object-cover"
-            >
-              <source src={slide.src} type="video/mp4" />
-            </video>
-          )}
-        </div>
+        <HeroSlide
+          key={index}
+          type={slide.type}
+          src={slide.src}
+          index={index}
+          currentIndex={currentIndex}
+          key={key}
+        />
       ))}
 
-      {/* Hero Text Overlay */}
       <div className="absolute bottom-16 left-16 z-10">
         <h1 className="text-4xl font-bold text-white mb-4">
           Welcome to Ekowest TV
@@ -96,20 +79,7 @@ export const Hero = () => {
         </p>
       </div>
 
-      <button
-        onClick={prevSlide}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors duration-200 z-20"
-        aria-label="Previous slide"
-      >
-        <ChevronLeft className="w-6 h-6" />
-      </button>
-      <button
-        onClick={nextSlide}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-colors duration-200 z-20"
-        aria-label="Next slide"
-      >
-        <ChevronRight className="w-6 h-6" />
-      </button>
+      <HeroControls onPrevSlide={prevSlide} onNextSlide={nextSlide} />
     </div>
   );
 };
