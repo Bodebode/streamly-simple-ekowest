@@ -28,19 +28,14 @@ export const useSkits = () => {
         
         if (error) {
           console.error('Error fetching skits:', error);
-          throw error;
+          return MOCK_MOVIES.skits;
         }
 
         if (!data || data.length === 0) {
           console.log('No skits found in cache, invoking edge function');
           const { data: freshData, error: functionError } = await supabase.functions.invoke('get-skits');
           
-          if (functionError) {
-            console.error('Error fetching fresh skits:', functionError);
-            return MOCK_MOVIES.skits;
-          }
-
-          if (!freshData || freshData.length === 0) {
+          if (functionError || !freshData || freshData.length === 0) {
             console.log('No fresh skits found, using mock data');
             return MOCK_MOVIES.skits;
           }
@@ -52,14 +47,8 @@ export const useSkits = () => {
         const uniqueVideos = removeDuplicates(data);
         
         if (uniqueVideos.length < 12) {
-          console.log('Not enough unique skits, fetching fresh data');
-          const { data: freshData, error: functionError } = await supabase.functions.invoke('get-skits');
-          
-          if (functionError || !freshData) {
-            return MOCK_MOVIES.skits;
-          }
-
-          return freshData;
+          console.log('Not enough unique skits, using mock data');
+          return MOCK_MOVIES.skits;
         }
 
         return uniqueVideos;
