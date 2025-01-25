@@ -2,8 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { MOCK_MOVIES } from '@/data/mockMovies';
+import { Movie, CachedMovie } from '@/types/movies';
+import { transformCachedToMovie } from '@/utils/movie-transforms';
 
-const removeDuplicates = (videos: any[]): any[] => {
+const removeDuplicates = (videos: CachedMovie[]): CachedMovie[] => {
   const seen = new Set<string>();
   return videos.filter(video => {
     const duplicate = seen.has(video.video_id);
@@ -40,7 +42,7 @@ export const useSkits = () => {
             return MOCK_MOVIES.skits;
           }
 
-          return freshData;
+          return transformCachedToMovie(freshData as CachedMovie[]);
         }
 
         // Filter for unique videos and ensure minimum count
@@ -51,7 +53,7 @@ export const useSkits = () => {
           return MOCK_MOVIES.skits;
         }
 
-        return uniqueVideos;
+        return transformCachedToMovie(uniqueVideos);
       } catch (error) {
         console.error('Error in skits query:', error);
         toast.error('Failed to load skits');

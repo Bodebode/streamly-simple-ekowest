@@ -16,7 +16,7 @@ export interface CachedMovie {
 }
 
 export interface Movie {
-  id: string;  // Changed from number to string to match database
+  id: string;
   title: string;
   image: string;
   category: string;
@@ -30,14 +30,8 @@ export interface MovieData {
   skits: Movie[];
 }
 
-export interface User {
-  id: string;
-  email?: string;
-  name?: string;
-}
-
 export interface MovieCardProps {
-  id: string;  // Changed from number to string
+  id: string;
   title: string;
   image: string;
   category: string;
