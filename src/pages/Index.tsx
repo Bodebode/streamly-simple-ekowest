@@ -7,7 +7,7 @@ import { useHighlyRated } from '@/hooks/use-highly-rated';
 import { useNewReleases } from '@/hooks/use-new-releases';
 import { useSkits } from '@/hooks/use-skits';
 import { useYorubaMovies } from '@/hooks/use-yoruba';
-import { useEffect, useRef, useState } from 'react';
+import { useState, useRef } from 'react';
 import { MOCK_MOVIES } from '../data/mockMovies';
 import { usePopulateSections } from '@/hooks/use-populate-sections';
 import { transformCachedToMovie } from '@/utils/movie-transforms';
@@ -31,6 +31,8 @@ const Index = () => {
     refetchNewReleases,
     refetchSkits
   });
+
+  console.log('[Index] New Releases data:', newReleases);
 
   return (
     <MainLayout showMainFooter>
@@ -85,7 +87,7 @@ const Index = () => {
           <div ref={newReleaseRef}>
             <CategoryRow 
               title="New Release" 
-              movies={newReleases ? transformCachedToMovie(newReleases as unknown as CachedMovie[]) : MOCK_MOVIES.highlyRated}
+              movies={newReleases ? transformCachedToMovie(newReleases as unknown as CachedMovie[]) : []}
               selectedVideoId={selectedVideoId}
               onVideoSelect={setSelectedVideoId}
             />

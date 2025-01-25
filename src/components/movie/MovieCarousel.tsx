@@ -15,16 +15,24 @@ const MovieCarouselComponent = ({ movies, onMovieSelect, isVideoPlaying }: Movie
   const isMobile = useIsMobile();
 
   // Remove any duplicates based on videoId and ensure we have valid videos
-  const uniqueMovies = movies.reduce((acc: Movie[], current) => {
+  const uniqueMovies = movies?.reduce((acc: Movie[], current) => {
     const isDuplicate = acc.some(movie => movie.videoId === current.videoId);
     if (!isDuplicate && current.videoId && acc.length < 12) {
       acc.push(current);
     }
     return acc;
-  }, []);
+  }, []) || [];
 
-  console.log(`[MovieCarousel] Original movies count: ${movies.length}`);
+  console.log(`[MovieCarousel] Original movies count: ${movies?.length || 0}`);
   console.log(`[MovieCarousel] Unique movies count after filtering: ${uniqueMovies.length}`);
+
+  if (!movies || movies.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-[210px] md:h-[300px] text-gray-500">
+        No videos available in this section
+      </div>
+    );
+  }
 
   return (
     <VideoErrorBoundary>
@@ -53,7 +61,7 @@ const MovieCarouselComponent = ({ movies, onMovieSelect, isVideoPlaying }: Movie
             </CarouselItem>
           ))}
         </CarouselContent>
-        {!isMobile && (
+        {!isMobile && uniqueMovies.length > 0 && (
           <>
             <CarouselPrevious className="hidden md:flex -left-12 transition-opacity duration-300 hover:opacity-100 opacity-75" />
             <CarouselNext className="hidden md:flex -right-12 transition-opacity duration-300 hover:opacity-100 opacity-75" />
