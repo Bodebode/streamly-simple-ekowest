@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Search, X, Loader2 } from 'lucide-react';
@@ -11,6 +11,20 @@ export const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
   const [isLoading, setIsLoading] = useState(false);
   const debouncedSearch = useDebounce(searchQuery, 500);
   const navigate = useNavigate();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      // Store the currently focused element
+      previousFocusRef.current = document.activeElement as HTMLElement;
+      // Focus the search input when modal opens
+      setTimeout(() => inputRef.current?.focus(), 0);
+    } else {
+      // Restore focus when modal closes
+      previousFocusRef.current?.focus();
+    }
+  }, [isOpen]);
 
   const handleSearch = async (query: string) => {
     setIsLoading(true);
@@ -45,11 +59,13 @@ export const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
               className="pl-10 pr-10"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              ref={inputRef}
             />
             {searchQuery && (
               <button 
                 onClick={() => setSearchQuery('')}
                 className="absolute right-3 top-2.5"
+                aria-label="Clear search"
               >
                 <X className="h-5 w-5 text-muted-foreground" />
               </button>
@@ -67,6 +83,15 @@ export const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                   key={video.id.videoId}
                   className="flex gap-3 p-2 hover:bg-accent rounded-lg cursor-pointer"
                   onClick={() => handleVideoSelect(video.id.videoId)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleVideoSelect(video.id.videoId);
+                    }
+                  }}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`Play ${video.snippet.title}`}
                 >
                   <img 
                     src={video.snippet.thumbnails.default.url}

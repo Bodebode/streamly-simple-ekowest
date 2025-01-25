@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { VideoControls } from './video/VideoControls';
 import { VideoIframe } from './video/VideoIframe';
 import { VideoErrorBoundary } from './video/VideoErrorBoundary';
+import { useFocusTrap } from '@/hooks/use-focus-trap';
 
 interface VideoPlayerProps {
   videoId: string | null;
@@ -13,9 +14,19 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [isDimmed, setIsDimmed] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
+  // Initialize focus trap
+  useFocusTrap(containerRef, isFullscreen);
 
   useEffect(() => {
     if (videoId) {
+      // Store the currently focused element
+      previousFocusRef.current = document.activeElement as HTMLElement;
+      
+      // Focus the container when it opens
+      containerRef.current?.focus();
+
       console.log(`[VideoPlayer] Attempting to play video: ${videoId}`);
       
       fetch(`https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v=${videoId}&format=json`)
@@ -30,6 +41,11 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
           toast.error('This video is not available');
           onClose();
         });
+
+      // Cleanup function to restore focus
+      return () => {
+        previousFocusRef.current?.focus();
+      };
     }
   }, [videoId, onClose]);
 
@@ -81,7 +97,14 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
   if (!videoId) return null;
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto mt-24 mb-8" ref={containerRef}>
+    <div 
+      className="relative w-full max-w-4xl mx-auto mt-24 mb-8" 
+      ref={containerRef}
+      tabIndex={-1}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Video player"
+    >
       <VideoControls
         isFullscreen={isFullscreen}
         isDimmed={isDimmed}
