@@ -69,28 +69,22 @@ const Auth = () => {
       }
     });
 
-    // Listen for authentication errors through the error callback
-    const { data: { subscription: errorSubscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT') {
-        const authError = (session as any)?.error;
-        if (authError) {
-          handleAuthError(authError as AuthError);
-        }
-      }
-    });
-
     return () => {
       subscription.unsubscribe();
-      errorSubscription.unsubscribe();
     };
   }, [navigate, toast, location]);
 
   const handleContinueAsGuest = () => {
+    // Set a flag in localStorage to indicate guest mode
+    localStorage.setItem('guestMode', 'true');
+    
     toast({
       title: "Welcome Guest!",
       description: "You're browsing as a guest user. Some features may be limited.",
     });
-    navigate('/');
+    
+    // Navigate to home page
+    navigate('/', { replace: true });
   };
 
   return (
