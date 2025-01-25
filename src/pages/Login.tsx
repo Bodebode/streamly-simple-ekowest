@@ -19,6 +19,7 @@ export const Login = () => {
     // Mock successful login - replace with your actual API call
     const mockToken = "mock-jwt-token";
     const mockUser = {
+      id: `user_${Date.now()}`, // Generate a unique ID
       email,
       name: email.split('@')[0]
     };
