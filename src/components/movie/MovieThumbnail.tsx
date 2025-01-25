@@ -2,6 +2,7 @@ import { Play } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { truncateTitle } from '@/lib/utils';
 import { toast } from 'sonner';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 
 interface MovieThumbnailProps {
   title: string;
@@ -15,6 +16,7 @@ interface MovieThumbnailProps {
 export const MovieThumbnail = ({ title, image, category, videoId, isHovered, isVideoPlaying }: MovieThumbnailProps) => {
   const [thumbnailError, setThumbnailError] = useState(false);
   const [thumbnailQuality, setThumbnailQuality] = useState<'max' | 'high' | 'fallback'>('max');
+  const [isLoading, setIsLoading] = useState(true);
   
   // Array of fallback images for when the main thumbnail is missing
   const fallbackImages = [
@@ -27,54 +29,63 @@ export const MovieThumbnail = ({ title, image, category, videoId, isHovered, isV
   // Get a consistent fallback image based on the movie title
   const getFallbackImage = () => {
     const index = title.length % fallbackImages.length;
-    return `${fallbackImages[index]}?auto=format&fit=crop&q=80`;
+    return `${fallbackImages[index]}?auto=format&fit=crop&w=400&q=75`;
   };
 
   useEffect(() => {
-    // Check thumbnail quality on mount
     if (videoId) {
       const maxResUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
       const img = new Image();
       img.onload = () => {
         if (img.width === 120 && img.height === 90) {
-          // YouTube returns a small placeholder for non-existent maxresdefault
           setThumbnailQuality('high');
           console.log(`[Thumbnail Quality Check] Low quality thumbnail detected for: "${title}" (${videoId})`);
-          if (category === 'Yoruba Movies') {
-            console.log(`[Yoruba Movie Quality Alert] "${title}" has a low-quality thumbnail`);
-          }
         } else {
           setThumbnailQuality('max');
-          if (category === 'Yoruba Movies') {
-            console.log(`[Yoruba Movie Quality Check] "${title}" has a high-quality thumbnail`);
-          }
         }
+        setIsLoading(false);
       };
       img.onerror = () => {
         setThumbnailQuality('high');
+        setIsLoading(false);
         console.log(`[Thumbnail] Falling back to hqdefault for: ${title} (${videoId})`);
       };
       img.src = maxResUrl;
-    } else if (!image || image.includes('unsplash.com')) {
+    } else {
       setThumbnailQuality('fallback');
-      console.log(`[Thumbnail] Using fallback image for: ${title} (Category: ${category})`);
+      setIsLoading(false);
     }
-  }, [videoId, title, image, category]);
+  }, [videoId, title]);
   
   const thumbnailUrl = videoId 
     ? `https://img.youtube.com/vi/${videoId}/${thumbnailQuality === 'max' ? 'maxresdefault' : 'hqdefault'}.jpg`
     : (image || getFallbackImage());
 
+  // Add query parameters for image optimization
+  const optimizedUrl = new URL(thumbnailUrl);
+  if (!thumbnailUrl.includes('youtube.com')) {
+    optimizedUrl.searchParams.set('auto', 'format');
+    optimizedUrl.searchParams.set('fit', 'crop');
+    optimizedUrl.searchParams.set('w', '400');
+    optimizedUrl.searchParams.set('q', '75');
+  }
+
   return (
-    <>
+    <AspectRatio ratio={16 / 9} className="w-full h-full">
+      {isLoading && (
+        <div className="absolute inset-0 bg-muted animate-pulse rounded-lg" />
+      )}
       <img
-        src={thumbnailError ? getFallbackImage() : thumbnailUrl}
+        src={optimizedUrl.toString()}
         alt={title}
-        className="w-full h-full object-cover rounded-lg"
+        className={`w-full h-full object-cover rounded-lg transition-opacity duration-300 ${
+          isLoading ? 'opacity-0' : 'opacity-100'
+        }`}
         onError={() => {
           console.log(`[Thumbnail] Error loading thumbnail for: ${title}`);
           setThumbnailError(true);
         }}
+        loading="lazy"
       />
       {isHovered && !isVideoPlaying && (
         <div className="absolute inset-0 bg-black bg-opacity-75 p-4 flex flex-col justify-end rounded-lg">
@@ -88,6 +99,6 @@ export const MovieThumbnail = ({ title, image, category, videoId, isHovered, isV
           )}
         </div>
       )}
-    </>
+    </AspectRatio>
   );
 };
