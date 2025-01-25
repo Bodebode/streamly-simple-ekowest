@@ -83,7 +83,7 @@ const Auth = () => {
       description: "You're browsing as a guest user. Some features may be limited.",
     });
     
-    // Navigate to home page
+    // Navigate to home page and replace the current history entry
     navigate('/', { replace: true });
   };
 
