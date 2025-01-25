@@ -8,8 +8,8 @@ import { transformCachedToMovie } from '@/utils/movie-transforms';
 const removeDuplicates = (videos: CachedMovie[]): CachedMovie[] => {
   const seen = new Set<string>();
   return videos.filter(video => {
-    const duplicate = seen.has(video.video_id);
-    seen.add(video.video_id);
+    const duplicate = seen.has(video.video_id || '');
+    seen.add(video.video_id || '');
     return !duplicate && video.video_id && video.is_available;
   }).slice(0, 12);
 };
@@ -19,6 +19,7 @@ export const useSkits = () => {
     queryKey: ['skits'],
     queryFn: async () => {
       try {
+        console.log('Fetching skits from cache...');
         const { data, error } = await supabase
           .from('cached_videos')
           .select('*')
