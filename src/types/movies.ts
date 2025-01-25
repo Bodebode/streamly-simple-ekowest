@@ -16,7 +16,7 @@ export interface CachedMovie {
 }
 
 export interface Movie {
-  id: string;
+  id: string;  // Changed from number to string to match the database
   title: string;
   image: string;
   category: string;
@@ -28,4 +28,12 @@ export interface MovieData {
   highlyRated: Movie[];
   yoruba: Movie[];
   skits: Movie[];
+}
+
+// Add User type to fix auth store typing issues
+export interface User {
+  id: string;
+  email?: string;
+  name?: string;
+  // Add other potential user properties
 }

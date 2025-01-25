@@ -1,28 +1,12 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { User } from '@/types/movies';
 
-interface AuthStore {
-  token: string | null;
-  user: {
-    email: string;
-    name: string;
-  } | null;
-  setAuth: (token: string, user: { email: string; name: string }) => void;
-  clearAuth: () => void;
+interface AuthState {
+  user: User | null;
+  setUser: (user: User | null) => void;
 }
 
-export const useAuthStore = create<AuthStore>()(
-  persist(
-    (set) => ({
-      token: null,
-      user: null,
-      setAuth: (token, user) => set({ token, user }),
-      clearAuth: () => set({ token: null, user: null }),
-    }),
-    {
-      name: 'ekowest-auth',
-      storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ token: state.token, user: state.user }),
-    }
-  )
-);
+export const useAuthStore = create<AuthState>((set) => ({
+  user: null,
+  setUser: (user) => set({ user }),
+}));
