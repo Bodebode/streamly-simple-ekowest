@@ -1,4 +1,5 @@
 import { useTheme } from 'next-themes';
+import { useEffect, useRef, useState } from 'react';
 
 interface HeroSlideProps {
   type: 'video' | 'image';
@@ -9,6 +10,23 @@ interface HeroSlideProps {
 }
 
 export const HeroSlide = ({ type, src, index, currentIndex, key }: HeroSlideProps) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (type === 'video' && index === currentIndex && !isLoaded) {
+      setIsLoaded(true);
+    }
+  }, [type, index, currentIndex, isLoaded]);
+
+  const handleVideoLoad = () => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(error => {
+        console.log('Video autoplay failed:', error);
+      });
+    }
+  };
+
   return (
     <div
       key={`${index}-${key}`}
@@ -21,17 +39,22 @@ export const HeroSlide = ({ type, src, index, currentIndex, key }: HeroSlideProp
           src={src}
           alt={`Hero Slide ${index + 1}`}
           className="w-full h-full object-cover"
+          loading="lazy"
         />
       ) : (
-        <video
-          key={key}
-          autoPlay
-          loop
-          muted
-          className="w-full h-full object-cover"
-        >
-          <source src={src} type="video/mp4" />
-        </video>
+        (index === currentIndex || isLoaded) && (
+          <video
+            ref={videoRef}
+            key={key}
+            autoPlay
+            loop
+            muted
+            className="w-full h-full object-cover"
+            onLoadedData={handleVideoLoad}
+          >
+            <source src={src} type="video/mp4" />
+          </video>
+        )
       )}
     </div>
   );

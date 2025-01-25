@@ -32,7 +32,6 @@ export const Hero = () => {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      const currentSlide = slides[currentIndex];
       setCurrentIndex((prevIndex) => 
         prevIndex === slides.length - 1 ? 0 : prevIndex + 1
       );
