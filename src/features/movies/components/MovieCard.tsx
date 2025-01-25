@@ -1,4 +1,3 @@
-// Move existing MovieCard.tsx content here, updating imports
 import { useState, useEffect } from 'react';
 import { MovieCardPreview } from './MovieCardPreview';
 import { MovieCardBase } from './MovieCardBase';
@@ -122,3 +121,4 @@ export const MovieCard = ({
       )}
     </div>
   );
+};
