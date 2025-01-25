@@ -20,7 +20,7 @@ const CategoryRowComponent = ({
   onVideoSelect, 
   updateHighlyRated 
 }: CategoryRowProps) => {
-  const [filteredMovies, setFilteredMovies] = useState<Movie[]>(movies);
+  const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
   const { isLoading } = useRelatedVideos(selectedVideoId, title, movies);
 
   const handleCloseVideo = useCallback(() => {

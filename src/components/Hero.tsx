@@ -6,7 +6,7 @@ import { HeroControls } from './hero/HeroControls';
 export const Hero = () => {
   const { theme } = useTheme();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [key, setKey] = useState(0);
+  const [themeKey, setThemeKey] = useState(0);
 
   const videoUrl = theme === 'light' 
     ? 'https://yuisywwlzorzdrzvjlvm.supabase.co/storage/v1/object/public/videos/Ekowest_Hero_Vid_White.mp4'
@@ -42,7 +42,7 @@ export const Hero = () => {
   }, [currentIndex]);
 
   useEffect(() => {
-    setKey(prev => prev + 1);
+    setThemeKey(prev => prev + 1);
   }, [theme]);
 
   const nextSlide = () => {
@@ -61,12 +61,11 @@ export const Hero = () => {
     <div className="relative w-full h-[600px] overflow-hidden mb-16">
       {slides.map((slide, index) => (
         <HeroSlide
-          key={index}
+          key={`${index}-${themeKey}`}
           type={slide.type}
           src={slide.src}
           index={index}
           currentIndex={currentIndex}
-          key={key}
         />
       ))}
 
