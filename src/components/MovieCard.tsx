@@ -40,18 +40,19 @@ export const MovieCard = ({
         const { data, error } = await supabase
           .from('user_movie_lists')
           .select('movie_id')
-          .eq('user_id', user.id) // Using the actual UUID from auth
+          .eq('user_id', user.id)
           .eq('movie_id', id)
           .single();
         
-        if (error) throw error;
+        if (error) {
+          // Only log the error, don't show toast
+          console.error('Error checking movie list status:', error);
+          return;
+        }
         setIsInList(!!data);
       } catch (error) {
-        console.error('Error checking movie list status:', error);
-        // Don't show error toast for auth-related issues
-        if (error.code !== 'PGRST116') {
-          toast.error('Failed to check movie list status');
-        }
+        // Only log the error, don't show toast
+        console.error('Error in movie list check:', error);
       }
     };
 
