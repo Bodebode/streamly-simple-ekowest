@@ -342,55 +342,23 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
-      validate_yoruba_criteria:
-        | {
-            Args: {
-              p_duration: number
-              p_quality: string
-              p_views: number
-              p_language_tags: string[]
-              p_channel_metadata: Json
-              p_content_tags: string[]
-              p_like_ratio: number
-              p_cultural_elements: string[]
-              p_storytelling_pattern: string
-              p_setting_authenticity: boolean
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_duration: number
-              p_quality: string
-              p_views: number
-              p_language_tags: string[]
-              p_channel_metadata: Json
-              p_content_tags: string[]
-              p_like_ratio: number
-              p_cultural_elements: string[]
-              p_storytelling_pattern: string
-              p_setting_authenticity: boolean
-              p_thumbnail_url: string
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_duration: number
-              p_quality: string
-              p_views: number
-              p_language_tags: string[]
-              p_channel_metadata: Json
-              p_content_tags: string[]
-              p_like_ratio: number
-              p_cultural_elements: string[]
-              p_storytelling_pattern: string
-              p_setting_authenticity: boolean
-              p_thumbnail_url: string
-              p_is_embeddable: boolean
-            }
-            Returns: Json
-          }
+      validate_yoruba_criteria: {
+        Args: {
+          p_duration: number
+          p_quality: string
+          p_views: number
+          p_language_tags: string[]
+          p_channel_metadata: Json
+          p_content_tags: string[]
+          p_like_ratio: number
+          p_cultural_elements: string[]
+          p_storytelling_pattern: string
+          p_setting_authenticity: boolean
+          p_thumbnail_url?: string
+          p_is_embeddable?: boolean
+        }
+        Returns: Json
+      }
       your_function_name: {
         Args: Record<PropertyKey, never>
         Returns: undefined
