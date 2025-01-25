@@ -9,7 +9,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// Create Supabase client
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!
 const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 const supabase = createClient(supabaseUrl, supabaseKey)
@@ -28,7 +27,9 @@ serve(async (req) => {
       .from('cached_videos')
       .select('*')
       .eq('category', 'Skits')
+      .eq('is_available', true)
       .gt('expires_at', new Date().toISOString())
+      .order('access_count', { ascending: false })
       .limit(12)
 
     if (cacheError) {
@@ -47,10 +48,10 @@ serve(async (req) => {
       throw new Error('YouTube API key not configured')
     }
 
-    // Search for Nigerian comedy skits
+    // Search for Nigerian comedy skits with more specific parameters
     console.log('Fetching skits from YouTube API')
     const searchResponse = await fetch(
-      `${BASE_URL}/search?part=snippet&q=nigerian+comedy+skit&type=video&maxResults=50&key=${API_KEY}`
+      `${BASE_URL}/search?part=snippet&q=nigerian+comedy+skit+funny&type=video&maxResults=50&relevanceLanguage=en&videoDuration=short&key=${API_KEY}`
     )
 
     if (!searchResponse.ok) {
@@ -60,6 +61,7 @@ serve(async (req) => {
     const searchData = await searchResponse.json()
 
     if (!searchData.items || searchData.items.length === 0) {
+      console.error('No items returned from YouTube API')
       return new Response(JSON.stringify([]), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })

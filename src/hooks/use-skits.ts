@@ -24,31 +24,43 @@ export const useSkits = () => {
           .eq('is_available', true)
           .gt('expires_at', new Date().toISOString())
           .order('access_count', { ascending: false })
-          .limit(24); // Increased limit to ensure enough unique videos
+          .limit(24);
         
         if (error) {
           console.error('Error fetching skits:', error);
-          toast.error('Failed to load skits');
-          return MOCK_MOVIES.skits;
+          throw error;
         }
 
         if (!data || data.length === 0) {
-          console.log('No skits found, using mock data');
-          return MOCK_MOVIES.skits;
+          console.log('No skits found in cache, invoking edge function');
+          const { data: freshData, error: functionError } = await supabase.functions.invoke('get-skits');
+          
+          if (functionError) {
+            console.error('Error fetching fresh skits:', functionError);
+            return MOCK_MOVIES.skits;
+          }
+
+          if (!freshData || freshData.length === 0) {
+            console.log('No fresh skits found, using mock data');
+            return MOCK_MOVIES.skits;
+          }
+
+          return freshData;
         }
 
         // Filter for unique videos and ensure minimum count
         const uniqueVideos = removeDuplicates(data);
         
         if (uniqueVideos.length < 12) {
-          console.log('Not enough unique skits, using mock data');
-          return MOCK_MOVIES.skits;
-        }
+          console.log('Not enough unique skits, fetching fresh data');
+          const { data: freshData, error: functionError } = await supabase.functions.invoke('get-skits');
+          
+          if (functionError || !freshData) {
+            return MOCK_MOVIES.skits;
+          }
 
-        // Increment access count for retrieved videos
-        uniqueVideos.forEach(video => {
-          supabase.rpc('increment_access_count', { video_id: video.id });
-        });
+          return freshData;
+        }
 
         return uniqueVideos;
       } catch (error) {
@@ -59,6 +71,8 @@ export const useSkits = () => {
     },
     staleTime: 1000 * 60 * 30, // Consider data fresh for 30 minutes
     gcTime: 1000 * 60 * 60, // Keep in cache for 1 hour
-    retry: 1,
+    retry: 2,
+    refetchOnMount: true,
+    initialData: MOCK_MOVIES.skits, // Provide initial data while loading
   });
 };
