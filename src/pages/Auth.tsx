@@ -1,13 +1,15 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { AuthUI } from '@/components/AuthUI';
 import { useToast } from '@/hooks/use-toast';
 import { AuthError } from '@supabase/supabase-js';
 import { Button } from '@/components/ui/button';
+import { MainLayout } from '@/layouts/MainLayout';
 
 const Auth = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -50,7 +52,8 @@ const Auth = () => {
       console.log('Auth event:', event);
       
       if (event === 'SIGNED_IN' && session) {
-        navigate('/');
+        const returnTo = location.state?.from?.pathname || '/';
+        navigate(returnTo);
       } else if (event === 'SIGNED_OUT') {
         navigate('/auth');
       } else if (event === 'PASSWORD_RECOVERY') {
@@ -80,7 +83,7 @@ const Auth = () => {
       subscription.unsubscribe();
       errorSubscription.unsubscribe();
     };
-  }, [navigate, toast]);
+  }, [navigate, toast, location]);
 
   const handleContinueAsGuest = () => {
     toast({
@@ -91,30 +94,44 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-koya-background py-12 px-4 sm:px-6 lg:px-8">
-      <AuthUI />
-      <div className="mt-8 w-full max-w-[400px]">
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
+    <MainLayout>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-koya-background py-12 px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-md space-y-8">
+          <div>
+            <h2 className="mt-6 text-center text-3xl font-bold tracking-tight">
+              Welcome to Ekowest TV
+            </h2>
+            <p className="mt-2 text-center text-sm text-muted-foreground">
+              Sign in to access your personalized content
+            </p>
           </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-gray-50 dark:bg-koya-background text-gray-500">
-              or
-            </span>
+          
+          <AuthUI />
+          
+          <div className="mt-8">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-gray-50 dark:bg-koya-background text-gray-500">
+                  or
+                </span>
+              </div>
+            </div>
+            <div className="mt-6">
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={handleContinueAsGuest}
+              >
+                Continue as Guest
+              </Button>
+            </div>
           </div>
-        </div>
-        <div className="mt-6">
-          <Button 
-            variant="outline" 
-            className="w-full"
-            onClick={handleContinueAsGuest}
-          >
-            Continue as Guest
-          </Button>
         </div>
       </div>
-    </div>
+    </MainLayout>
   );
 };
 
