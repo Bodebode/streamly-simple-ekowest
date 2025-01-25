@@ -35,15 +35,8 @@ export const useSkits = () => {
         }
 
         if (!data || data.length === 0) {
-          console.log('No skits found in cache, invoking edge function');
-          const { data: freshData, error: functionError } = await supabase.functions.invoke('get-skits');
-          
-          if (functionError || !freshData || freshData.length === 0) {
-            console.log('No fresh skits found, using mock data');
-            return MOCK_MOVIES.skits;
-          }
-
-          return transformCachedToMovie(freshData as CachedMovie[]);
+          console.log('No skits found in cache, using mock data');
+          return MOCK_MOVIES.skits;
         }
 
         // Filter for unique videos and ensure minimum count
