@@ -20,63 +20,59 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
       fetch(`https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v=${videoId}&format=json`)
         .then(response => {
           if (!response.ok) {
-            console.error(`[VideoPlayer] Video ${videoId} is not available`);
-            toast.error('This video is not available for playback');
-            onClose();
+            throw new Error('Video not available');
           }
+          return response.json();
         })
         .catch(error => {
-          console.error(`[VideoPlayer] Error checking video availability:`, error);
-          toast.error('Unable to verify video availability');
+          console.error('[VideoPlayer] Error checking video availability:', error);
+          toast.error('This video is not available');
+          onClose();
         });
     }
   }, [videoId, onClose]);
 
   useEffect(() => {
-    const handleEscKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && document.fullscreenElement) {
-        document.exitFullscreen()
-          .then(() => setIsFullscreen(false))
-          .catch(err => {
-            console.error(`[VideoPlayer] Error exiting fullscreen:`, err);
-            toast.error('Unable to exit fullscreen mode');
-          });
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        if (isFullscreen) {
+          document.exitFullscreen().catch(console.error);
+        } else {
+          onClose();
+        }
       }
     };
 
-    document.addEventListener('keydown', handleEscKey);
-    return () => document.removeEventListener('keydown', handleEscKey);
-  }, []);
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [isFullscreen, onClose]);
 
-  const handleFullscreen = () => {
+  const handleFullscreen = async () => {
     if (!document.fullscreenElement) {
-      containerRef.current?.requestFullscreen()
-        .then(() => setIsFullscreen(true))
-        .catch(err => {
-          console.error(`[VideoPlayer] Error attempting to enable fullscreen:`, err);
-          toast.error('Unable to enter fullscreen mode');
-        });
+      try {
+        await containerRef.current?.requestFullscreen();
+        setIsFullscreen(true);
+      } catch (error) {
+        console.error('[VideoPlayer] Fullscreen error:', error);
+        toast.error('Fullscreen mode is not supported');
+      }
     } else {
-      document.exitFullscreen()
-        .then(() => setIsFullscreen(false))
-        .catch(err => {
-          console.error(`[VideoPlayer] Error attempting to exit fullscreen:`, err);
-          toast.error('Unable to exit fullscreen mode');
-        });
+      try {
+        await document.exitFullscreen();
+        setIsFullscreen(false);
+      } catch (error) {
+        console.error('[VideoPlayer] Exit fullscreen error:', error);
+      }
     }
   };
 
   const toggleDimming = () => {
     setIsDimmed(!isDimmed);
-    if (!isDimmed) {
-      document.body.classList.add('dimmed');
-    } else {
-      document.body.classList.remove('dimmed');
-    }
+    document.body.style.backgroundColor = !isDimmed ? '#000' : '';
   };
 
   const handleIframeError = () => {
-    console.error(`[VideoPlayer] Error loading video: ${videoId}`);
+    console.error('[VideoPlayer] Error loading video iframe');
     toast.error('Error loading video');
     onClose();
   };
