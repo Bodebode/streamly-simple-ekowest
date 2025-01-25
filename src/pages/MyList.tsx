@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Navbar } from '../components/Navbar';
-import { MovieCard } from '../components/MovieCard';
+import { Navbar } from '@/layouts/Navbar';
+import { MovieCard } from '@/components/MovieCard';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/auth-store';
 import { toast } from 'sonner';

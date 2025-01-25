@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { Youtube, ExternalLink, Mail } from 'lucide-react';
 
 export const Footer = () => {
   return (
