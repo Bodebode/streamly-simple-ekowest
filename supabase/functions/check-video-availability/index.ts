@@ -11,28 +11,36 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Even if no videoId is provided, we should return a valid JSON response
-    const result = {
+    let result = {
       available: false,
       status: 404,
       videoId: null,
       message: 'No video ID provided'
     };
 
-    // Try to parse the request body
     if (req.body) {
-      const { videoId } = await req.json();
-      
-      if (videoId) {
-        // Try to fetch video info from YouTube's oembed endpoint
-        const response = await fetch(
-          `https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v=${videoId}&format=json`
-        );
+      try {
+        const { videoId } = await req.json();
+        
+        if (videoId) {
+          console.log('Checking availability for video:', videoId);
+          
+          const response = await fetch(
+            `https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v=${videoId}&format=json`
+          );
 
-        result.available = response.ok;
-        result.status = response.status;
-        result.videoId = videoId;
-        result.message = response.ok ? 'Video is available' : 'Video is not available';
+          result = {
+            available: response.ok,
+            status: response.status,
+            videoId,
+            message: response.ok ? 'Video is available' : 'Video is not available'
+          };
+          
+          console.log('Video availability result:', result);
+        }
+      } catch (parseError) {
+        console.error('Error parsing request body:', parseError);
+        result.message = 'Invalid request format';
       }
     }
 
@@ -40,7 +48,7 @@ Deno.serve(async (req) => {
       JSON.stringify(result),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 
+        status: 200
       }
     );
 
@@ -51,11 +59,12 @@ Deno.serve(async (req) => {
         error: error.message,
         available: false,
         status: 500,
-        message: 'Internal server error'
+        message: 'Internal server error',
+        videoId: null
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 // Still return 200 to handle the error gracefully on client
+        status: 200 // Return 200 to handle errors gracefully on client
       }
     );
   }
