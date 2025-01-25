@@ -1,6 +1,5 @@
 import { Hero } from '../components/Hero';
 import { CategoryRow } from '../components/CategoryRow';
-import { Navbar } from '../components/Navbar';
 import { Moon, Sun, RefreshCw } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
@@ -14,7 +13,7 @@ import { usePopulateSections } from '@/hooks/use-populate-sections';
 import { transformCachedToMovie } from '@/utils/movie-transforms';
 import { CachedMovie } from '@/types/movies';
 import { useLocation } from 'react-router-dom';
-import { MainFooter } from '@/components/MainFooter';
+import { MainLayout } from '@/layouts/MainLayout';
 
 const Index = () => {
   const { theme, setTheme } = useTheme();
@@ -34,8 +33,7 @@ const Index = () => {
   });
 
   return (
-    <div className="min-h-screen">
-      <Navbar />
+    <MainLayout showMainFooter>
       <div className="fixed bottom-4 right-4 z-50 flex gap-2">
         <Button
           variant="outline"
@@ -93,9 +91,8 @@ const Index = () => {
             />
           </div>
         </div>
-        <MainFooter />
       </div>
-    </div>
+    </MainLayout>
   );
 };
 

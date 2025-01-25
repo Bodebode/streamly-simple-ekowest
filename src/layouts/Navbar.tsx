@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Drum, Coins, Search, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
 import { useAuthStore } from '@/stores/auth-store';
 import { cn } from '@/lib/utils';
 
