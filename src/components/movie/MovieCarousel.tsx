@@ -8,13 +8,7 @@ import {
 import { MovieCard } from '../MovieCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { memo } from 'react';
-import { Movie } from '@/types/movies';
-
-interface MovieCarouselProps {
-  movies: Movie[];
-  onMovieSelect: (videoId: string | null) => void;
-  isVideoPlaying: boolean;
-}
+import { MovieCarouselProps, Movie } from '@/types/movies';
 
 const MovieCarouselComponent = ({ movies, onMovieSelect, isVideoPlaying }: MovieCarouselProps) => {
   const isMobile = useIsMobile();

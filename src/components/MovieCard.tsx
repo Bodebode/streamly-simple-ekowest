@@ -6,16 +6,7 @@ import { useMovieCardPreview } from './movie/MovieCardPreviewHandler';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/auth-store';
 import { toast } from 'sonner';
-
-interface MovieCardProps {
-  id: string;
-  title: string;
-  image: string;
-  category: string;
-  videoId?: string;
-  onMovieSelect: (videoId: string) => void;
-  isVideoPlaying: boolean;
-}
+import { MovieCardProps } from '@/types/movies';
 
 export const MovieCard = ({ 
   id, 

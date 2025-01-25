@@ -35,3 +35,28 @@ export interface User {
   email?: string;
   name?: string;
 }
+
+// Ensure all components use this type for movie-related props
+export interface MovieCardProps {
+  id: string;
+  title: string;
+  image: string;
+  category: string;
+  videoId?: string;
+  onMovieSelect: (videoId: string) => void;
+  isVideoPlaying: boolean;
+}
+
+export interface CategoryRowProps {
+  title: string;
+  movies: Movie[];
+  selectedVideoId: string | null;
+  onVideoSelect: (videoId: string | null) => void;
+  updateHighlyRated?: (movies: Movie[]) => void;
+}
+
+export interface MovieCarouselProps {
+  movies: Movie[];
+  onMovieSelect: (videoId: string | null) => void;
+  isVideoPlaying: boolean;
+}
