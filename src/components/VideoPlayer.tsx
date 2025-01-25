@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { VideoControls } from './video/VideoControls';
 import { VideoIframe } from './video/VideoIframe';
+import { VideoErrorBoundary } from './video/VideoErrorBoundary';
 
 interface VideoPlayerProps {
   videoId: string | null;
@@ -9,8 +10,8 @@ interface VideoPlayerProps {
 }
 
 export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isDimmed, setIsDimmed] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [isDimmed, setIsDimmed] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -88,7 +89,9 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
         onDimming={toggleDimming}
         onClose={onClose}
       />
-      <VideoIframe videoId={videoId} onError={handleIframeError} />
+      <VideoErrorBoundary>
+        <VideoIframe videoId={videoId} onError={handleIframeError} />
+      </VideoErrorBoundary>
     </div>
   );
 };

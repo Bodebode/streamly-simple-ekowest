@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/auth-store';
 import { toast } from 'sonner';
 import { MovieCardProps } from '@/types/movies';
+import { VideoErrorBoundary } from './video/VideoErrorBoundary';
 
 export const MovieCard = ({ 
   id, 
@@ -17,11 +18,11 @@ export const MovieCard = ({
   onMovieSelect, 
   isVideoPlaying 
 }: MovieCardProps) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
-  const [showTitle, setShowTitle] = useState(true);
-  const [isInList, setIsInList] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [showPreview, setShowPreview] = useState<boolean>(false);
+  const [showTitle, setShowTitle] = useState<boolean>(true);
+  const [isInList, setIsInList] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { user } = useAuthStore();
 
   const { handleMouseEnter, handleMouseLeave, clearTimers } = useMovieCardPreview({
@@ -35,14 +36,20 @@ export const MovieCard = ({
     const checkIfInList = async () => {
       if (!user?.id) return;
       
-      const { data } = await supabase
-        .from('user_movie_lists')
-        .select('movie_id')
-        .eq('user_id', user.id)
-        .eq('movie_id', id)
-        .single();
-      
-      setIsInList(!!data);
+      try {
+        const { data, error } = await supabase
+          .from('user_movie_lists')
+          .select('movie_id')
+          .eq('user_id', user.id)
+          .eq('movie_id', id)
+          .single();
+        
+        if (error) throw error;
+        setIsInList(!!data);
+      } catch (error) {
+        console.error('Error checking movie list status:', error);
+        toast.error('Failed to check movie list status');
+      }
     };
 
     checkIfInList();
@@ -91,24 +98,26 @@ export const MovieCard = ({
         />
       )}
       
-      {showPreview && videoId && !isVideoPlaying ? (
-        <MovieCardPreview
-          videoId={videoId}
-          title={title}
-          category={category}
-          showTitle={showTitle}
-          onClick={handleClick}
-        />
-      ) : (
-        <MovieCardBase
-          title={title}
-          image={image}
-          category={category}
-          videoId={videoId}
-          isHovered={isHovered}
-          isVideoPlaying={isVideoPlaying}
-        />
-      )}
+      <VideoErrorBoundary>
+        {showPreview && videoId && !isVideoPlaying ? (
+          <MovieCardPreview
+            videoId={videoId}
+            title={title}
+            category={category}
+            showTitle={showTitle}
+            onClick={handleClick}
+          />
+        ) : (
+          <MovieCardBase
+            title={title}
+            image={image}
+            category={category}
+            videoId={videoId}
+            isHovered={isHovered}
+            isVideoPlaying={isVideoPlaying}
+          />
+        )}
+      </VideoErrorBoundary>
     </div>
   );
 };
