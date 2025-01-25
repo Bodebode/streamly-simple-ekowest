@@ -6,7 +6,6 @@ import { useMovieCardPreview } from './MovieCardPreviewHandler';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/auth-store';
 import { toast } from 'sonner';
-import { Movie } from '@/types/movies';
 
 interface MovieCardProps {
   id: string;
