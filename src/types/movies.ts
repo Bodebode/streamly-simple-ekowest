@@ -16,7 +16,7 @@ export interface CachedMovie {
 }
 
 export interface Movie {
-  id: string;
+  id: string;  // Changed from number to string to match database
   title: string;
   image: string;
   category: string;
@@ -36,9 +36,8 @@ export interface User {
   name?: string;
 }
 
-// Ensure all components use this type for movie-related props
 export interface MovieCardProps {
-  id: string;
+  id: string;  // Changed from number to string
   title: string;
   image: string;
   category: string;

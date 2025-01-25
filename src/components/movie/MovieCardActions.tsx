@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface MovieCardActionsProps {
   id: string;
-  userId: string | undefined;
+  userId: string;
   isInList: boolean;
   isLoading: boolean;
 }
