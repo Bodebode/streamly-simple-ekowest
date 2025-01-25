@@ -1,6 +1,6 @@
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { useState, memo, useCallback, useEffect } from 'react';
-import { MovieCarousel } from './MovieCarousel';
+import { MovieCarousel } from '@/components/movie/MovieCarousel';
 import { useRelatedVideos } from '@/hooks/use-related-videos';
 import { checkVideoAvailability } from '@/utils/video-validation';
 import { Movie } from '@/types/movies';

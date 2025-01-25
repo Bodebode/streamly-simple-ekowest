@@ -38,7 +38,7 @@ export const Hero = () => {
     }, slides[currentIndex].duration);
 
     return () => clearInterval(timer);
-  }, [currentIndex]);
+  }, [currentIndex, slides]);
 
   useEffect(() => {
     setThemeKey(prev => prev + 1);
