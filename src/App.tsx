@@ -42,6 +42,7 @@ const App = () => {
             <BrowserRouter>
               <Routes>
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/login" element={<Navigate to="/auth" replace />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/watch2earn" element={<Watch2Earn />} />
                 <Route 
