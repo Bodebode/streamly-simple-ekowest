@@ -12,7 +12,7 @@ const CategoryRowComponent = ({
   onVideoSelect, 
   updateHighlyRated 
 }: CategoryRowProps) => {
-  const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
+  const [filteredMovies, setFilteredMovies] = useState(movies);
   const { isLoading } = useRelatedVideos(selectedVideoId, title, movies);
 
   const handleCloseVideo = useCallback(() => {
@@ -31,11 +31,18 @@ const CategoryRowComponent = ({
   const isPlayingInThisRow = selectedVideoId && movies.some(movie => movie.videoId === selectedVideoId);
 
   return (
-    <div className="mb-16">
+    <section 
+      className="mb-16"
+      aria-label={`${title} movie category`}
+    >
       <h2 className="text-xl md:text-2xl font-bold mb-4 px-4 md:text-center">
         {title} {isLoading && title === 'Comedy' && '(Loading...)'}
       </h2>
-      <div className="relative px-4 md:px-16">
+      <div 
+        className="relative px-4 md:px-16"
+        role="region"
+        aria-label={`Scrollable ${title} movies`}
+      >
         <MovieCarousel
           movies={filteredMovies}
           onMovieSelect={onVideoSelect}
@@ -45,7 +52,7 @@ const CategoryRowComponent = ({
           <VideoPlayer videoId={selectedVideoId} onClose={handleCloseVideo} />
         )}
       </div>
-    </div>
+    </section>
   );
 };
 

@@ -76,6 +76,13 @@ export const MovieCard = ({
     }
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleClick();
+    }
+  };
+
   return (
     <div
       className="relative movie-card w-full h-[210px] md:h-[300px] rounded-lg cursor-pointer group"
@@ -88,6 +95,10 @@ export const MovieCard = ({
         handleMouseLeave();
       }}
       onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
+      aria-label={`Play ${title} - ${category}`}
     >
       {user && (
         <MovieCardActions

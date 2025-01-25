@@ -10,7 +10,7 @@ interface MovieCardActionsProps {
 }
 
 export const MovieCardActions = ({ id, userId, isInList, isLoading }: MovieCardActionsProps) => {
-  const toggleMyList = async (e: React.MouseEvent) => {
+  const toggleMyList = async (e: React.MouseEvent | React.KeyboardEvent) => {
     e.stopPropagation();
     
     if (!userId) {
@@ -40,19 +40,29 @@ export const MovieCardActions = ({ id, userId, isInList, isLoading }: MovieCardA
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleMyList(e);
+    }
+  };
+
   return (
     <button
-      onClick={toggleMyList}
+      onClick={(e) => toggleMyList(e)}
+      onKeyDown={handleKeyDown}
       disabled={isLoading}
+      aria-label={isInList ? 'Remove from My List' : 'Add to My List'}
+      aria-pressed={isInList}
       className={`absolute top-2 right-2 z-10 p-1.5 rounded-full 
         transition-all duration-200 
         ${isInList ? 'bg-green-500 hover:bg-green-600' : 'bg-black/50 hover:bg-black/70'}
         ${isLoading ? 'cursor-not-allowed' : ''}`}
     >
       {isInList ? (
-        <Check className="w-4 h-4 text-white" />
+        <Check className="w-4 h-4 text-white" aria-hidden="true" />
       ) : (
-        <Plus className="w-4 h-4 text-white" />
+        <Plus className="w-4 h-4 text-white" aria-hidden="true" />
       )}
     </button>
   );
