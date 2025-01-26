@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 import { MOCK_MOVIES } from '@/data/mockMovies';
 import { CachedMovie, Movie } from '@/types/movies';
 import { transformCachedToMovie } from '@/utils/movie-transforms';
@@ -23,12 +22,12 @@ export const useNewReleases = () => {
         
         if (error) {
           console.error('Error fetching new releases:', error);
-          return MOCK_MOVIES.trending;
+          return MOCK_MOVIES.newReleases;
         }
         
         if (!data || data.length === 0) {
           console.log('No new releases found, using mock data');
-          return MOCK_MOVIES.trending;
+          return MOCK_MOVIES.newReleases;
         }
 
         const movies = transformCachedToMovie(data as CachedMovie[]);
@@ -36,10 +35,10 @@ export const useNewReleases = () => {
         return movies;
       } catch (error) {
         console.error('Error in new releases query:', error);
-        return MOCK_MOVIES.trending;
+        return MOCK_MOVIES.newReleases;
       }
     },
-    initialData: MOCK_MOVIES.trending,
+    initialData: MOCK_MOVIES.newReleases,
     staleTime: 1000 * 60 * 15, // 15 minutes
     gcTime: 1000 * 60 * 30, // 30 minutes
   });

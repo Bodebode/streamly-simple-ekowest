@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 import { MOCK_MOVIES } from '@/data/mockMovies';
 import { CachedMovie, Movie } from '@/types/movies';
 import { transformCachedToMovie } from '@/utils/movie-transforms';
@@ -19,7 +18,7 @@ export const useSkits = () => {
           .gt('expires_at', new Date().toISOString())
           .lt('duration', 600) // Less than 10 minutes
           .gt('views', 10000) // At least 10k views
-          .order('access_count', { ascending: false })
+          .order('views', { ascending: false })
           .limit(12);
         
         if (error) {

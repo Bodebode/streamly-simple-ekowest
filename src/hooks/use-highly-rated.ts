@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 import { MOCK_MOVIES } from '@/data/mockMovies';
 import { CachedMovie, Movie } from '@/types/movies';
 import { transformCachedToMovie } from '@/utils/movie-transforms';
@@ -19,7 +18,7 @@ export const useHighlyRated = () => {
           .gt('expires_at', new Date().toISOString())
           .gt('views', 500000)  // Only videos with more than 500k views
           .gt('like_ratio', 0.8) // High like ratio
-          .order('access_count', { ascending: false })
+          .order('views', { ascending: false })
           .limit(12);
         
         if (error) {

@@ -13,14 +13,19 @@ export interface CachedMovie {
   access_count?: number;
   is_available?: boolean;
   video_quality?: string;
+  like_ratio?: number;
 }
 
 export interface Movie {
-  id: string;  // Changed from number to string to match database
+  id: string;
   title: string;
   image: string;
   category: string;
   videoId?: string;
+  views?: number;
+  duration?: number;
+  publishedAt?: string;
+  likeRatio?: number;
 }
 
 export interface MovieData {
@@ -28,16 +33,11 @@ export interface MovieData {
   highlyRated: Movie[];
   yoruba: Movie[];
   skits: Movie[];
-}
-
-export interface User {
-  id: string;
-  email?: string;
-  name?: string;
+  newReleases: Movie[];
 }
 
 export interface MovieCardProps {
-  id: string;  // Changed from number to string
+  id: string;
   title: string;
   image: string;
   category: string;
