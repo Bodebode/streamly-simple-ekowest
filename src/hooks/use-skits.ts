@@ -2,21 +2,15 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { MOCK_MOVIES } from '@/data/mockMovies';
-
-const removeDuplicates = (videos: any[]): any[] => {
-  const seen = new Set<string>();
-  return videos.filter(video => {
-    const duplicate = seen.has(video.video_id);
-    seen.add(video.video_id);
-    return !duplicate && video.video_id && video.is_available;
-  }).slice(0, 12);
-};
+import { CachedMovie, Movie } from '@/types/movies';
+import { transformCachedToMovie } from '@/utils/movie-transforms';
 
 export const useSkits = () => {
   return useQuery({
     queryKey: ['skits'],
     queryFn: async () => {
       try {
+        console.log('Fetching skits...');
         const { data, error } = await supabase
           .from('cached_videos')
           .select('*')
@@ -24,11 +18,10 @@ export const useSkits = () => {
           .eq('is_available', true)
           .gt('expires_at', new Date().toISOString())
           .order('access_count', { ascending: false })
-          .limit(24); // Increased limit to ensure enough unique videos
+          .limit(12);
         
         if (error) {
           console.error('Error fetching skits:', error);
-          toast.error('Failed to load skits');
           return MOCK_MOVIES.skits;
         }
 
@@ -37,28 +30,17 @@ export const useSkits = () => {
           return MOCK_MOVIES.skits;
         }
 
-        // Filter for unique videos and ensure minimum count
-        const uniqueVideos = removeDuplicates(data);
-        
-        if (uniqueVideos.length < 12) {
-          console.log('Not enough unique skits, using mock data');
-          return MOCK_MOVIES.skits;
-        }
-
-        // Increment access count for retrieved videos
-        uniqueVideos.forEach(video => {
-          supabase.rpc('increment_access_count', { video_id: video.id });
-        });
-
-        return uniqueVideos;
+        // Transform cached videos to Movie type
+        const movies = transformCachedToMovie(data as CachedMovie[]);
+        console.log(`Found ${movies.length} skits`);
+        return movies;
       } catch (error) {
         console.error('Error in skits query:', error);
-        toast.error('Failed to load skits');
         return MOCK_MOVIES.skits;
       }
     },
-    staleTime: 1000 * 60 * 30, // Consider data fresh for 30 minutes
-    gcTime: 1000 * 60 * 60, // Keep in cache for 1 hour
-    retry: 1,
+    initialData: MOCK_MOVIES.skits,
+    staleTime: 1000 * 60 * 30, // 30 minutes
+    gcTime: 1000 * 60 * 60, // 1 hour
   });
 };
