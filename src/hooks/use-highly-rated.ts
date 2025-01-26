@@ -17,6 +17,8 @@ export const useHighlyRated = () => {
           .eq('category', 'Highly Rated')
           .eq('is_available', true)
           .gt('expires_at', new Date().toISOString())
+          .gt('views', 500000)  // Only videos with more than 500k views
+          .gt('like_ratio', 0.8) // High like ratio
           .order('access_count', { ascending: false })
           .limit(12);
         
@@ -30,7 +32,6 @@ export const useHighlyRated = () => {
           return MOCK_MOVIES.highlyRated;
         }
 
-        // Transform cached videos to Movie type
         const movies = transformCachedToMovie(data as CachedMovie[]);
         console.log(`Found ${movies.length} highly rated videos`);
         return movies;

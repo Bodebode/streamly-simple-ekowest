@@ -17,7 +17,8 @@ export const useNewReleases = () => {
           .eq('category', 'New Release')
           .eq('is_available', true)
           .gt('expires_at', new Date().toISOString())
-          .order('cached_at', { ascending: false })
+          .gt('published_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()) // Last 30 days
+          .order('published_at', { ascending: false })
           .limit(12);
         
         if (error) {
@@ -30,7 +31,6 @@ export const useNewReleases = () => {
           return MOCK_MOVIES.trending;
         }
 
-        // Transform cached videos to Movie type
         const movies = transformCachedToMovie(data as CachedMovie[]);
         console.log(`Found ${movies.length} new releases`);
         return movies;

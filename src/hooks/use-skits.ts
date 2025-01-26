@@ -17,6 +17,8 @@ export const useSkits = () => {
           .eq('category', 'Skits')
           .eq('is_available', true)
           .gt('expires_at', new Date().toISOString())
+          .lt('duration', 600) // Less than 10 minutes
+          .gt('views', 10000) // At least 10k views
           .order('access_count', { ascending: false })
           .limit(12);
         
@@ -30,7 +32,6 @@ export const useSkits = () => {
           return MOCK_MOVIES.skits;
         }
 
-        // Transform cached videos to Movie type
         const movies = transformCachedToMovie(data as CachedMovie[]);
         console.log(`Found ${movies.length} skits`);
         return movies;
