@@ -69,18 +69,21 @@ const Index = () => {
             movies={highlyRatedVideos ? transformCachedToMovie(highlyRatedVideos as unknown as CachedMovie[]) : MOCK_MOVIES.highlyRated}
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
+            refetchFunction={refetchHighlyRated}
           />
           <CategoryRow 
             title="Yoruba Movies" 
             movies={yorubaMovies || []}
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
+            refetchFunction={refetchYoruba}
           />
           <CategoryRow 
             title="Skits" 
             movies={skits ? transformCachedToMovie(skits as unknown as CachedMovie[]) : MOCK_MOVIES.skits}
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
+            refetchFunction={refetchSkits}
           />
           <div ref={newReleaseRef}>
             <CategoryRow 
@@ -88,6 +91,7 @@ const Index = () => {
               movies={newReleases ? transformCachedToMovie(newReleases as unknown as CachedMovie[]) : MOCK_MOVIES.highlyRated}
               selectedVideoId={selectedVideoId}
               onVideoSelect={setSelectedVideoId}
+              refetchFunction={refetchNewReleases}
             />
           </div>
         </div>

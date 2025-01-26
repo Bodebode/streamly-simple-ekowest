@@ -4,16 +4,19 @@ import { MovieCarousel } from './movie/MovieCarousel';
 import { useRelatedVideos } from '@/hooks/use-related-videos';
 import { checkVideoAvailability } from '@/utils/video-validation';
 import { CategoryRowProps } from '@/types/movies';
+import { useSectionVisibility } from '@/hooks/use-section-visibility';
 
 const CategoryRowComponent = ({ 
   title, 
   movies, 
   selectedVideoId, 
   onVideoSelect, 
-  updateHighlyRated 
+  updateHighlyRated,
+  refetchFunction 
 }: CategoryRowProps) => {
   const [filteredMovies, setFilteredMovies] = useState(movies);
   const { isLoading } = useRelatedVideos(selectedVideoId, title, movies);
+  const isVisible = useSectionVisibility(title, filteredMovies, refetchFunction);
 
   const handleCloseVideo = useCallback(() => {
     onVideoSelect(null);
@@ -29,6 +32,10 @@ const CategoryRowComponent = ({
   }, [movies]);
 
   const isPlayingInThisRow = selectedVideoId && movies.some(movie => movie.videoId === selectedVideoId);
+
+  if (!isVisible) {
+    return null;
+  }
 
   return (
     <section 
