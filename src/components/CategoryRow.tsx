@@ -3,7 +3,7 @@ import { useState, memo, useCallback, useEffect } from 'react';
 import { MovieCarousel } from './movie/MovieCarousel';
 import { useRelatedVideos } from '@/hooks/use-related-videos';
 import { checkVideoAvailability } from '@/utils/video-validation';
-import { CategoryRowProps, Movie } from '@/types/movies';
+import { CategoryRowProps } from '@/types/movies';
 
 const CategoryRowComponent = ({ 
   title, 
@@ -12,7 +12,7 @@ const CategoryRowComponent = ({
   onVideoSelect, 
   updateHighlyRated 
 }: CategoryRowProps) => {
-  const [filteredMovies, setFilteredMovies] = useState<Movie[]>(movies);
+  const [filteredMovies, setFilteredMovies] = useState(movies);
   const { isLoading } = useRelatedVideos(selectedVideoId, title, movies);
 
   const handleCloseVideo = useCallback(() => {

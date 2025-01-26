@@ -89,254 +89,235 @@ const trendingMovies = [
 
 const highlyRatedMovies = [
   {
-    id: "hr1",
+    id: "1",
     title: "The Matrix Code",
     image: "https://img.youtube.com/vi/pY4L5IXFXPA/maxresdefault.jpg",
     category: "Highly Rated",
-    videoId: "pY4L5IXFXPA",
-    views: 750000,
-    likeRatio: 0.85
+    videoId: "pY4L5IXFXPA"
   },
   {
-    id: "hr2",
+    id: "2",
     title: "Digital Dreams",
     image: "https://img.youtube.com/vi/grDl2G_3WuY/maxresdefault.jpg",
     category: "Highly Rated",
-    videoId: "grDl2G_3WuY",
-    views: 600000,
-    likeRatio: 0.9
+    videoId: "grDl2G_3WuY"
   },
   {
-    id: "hr3",
+    id: "3",
     title: "Code Runner",
     image: "https://img.youtube.com/vi/yPnj3pjdf64/maxresdefault.jpg",
     category: "Highly Rated",
-    videoId: "yPnj3pjdf64",
-    views: 520000,
-    likeRatio: 0.82
+    videoId: "yPnj3pjdf64"
   },
   {
-    id: "hr4",
+    id: "4",
     title: "Binary Sunset",
     image: "https://img.youtube.com/vi/mjUH1mE3l9U/maxresdefault.jpg",
     category: "Highly Rated",
-    videoId: "mjUH1mE3l9U",
-    views: 800000,
-    likeRatio: 0.88
+    videoId: "mjUH1mE3l9U"
   },
   {
-    id: "hr5",
+    id: "5",
     title: "Digital Noir",
     image: "https://img.youtube.com/vi/UPzXAvL36Ag/maxresdefault.jpg",
     category: "Highly Rated",
-    videoId: "UPzXAvL36Ag",
-    views: 650000,
-    likeRatio: 0.9
+    videoId: "UPzXAvL36Ag"
   },
   {
-    id: "hr6",
+    id: "6",
     title: "Code Warriors",
     image: "https://img.youtube.com/vi/2wiSLBpZpME/maxresdefault.jpg",
     category: "Highly Rated",
-    videoId: "2wiSLBpZpME",
-    views: 700000,
-    likeRatio: 0.87
+    videoId: "2wiSLBpZpME"
   },
   {
-    id: "hr7",
+    id: "7",
     title: "Matrix Reloaded",
     image: "https://img.youtube.com/vi/mMM8_AFwxBE/maxresdefault.jpg",
     category: "Highly Rated",
-    videoId: "mMM8_AFwxBE",
-    views: 900000,
-    likeRatio: 0.91
+    videoId: "mMM8_AFwxBE"
   },
   {
-    id: "hr8",
+    id: "8",
     title: "Cyber Protocol",
     image: "https://img.youtube.com/vi/wwgEkkapi-0/maxresdefault.jpg",
     category: "Highly Rated",
-    videoId: "wwgEkkapi-0",
-    views: 550000,
-    likeRatio: 0.84
+    videoId: "wwgEkkapi-0"
   },
   {
-    id: "hr9",
+    id: "9",
     title: "Neural Network",
     image: "https://img.youtube.com/vi/GoWZfsdd1yw/maxresdefault.jpg",
     category: "Highly Rated",
-    videoId: "GoWZfsdd1yw",
-    views: 620000,
-    likeRatio: 0.86
+    videoId: "GoWZfsdd1yw"
   },
   {
-    id: "hr10",
+    id: "10",
     title: "Digital Fortress",
     image: "https://img.youtube.com/vi/GfF4Dz_e3P4/maxresdefault.jpg",
     category: "Highly Rated",
-    videoId: "GfF4Dz_e3P4",
-    views: 580000,
-    likeRatio: 0.83
+    videoId: "GfF4Dz_e3P4"
   },
   {
-    id: "hr11",
+    id: "11",
     title: "Quantum Code",
     image: "https://img.youtube.com/vi/Yg9z8lv1k_4/maxresdefault.jpg",
     category: "Highly Rated",
-    videoId: "Yg9z8lv1k_4",
-    views: 720000,
-    likeRatio: 0.89
+    videoId: "Yg9z8lv1k_4"
+  }
+];
+
+const yorubaMovies = [
+  {
+    id: "1",
+    title: "Digital Storm",
+    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
+    category: "Yoruba Movies"
+  },
+  {
+    id: "2",
+    title: "Code Breaker",
+    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
+    category: "Yoruba Movies"
+  },
+  {
+    id: "3",
+    title: "Matrix Revolution",
+    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
+    category: "Yoruba Movies"
+  },
+  {
+    id: "4",
+    title: "Cyber Chase",
+    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
+    category: "Yoruba Movies"
+  },
+  {
+    id: "5",
+    title: "Digital Warrior",
+    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
+    category: "Yoruba Movies"
+  },
+  {
+    id: "6",
+    title: "Code Master",
+    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
+    category: "Yoruba Movies"
+  },
+  {
+    id: "7",
+    title: "Binary Battle",
+    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
+    category: "Yoruba Movies"
+  },
+  {
+    id: "8",
+    title: "Cyber Assault",
+    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
+    category: "Yoruba Movies"
+  },
+  {
+    id: "9",
+    title: "Digital Defense",
+    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
+    category: "Yoruba Movies"
+  },
+  {
+    id: "10",
+    title: "Code Combat",
+    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
+    category: "Yoruba Movies"
+  },
+  {
+    id: "11",
+    title: "Binary Force",
+    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
+    category: "Yoruba Movies"
+  },
+  {
+    id: "12",
+    title: "Tech Warrior",
+    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80",
+    category: "Yoruba Movies"
   }
 ];
 
 const skitsMovies = [
   {
-    id: "s1",
+    id: "1",
     title: "Funny Moments Compilation",
     image: "https://img.youtube.com/vi/3aQFM1ZtMG0/maxresdefault.jpg",
     category: "Skits",
-    videoId: "3aQFM1ZtMG0",
-    duration: 480, // 8 minutes
-    views: 15000
+    videoId: "3aQFM1ZtMG0"
   },
   {
-    id: "s2",
+    id: "2",
     title: "Stand-up Special",
     image: "https://img.youtube.com/vi/pY4L5IXFXPA/maxresdefault.jpg",
     category: "Skits",
-    videoId: "pY4L5IXFXPA",
-    duration: 300, // 5 minutes
-    views: 25000
+    videoId: "pY4L5IXFXPA"
   },
   {
-    id: "s3",
+    id: "3",
     title: "Comedy Sketch Show",
     image: "https://img.youtube.com/vi/grDl2G_3WuY/maxresdefault.jpg",
     category: "Skits",
-    videoId: "grDl2G_3WuY",
-    duration: 600, // 10 minutes
-    views: 12000
+    videoId: "grDl2G_3WuY"
   },
   {
-    id: "s4",
+    id: "4",
     title: "Aki and Pawpaw: The Return",
     image: "https://img.youtube.com/vi/yPnj3pjdf64/maxresdefault.jpg",
     category: "Skits",
-    videoId: "yPnj3pjdf64",
-    duration: 540, // 9 minutes
-    views: 18000
+    videoId: "yPnj3pjdf64"
   },
   {
-    id: "s5",
+    id: "5",
     title: "Hilarious Pranks",
     image: "https://img.youtube.com/vi/mjUH1mE3l9U/maxresdefault.jpg",
     category: "Skits",
-    videoId: "mjUH1mE3l9U",
-    duration: 420, // 7 minutes
-    views: 22000
+    videoId: "mjUH1mE3l9U"
   },
   {
-    id: "s6",
+    id: "6",
     title: "Comedy Central Presents",
     image: "https://img.youtube.com/vi/UPzXAvL36Ag/maxresdefault.jpg",
     category: "Skits",
-    videoId: "UPzXAvL36Ag",
-    duration: 300, // 5 minutes
-    views: 30000
+    videoId: "UPzXAvL36Ag"
   },
   {
-    id: "s7",
+    id: "7",
     title: "Late Night Comedy",
     image: "https://img.youtube.com/vi/2wiSLBpZpME/maxresdefault.jpg",
     category: "Skits",
-    videoId: "2wiSLBpZpME",
-    duration: 600, // 10 minutes
-    views: 15000
+    videoId: "2wiSLBpZpME"
   },
   {
-    id: "s8",
+    id: "8",
     title: "Improv Comedy Show",
     image: "https://img.youtube.com/vi/mMM8_AFwxBE/maxresdefault.jpg",
     category: "Skits",
-    videoId: "mMM8_AFwxBE",
-    duration: 480, // 8 minutes
-    views: 17000
+    videoId: "mMM8_AFwxBE"
   },
   {
-    id: "s9",
+    id: "9",
     title: "Comedy Club Special",
     image: "https://img.youtube.com/vi/wwgEkkapi-0/maxresdefault.jpg",
     category: "Skits",
-    videoId: "wwgEkkapi-0",
-    duration: 300, // 5 minutes
-    views: 20000
+    videoId: "wwgEkkapi-0"
   },
   {
-    id: "s10",
+    id: "10",
     title: "Best Stand-up Moments",
     image: "https://img.youtube.com/vi/GoWZfsdd1yw/maxresdefault.jpg",
     category: "Skits",
-    videoId: "GoWZfsdd1yw",
-    duration: 600, // 10 minutes
-    views: 25000
-  }
-];
-
-const newReleases = [
-  {
-    id: "nr1",
-    title: "Latest Action Movie",
-    image: "https://img.youtube.com/vi/Yg9z8lv1k_4/maxresdefault.jpg",
-    category: "New Release",
-    videoId: "Yg9z8lv1k_4",
-    publishedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days ago
-  },
-  {
-    id: "nr2",
-    title: "Fresh Comedy",
-    image: "https://img.youtube.com/vi/3aQFM1ZtMG0/maxresdefault.jpg",
-    category: "New Release",
-    videoId: "3aQFM1ZtMG0",
-    publishedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString() // 15 days ago
-  },
-  {
-    id: "nr3",
-    title: "New Thriller",
-    image: "https://img.youtube.com/vi/pY4L5IXFXPA/maxresdefault.jpg",
-    category: "New Release",
-    videoId: "pY4L5IXFXPA",
-    publishedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() // 10 days ago
-  },
-  {
-    id: "nr4",
-    title: "Exciting Drama",
-    image: "https://img.youtube.com/vi/grDl2G_3WuY/maxresdefault.jpg",
-    category: "New Release",
-    videoId: "grDl2G_3WuY",
-    publishedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() // 5 days ago
-  },
-  {
-    id: "nr5",
-    title: "Romantic Comedy",
-    image: "https://img.youtube.com/vi/yPnj3pjdf64/maxresdefault.jpg",
-    category: "New Release",
-    videoId: "yPnj3pjdf64",
-    publishedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() // 3 days ago
-  },
-  {
-    id: "nr6",
-    title: "Action Packed Adventure",
-    image: "https://img.youtube.com/vi/mjUH1mE3l9U/maxresdefault.jpg",
-    category: "New Release",
-    videoId: "mjUH1mE3l9U",
-    publishedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() // 1 day ago
+    videoId: "GoWZfsdd1yw"
   }
 ];
 
 export const MOCK_MOVIES: MovieData = {
   trending: trendingMovies,
   highlyRated: highlyRatedMovies,
-  yoruba: [],
-  skits: skitsMovies,
-  newReleases
+  yoruba: yorubaMovies,
+  skits: skitsMovies
 };

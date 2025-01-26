@@ -7,9 +7,12 @@ import { useHighlyRated } from '@/hooks/use-highly-rated';
 import { useNewReleases } from '@/hooks/use-new-releases';
 import { useSkits } from '@/hooks/use-skits';
 import { useYorubaMovies } from '@/hooks/use-yoruba';
-import { useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MOCK_MOVIES } from '../data/mockMovies';
 import { usePopulateSections } from '@/hooks/use-populate-sections';
+import { transformCachedToMovie } from '@/utils/movie-transforms';
+import { CachedMovie } from '@/types/movies';
+import { useLocation } from 'react-router-dom';
 import { MainLayout } from '@/layouts/MainLayout';
 
 const Index = () => {
@@ -20,6 +23,7 @@ const Index = () => {
   const { data: skits, isLoading: isLoadingSkits, refetch: refetchSkits } = useSkits();
   const { data: yorubaMovies, isLoading: isLoadingYoruba, refetch: refetchYoruba } = useYorubaMovies();
   const newReleaseRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
 
   const { isPopulating, populateAllSections } = usePopulateSections({
     refetchYoruba,
@@ -62,7 +66,7 @@ const Index = () => {
           />
           <CategoryRow 
             title="Highly Rated" 
-            movies={highlyRatedVideos || MOCK_MOVIES.highlyRated}
+            movies={highlyRatedVideos ? transformCachedToMovie(highlyRatedVideos as unknown as CachedMovie[]) : MOCK_MOVIES.highlyRated}
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
           />
@@ -74,14 +78,14 @@ const Index = () => {
           />
           <CategoryRow 
             title="Skits" 
-            movies={skits || MOCK_MOVIES.skits}
+            movies={skits ? transformCachedToMovie(skits as unknown as CachedMovie[]) : MOCK_MOVIES.skits}
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
           />
           <div ref={newReleaseRef}>
             <CategoryRow 
               title="New Release" 
-              movies={newReleases || MOCK_MOVIES.trending}
+              movies={newReleases ? transformCachedToMovie(newReleases as unknown as CachedMovie[]) : MOCK_MOVIES.highlyRated}
               selectedVideoId={selectedVideoId}
               onVideoSelect={setSelectedVideoId}
             />
