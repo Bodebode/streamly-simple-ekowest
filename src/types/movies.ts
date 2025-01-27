@@ -28,6 +28,16 @@ export interface MovieCarouselProps {
   isVideoPlaying: boolean;
 }
 
+export interface MovieCardProps {
+  id: string;
+  title: string;
+  image: string;
+  category: string;
+  videoId?: string;
+  onMovieSelect: (videoId: string | null) => void;
+  isVideoPlaying: boolean;
+}
+
 export interface CachedMovie {
   id: string;
   title: string;
