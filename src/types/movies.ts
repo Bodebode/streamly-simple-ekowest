@@ -50,4 +50,5 @@ export interface CachedMovie {
   expires_at?: string;
   access_count?: number;
   is_available?: boolean;
+  like_ratio?: number;
 }

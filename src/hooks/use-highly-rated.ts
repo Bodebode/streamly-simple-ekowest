@@ -14,8 +14,8 @@ export const useHighlyRated = () => {
           .select('*')
           .eq('category', 'Highly Rated')
           .eq('is_available', true)
-          .gt('views', 500000)
-          .gt('like_ratio', 0.8)
+          .gt('views', 100000) // Lowered threshold to ensure we get some results
+          .gt('like_ratio', 0.6) // Adjusted ratio to be more lenient
           .gt('expires_at', new Date().toISOString())
           .order('views', { ascending: false })
           .limit(12);
@@ -31,14 +31,23 @@ export const useHighlyRated = () => {
           return MOCK_MOVIES.highlyRated;
         }
 
-        console.log(`Found ${data.length} highly rated videos`);
+        console.log(`Found ${data.length} highly rated videos:`, data);
         
+        // Transform cached videos to match Movie interface
+        const transformedData = data.map(video => ({
+          id: video.id,
+          title: video.title,
+          image: video.image,
+          category: video.category,
+          videoId: video.video_id
+        }));
+
         // Increment access count for retrieved videos
         data.forEach(video => {
           supabase.rpc('increment_access_count', { video_id: video.id });
         });
 
-        return data;
+        return transformedData;
       } catch (error) {
         console.error('Error in highly rated query:', error);
         toast.error('Failed to load videos, showing placeholders');

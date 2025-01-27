@@ -3,25 +3,20 @@ import { useState, memo, useCallback, useEffect } from 'react';
 import { MovieCarousel } from '@/components/movie/MovieCarousel';
 import { useRelatedVideos } from '@/hooks/use-related-videos';
 import { checkVideoAvailability } from '@/utils/video-validation';
-import { Movie } from '@/types/movies';
-
-interface CategoryRowProps {
-  title: string;
-  movies: Movie[];
-  selectedVideoId: string | null;
-  onVideoSelect: (videoId: string | null) => void;
-  updateHighlyRated?: (movies: Movie[]) => void;
-}
+import { Movie, CategoryRowProps } from '@/types/movies';
+import { useSectionVisibility } from '@/hooks/use-section-visibility';
 
 const CategoryRowComponent = ({ 
   title, 
   movies, 
   selectedVideoId, 
   onVideoSelect, 
-  updateHighlyRated 
+  updateHighlyRated,
+  refetchFunction 
 }: CategoryRowProps) => {
-  const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
+  const [filteredMovies, setFilteredMovies] = useState<Movie[]>(movies);
   const { isLoading } = useRelatedVideos(selectedVideoId, title, movies);
+  const isVisible = useSectionVisibility(title, filteredMovies, refetchFunction);
 
   const handleCloseVideo = useCallback(() => {
     onVideoSelect(null);
@@ -38,12 +33,23 @@ const CategoryRowComponent = ({
 
   const isPlayingInThisRow = selectedVideoId && movies.some(movie => movie.videoId === selectedVideoId);
 
+  if (!isVisible) {
+    return null;
+  }
+
   return (
-    <div className="mb-16">
+    <section 
+      className="mb-16"
+      aria-label={`${title} movie category`}
+    >
       <h2 className="text-xl md:text-2xl font-bold mb-4 px-4 md:text-center">
         {title} {isLoading && title === 'Comedy' && '(Loading...)'}
       </h2>
-      <div className="relative px-4 md:px-16">
+      <div 
+        className="relative px-4 md:px-16"
+        role="region"
+        aria-label={`Scrollable ${title} movies`}
+      >
         <MovieCarousel
           movies={filteredMovies}
           onMovieSelect={onVideoSelect}
@@ -53,7 +59,7 @@ const CategoryRowComponent = ({
           <VideoPlayer videoId={selectedVideoId} onClose={handleCloseVideo} />
         )}
       </div>
-    </div>
+    </section>
   );
 };
 
