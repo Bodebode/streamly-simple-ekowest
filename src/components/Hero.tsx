@@ -1,86 +1,48 @@
-import { useState, useEffect } from 'react';
-import { useTheme } from 'next-themes';
-import { HeroSlide } from './hero/HeroSlide';
-import { HeroControls } from './hero/HeroControls';
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/hooks/use-auth';
+import { supabase } from '@/integrations/supabase/client';
 
-export const Hero = () => {
-  const { theme } = useTheme();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [themeKey, setThemeKey] = useState(0);
+interface HeroSlide {
+  id: string; // Changed from number to string
+  title: string;
+  description: string;
+  videoUrl: string;
+  thumbnailUrl: string;
+}
 
-  const videoUrl = theme === 'light' 
-    ? 'https://yuisywwlzorzdrzvjlvm.supabase.co/storage/v1/object/public/videos/Ekowest_Hero_Vid_White.mp4'
-    : 'https://yuisywwlzorzdrzvjlvm.supabase.co/storage/v1/object/public/videos/Ekowest_Hero_Vid_Dark.mp4';
-
-  const slides = [
-    {
-      type: 'video' as const,
-      src: videoUrl,
-      duration: 39000,
-      id: 'hero-1'
-    },
-    {
-      type: 'image' as const,
-      src: '/videos/file-20220908-13-nwxk17.avif',
-      duration: 4000,
-      id: 'hero-2'
-    },
-    {
-      type: 'image' as const,
-      src: '/videos/Netflix-slate-e1692222322682.jpg',
-      duration: 4000,
-      id: 'hero-3'
-    }
-  ];
+const Hero = () => {
+  const { user } = useAuth();
+  const [slides, setSlides] = useState<HeroSlide[]>([]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => 
-        prevIndex === slides.length - 1 ? 0 : prevIndex + 1
-      );
-    }, slides[currentIndex].duration);
+    const fetchSlides = async () => {
+      const { data, error } = await supabase
+        .from('hero_slides')
+        .select('*');
 
-    return () => clearInterval(timer);
-  }, [currentIndex, slides]);
+      if (error) {
+        console.error('Error fetching hero slides:', error);
+        return;
+      }
 
-  useEffect(() => {
-    setThemeKey(prev => prev + 1);
-  }, [theme]);
+      setSlides(data);
+    };
 
-  const nextSlide = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === slides.length - 1 ? 0 : prevIndex + 1
-    );
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? slides.length - 1 : prevIndex - 1
-    );
-  };
+    fetchSlides();
+  }, []);
 
   return (
-    <div className="relative w-full h-[600px] overflow-hidden mb-16">
-      {slides.map((slide, index) => (
-        <HeroSlide
-          key={`${index}-${themeKey}`}
-          type={slide.type}
-          src={slide.src}
-          index={index}
-          currentIndex={currentIndex}
-        />
+    <div className="hero">
+      {slides.map(slide => (
+        <div key={slide.id} className="hero-slide">
+          <img src={slide.thumbnailUrl} alt={slide.title} />
+          <h2>{slide.title}</h2>
+          <p>{slide.description}</p>
+          <a href={slide.videoUrl} className="btn">Watch Now</a>
+        </div>
       ))}
-
-      <div className="absolute bottom-16 left-16 z-10">
-        <h1 className="text-4xl font-bold text-white mb-4">
-          Welcome to Ekowest TV
-        </h1>
-        <p className="text-xl text-white">
-          Experience the best of Nigerian entertainment
-        </p>
-      </div>
-
-      <HeroControls onPrevSlide={prevSlide} onNextSlide={nextSlide} />
     </div>
   );
 };
+
+export default Hero;

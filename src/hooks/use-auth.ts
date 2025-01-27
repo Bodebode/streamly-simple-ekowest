@@ -1,32 +1,24 @@
-import { useAuthStore } from '@/stores/auth-store';
+import { User } from '@supabase/supabase-js';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useAuth = () => {
-  const { token, user, setAuth, clearAuth } = useAuthStore();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const login = async (email: string, password: string) => {
-    try {
-      // Mock API call - replace with your actual API endpoint
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        body: JSON.stringify({ email, password }),
-      });
-      
-      const data = await response.json();
-      setAuth(data.token, { id: data.id, email, name: data.name });
-      return true;
-    } catch (error) {
-      return false;
-    }
-  };
+  useEffect(() => {
+    const session = supabase.auth.getSession();
+    setUser(session.user);
+    setLoading(false);
 
-  const logout = () => {
-    clearAuth();
-  };
+    const { data: subscription } = supabase.auth.onAuthStateChange((_, session) => {
+      setUser(session?.user ?? null);
+    });
 
-  return {
-    isAuthenticated: !!token,
-    user,
-    login,
-    logout,
-  };
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, []);
+
+  return { user, loading };
 };
