@@ -1,5 +1,5 @@
 export interface Movie {
-  id: string;
+  id: string;  // Changed from number to string to match database
   title: string;
   image: string;
   category: string;
@@ -29,7 +29,7 @@ export interface MovieCarouselProps {
 }
 
 export interface MovieCardProps {
-  id: string;
+  id: string;  // Changed from number to string
   title: string;
   image: string;
   category: string;
@@ -51,4 +51,11 @@ export interface CachedMovie {
   access_count?: number;
   is_available?: boolean;
   like_ratio?: number;
+}
+
+export interface User {
+  id: string;
+  email?: string;
+  username?: string;
+  avatar_url?: string;
 }

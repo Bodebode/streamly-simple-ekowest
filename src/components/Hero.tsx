@@ -17,16 +17,19 @@ export const Hero = () => {
       type: 'video' as const,
       src: videoUrl,
       duration: 39000,
+      id: 'hero-1'
     },
     {
       type: 'image' as const,
       src: '/videos/file-20220908-13-nwxk17.avif',
       duration: 4000,
+      id: 'hero-2'
     },
     {
       type: 'image' as const,
       src: '/videos/Netflix-slate-e1692222322682.jpg',
       duration: 4000,
+      id: 'hero-3'
     }
   ];
 
