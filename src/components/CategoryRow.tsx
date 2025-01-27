@@ -3,17 +3,8 @@ import { useState, memo, useCallback, useEffect } from 'react';
 import { MovieCarousel } from './movie/MovieCarousel';
 import { useRelatedVideos } from '@/hooks/use-related-videos';
 import { checkVideoAvailability } from '@/utils/video-validation';
-import { Movie } from '@/types/movies';
+import { Movie, CategoryRowProps } from '@/types/movies';
 import { useSectionVisibility } from '@/hooks/use-section-visibility';
-
-interface CategoryRowProps {
-  title: string;
-  movies: Movie[];
-  selectedVideoId: string | null;
-  onVideoSelect: (videoId: string | null) => void;
-  updateHighlyRated?: (movies: Movie[]) => void;
-  refetchFunction?: () => Promise<any>;
-}
 
 const CategoryRowComponent = ({ 
   title, 

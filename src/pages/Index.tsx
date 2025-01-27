@@ -1,4 +1,4 @@
-import Hero from '../components/Hero';
+import { Hero } from '../components/Hero';
 import { CategoryRow } from '../features/movies/components/CategoryRow';
 import { Moon, Sun, RefreshCw } from 'lucide-react';
 import { useTheme } from 'next-themes';
