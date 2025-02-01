@@ -24,6 +24,7 @@ export const MovieCard = ({
   const [isInList, setIsInList] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { user } = useAuthStore();
+  const [optimizedImage, setOptimizedImage] = useState<string>(image);
 
   const { handleMouseEnter, handleMouseLeave, clearTimers } = useMovieCardPreview({
     isVideoPlaying,
@@ -31,6 +32,35 @@ export const MovieCard = ({
     onPreviewChange: setShowPreview,
     onTitleChange: setShowTitle
   });
+
+  useEffect(() => {
+    const loadOptimizedImage = async () => {
+      if (image.startsWith('http')) {
+        // If it's already a URL, use it directly
+        setOptimizedImage(image);
+        return;
+      }
+
+      try {
+        const { data: { publicUrl }, error } = await supabase
+          .storage
+          .from('videos')
+          .getPublicUrl(image);
+          
+        if (error) {
+          console.error('Error loading optimized image:', error);
+          return;
+        }
+        
+        setOptimizedImage(publicUrl);
+      } catch (error) {
+        console.error('Failed to load optimized image:', error);
+        setOptimizedImage(image); // Fallback to original image
+      }
+    };
+
+    loadOptimizedImage();
+  }, [image]);
 
   useEffect(() => {
     const checkIfInList = async () => {
@@ -127,7 +157,7 @@ export const MovieCard = ({
         ) : (
           <MovieCardBase
             title={title}
-            image={image}
+            image={optimizedImage}
             category={category}
             videoId={videoId}
             isHovered={isHovered}

@@ -2,15 +2,36 @@ import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 import { HeroSlide } from './hero/HeroSlide';
 import { HeroControls } from './hero/HeroControls';
+import { supabase } from '@/integrations/supabase/client';
 
 export const Hero = () => {
   const { theme } = useTheme();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [themeKey, setThemeKey] = useState(0);
+  const [videoUrl, setVideoUrl] = useState('');
 
-  const videoUrl = theme === 'light' 
-    ? 'https://yuisywwlzorzdrzvjlvm.supabase.co/storage/v1/object/public/videos/Ekowest_Hero_Vid_White.mp4'
-    : 'https://yuisywwlzorzdrzvjlvm.supabase.co/storage/v1/object/public/videos/Ekowest_Hero_Vid_Dark.mp4';
+  useEffect(() => {
+    const loadVideo = async () => {
+      const fileName = theme === 'light' ? 'Ekowest_Hero_Vid_White.mp4' : 'Ekowest_Hero_Vid_Dark.mp4';
+      try {
+        const { data: { publicUrl }, error } = await supabase
+          .storage
+          .from('videos')
+          .getPublicUrl(fileName);
+          
+        if (error) {
+          console.error('Error loading hero video:', error);
+          return;
+        }
+        
+        setVideoUrl(publicUrl);
+      } catch (error) {
+        console.error('Failed to load hero video:', error);
+      }
+    };
+    
+    loadVideo();
+  }, [theme]);
 
   const slides = [
     {

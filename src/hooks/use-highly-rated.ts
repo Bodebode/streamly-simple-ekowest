@@ -10,7 +10,6 @@ export const useHighlyRated = () => {
       try {
         console.log('Fetching highly rated videos...');
         
-        // First try to get from cache with longer expiration
         const { data: cachedVideos, error: cacheError } = await supabase
           .from('cached_videos')
           .select('*')
@@ -28,6 +27,17 @@ export const useHighlyRated = () => {
 
         if (cachedVideos && cachedVideos.length > 0) {
           console.log(`Found ${cachedVideos.length} cached videos`);
+          
+          // Update access count and cache status in the background
+          cachedVideos.forEach(async (video) => {
+            try {
+              await supabase.rpc('increment_access_count', { video_id: video.id });
+              console.log(`Updated cache metrics for ${video.id}`);
+            } catch (err) {
+              console.error(`Failed to update cache metrics: ${err}`);
+            }
+          });
+
           return Promise.resolve(cachedVideos);
         }
 
