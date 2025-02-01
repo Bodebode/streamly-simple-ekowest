@@ -12,7 +12,7 @@ export const useAuth = () => {
       });
       
       const data = await response.json();
-      setAuth(data.token, { id: data.id, email, name: data.name });
+      setAuth(data.token, { id: data.id, email, username: data.username });
       return true;
     } catch (error) {
       return false;

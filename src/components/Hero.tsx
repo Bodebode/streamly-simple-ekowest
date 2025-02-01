@@ -63,7 +63,7 @@ export const Hero = () => {
     <div className="relative w-full h-[600px] overflow-hidden mb-16">
       {slides.map((slide, index) => (
         <HeroSlide
-          key={`${index}-${themeKey}`}
+          key={`${slide.id}-${themeKey}`}
           type={slide.type}
           src={slide.src}
           index={index}
