@@ -17,15 +17,29 @@ export const useSkits = () => {
     queryKey: ['skits'],
     queryFn: async () => {
       try {
-        const { data, error } = await supabase
+        const startTime = performance.now();
+        
+        const { data, error, count } = await supabase
           .from('cached_videos')
-          .select('*')
+          .select('*', { count: 'exact' })
           .eq('category', 'Skits')
           .eq('is_available', true)
           .gt('expires_at', new Date().toISOString())
           .order('access_count', { ascending: false })
           .limit(24); // Increased limit to ensure enough unique videos
         
+        const endTime = performance.now();
+        const executionTime = endTime - startTime;
+
+        // Log query metrics
+        await supabase.rpc('log_query_metrics', {
+          p_query_name: 'fetch_skits',
+          p_execution_time: executionTime,
+          p_rows_affected: count || 0,
+          p_category: 'Skits',
+          p_user_id: (await supabase.auth.getUser()).data.user?.id
+        });
+
         if (error) {
           console.error('Error fetching skits:', error);
           toast.error('Failed to load skits');
@@ -36,6 +50,8 @@ export const useSkits = () => {
           console.log('No skits found, using mock data');
           return MOCK_MOVIES.skits;
         }
+
+        console.log(`Fetched skits in ${executionTime.toFixed(2)}ms`);
 
         // Filter for unique videos and ensure minimum count
         const uniqueVideos = removeDuplicates(data);

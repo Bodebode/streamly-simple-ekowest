@@ -13,18 +13,33 @@ export const useYorubaMovies = () => {
     queryFn: async () => {
       try {
         console.log('Starting Yoruba movies fetch with enhanced criteria validation...');
+        const startTime = performance.now();
         
         // Try with strict criteria first
-        const { data: strictVideos, error: strictError } = await buildYorubaQuery(
+        const { data: strictVideos, error: strictError, count } = await buildYorubaQuery(
           supabase,
           { ...STRICT_CRITERIA, limit: 24 } // Increased limit to ensure we get enough unique videos
         );
+
+        const endTime = performance.now();
+        const executionTime = endTime - startTime;
+
+        // Log query metrics
+        await supabase.rpc('log_query_metrics', {
+          p_query_name: 'fetch_yoruba_movies',
+          p_execution_time: executionTime,
+          p_rows_affected: count || 0,
+          p_category: 'Yoruba',
+          p_user_id: (await supabase.auth.getUser()).data.user?.id
+        });
 
         if (strictError) {
           console.error('Error fetching Yoruba movies:', strictError);
           toast.error('Failed to load Yoruba movies');
           return MOCK_MOVIES.yoruba;
         }
+
+        console.log(`Fetched Yoruba movies in ${executionTime.toFixed(2)}ms`);
 
         if (strictVideos && strictVideos.length >= 12) {
           const uniqueVideos = removeDuplicates(strictVideos as unknown as CachedMovie[]);

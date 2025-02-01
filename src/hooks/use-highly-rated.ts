@@ -9,11 +9,12 @@ export const useHighlyRated = () => {
     queryFn: async () => {
       try {
         console.log('Fetching highly rated videos...');
+        const startTime = performance.now();
         
         // Optimized query with specific column selection and better indexing
-        const { data: cachedVideos, error: cacheError } = await supabase
+        const { data: cachedVideos, error: cacheError, count } = await supabase
           .from('cached_videos')
-          .select('id, title, image, category, video_id, views, like_ratio, is_available')
+          .select('id, title, image, category, video_id, views, like_ratio, is_available', { count: 'exact' })
           .eq('category', 'Highly Rated')
           .eq('is_available', true)
           .gt('views', 50000)
@@ -21,13 +22,25 @@ export const useHighlyRated = () => {
           .order('views', { ascending: false })
           .limit(12);
 
+        const endTime = performance.now();
+        const executionTime = endTime - startTime;
+
+        // Log query metrics
+        await supabase.rpc('log_query_metrics', {
+          p_query_name: 'fetch_highly_rated',
+          p_execution_time: executionTime,
+          p_rows_affected: count || 0,
+          p_category: 'Highly Rated',
+          p_user_id: (await supabase.auth.getUser()).data.user?.id
+        });
+
         if (cacheError) {
           console.error('Error fetching from cache:', cacheError);
           throw cacheError;
         }
 
         if (cachedVideos && cachedVideos.length > 0) {
-          console.log(`Found ${cachedVideos.length} cached videos`);
+          console.log(`Found ${cachedVideos.length} cached videos in ${executionTime.toFixed(2)}ms`);
           
           // Update access count and cache status in the background
           const updatePromises = cachedVideos.map(video => 

@@ -283,6 +283,44 @@ export type Database = {
         }
         Relationships: []
       }
+      query_metrics: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          execution_time: number
+          id: string
+          query_name: string
+          rows_affected: number | null
+          user_id: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          execution_time: number
+          id?: string
+          query_name: string
+          rows_affected?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          execution_time?: number
+          id?: string
+          query_name?: string
+          rows_affected?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "query_metrics_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_movie_lists: {
         Row: {
           added_at: string
@@ -331,6 +369,16 @@ export type Database = {
       increment_access_count: {
         Args: {
           video_id: string
+        }
+        Returns: undefined
+      }
+      log_query_metrics: {
+        Args: {
+          p_query_name: string
+          p_execution_time: number
+          p_rows_affected: number
+          p_category: string
+          p_user_id: string
         }
         Returns: undefined
       }
