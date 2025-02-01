@@ -9,53 +9,67 @@ export const useHighlyRated = () => {
     queryFn: async () => {
       try {
         console.log('Fetching highly rated videos...');
-        const { data, error } = await supabase
+        
+        // First try to get from cache with longer expiration
+        const { data: cachedVideos, error: cacheError } = await supabase
           .from('cached_videos')
           .select('*')
           .eq('category', 'Highly Rated')
           .eq('is_available', true)
-          .gt('views', 100000) // Lowered threshold to ensure we get some results
-          .gt('like_ratio', 0.6) // Adjusted ratio to be more lenient
-          .gt('expires_at', new Date().toISOString())
+          .gt('views', 50000) // Lowered threshold for testing
+          .gt('like_ratio', 0.5)
           .order('views', { ascending: false })
           .limit(12);
-        
-        if (error) {
-          console.error('Error fetching highly rated videos:', error);
-          toast.error('Failed to load videos, showing placeholders');
-          return MOCK_MOVIES.highlyRated;
-        }
-        
-        if (!data || data.length === 0) {
-          console.log('No highly rated videos found, using mock data');
-          return MOCK_MOVIES.highlyRated;
+
+        if (cacheError) {
+          console.error('Error fetching from cache:', cacheError);
+          throw cacheError;
         }
 
-        console.log(`Found ${data.length} highly rated videos:`, data);
-        
-        // Transform cached videos to match Movie interface
-        const transformedData = data.map(video => ({
-          id: video.id,
-          title: video.title,
-          image: video.image,
-          category: video.category,
-          videoId: video.video_id
-        }));
+        if (cachedVideos && cachedVideos.length > 0) {
+          console.log(`Found ${cachedVideos.length} cached videos`);
+          
+          // Update access count in the background
+          cachedVideos.forEach(video => {
+            supabase.rpc('increment_access_count', { video_id: video.id })
+              .then(() => console.log(`Incremented access count for ${video.id}`))
+              .catch(err => console.error(`Failed to increment access count: ${err}`));
+          });
 
-        // Increment access count for retrieved videos
-        data.forEach(video => {
-          supabase.rpc('increment_access_count', { video_id: video.id });
-        });
+          return cachedVideos;
+        }
 
-        return transformedData;
+        // If no cached videos, try with relaxed criteria
+        const { data: relaxedVideos, error: relaxedError } = await supabase
+          .from('cached_videos')
+          .select('*')
+          .eq('category', 'Highly Rated')
+          .eq('is_available', true)
+          .gt('views', 10000)
+          .order('views', { ascending: false })
+          .limit(12);
+
+        if (relaxedError) {
+          console.error('Error fetching with relaxed criteria:', relaxedError);
+          throw relaxedError;
+        }
+
+        if (relaxedVideos && relaxedVideos.length > 0) {
+          console.log(`Found ${relaxedVideos.length} videos with relaxed criteria`);
+          return relaxedVideos;
+        }
+
+        console.log('No videos found, using mock data');
+        return MOCK_MOVIES.highlyRated;
       } catch (error) {
         console.error('Error in highly rated query:', error);
         toast.error('Failed to load videos, showing placeholders');
         return MOCK_MOVIES.highlyRated;
       }
     },
-    staleTime: 1000 * 60 * 30, // Consider data fresh for 30 minutes
-    gcTime: 1000 * 60 * 60, // Keep in cache for 1 hour
-    retry: 1,
+    staleTime: 1000 * 60 * 15, // Consider data fresh for 15 minutes
+    gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * Math.pow(2, attemptIndex), 30000),
   });
 };

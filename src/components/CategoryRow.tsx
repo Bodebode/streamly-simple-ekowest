@@ -5,6 +5,7 @@ import { useRelatedVideos } from '@/hooks/use-related-videos';
 import { checkVideoAvailability } from '@/utils/video-validation';
 import { Movie, CategoryRowProps } from '@/types/movies';
 import { useSectionVisibility } from '@/hooks/use-section-visibility';
+import { prefetchVideos, updateVideoCache } from '@/utils/cache-manager';
 
 const CategoryRowComponent = ({ 
   title, 
@@ -22,16 +23,26 @@ const CategoryRowComponent = ({
     onVideoSelect(null);
   }, [onVideoSelect]);
 
+  const handleVideoSelect = useCallback((videoId: string | null) => {
+    if (videoId) {
+      updateVideoCache(videoId);
+    }
+    onVideoSelect(videoId);
+  }, [onVideoSelect]);
+
   useEffect(() => {
-    // Only filter out movies without videoIds
+    // Prefetch next batch of videos
+    if (filteredMovies.length < 12) {
+      prefetchVideos(title);
+    }
+    
+    // Filter out invalid videos
     const validMovies = movies.filter(movie => movie.videoId);
     setFilteredMovies(validMovies.length > 0 ? validMovies : movies);
     
-    // Still check video availability in the background
+    // Check availability in background
     checkVideoAvailability();
-  }, [movies]);
-
-  const isPlayingInThisRow = selectedVideoId && movies.some(movie => movie.videoId === selectedVideoId);
+  }, [movies, title]);
 
   if (!isVisible) {
     return null;
@@ -52,10 +63,10 @@ const CategoryRowComponent = ({
       >
         <MovieCarousel
           movies={filteredMovies}
-          onMovieSelect={onVideoSelect}
+          onMovieSelect={handleVideoSelect}
           isVideoPlaying={selectedVideoId !== null}
         />
-        {isPlayingInThisRow && selectedVideoId && (
+        {selectedVideoId && movies.some(movie => movie.videoId === selectedVideoId) && (
           <VideoPlayer videoId={selectedVideoId} onClose={handleCloseVideo} />
         )}
       </div>
