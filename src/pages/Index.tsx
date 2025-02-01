@@ -1,5 +1,5 @@
 import { Hero } from '../components/Hero';
-import { CategoryRow } from '../features/movies/components/CategoryRow';
+import { CategoryRow } from '../components/CategoryRow';
 import { Moon, Sun, RefreshCw } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
@@ -58,14 +58,14 @@ const Index = () => {
         </Button>
       </div>
       
-      <Tabs defaultValue="content" className="w-full">
-        <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+      <Tabs defaultValue="content" className="w-full pt-16">
+        <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 sticky top-16 z-40 bg-background">
           <TabsTrigger value="content">Content</TabsTrigger>
-          <TabsTrigger value="monitoring">Monitoring</TabsTrigger>
+          <TabsTrigger value="monitoring">Query Monitoring</TabsTrigger>
         </TabsList>
         
         <TabsContent value="content">
-          <div className="pt-16">
+          <div>
             <Hero />
             <div className="pb-8">
               <CategoryRow 
@@ -108,7 +108,7 @@ const Index = () => {
           </div>
         </TabsContent>
         
-        <TabsContent value="monitoring">
+        <TabsContent value="monitoring" className="mt-0">
           <QueryMetricsDashboard />
         </TabsContent>
       </Tabs>
