@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/carousel";
 import { MovieCard } from './MovieCard';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { Movie } from '@/types/movies';
 
 interface MovieCarouselProps {
@@ -19,17 +19,19 @@ interface MovieCarouselProps {
 const MovieCarouselComponent = ({ movies, onMovieSelect, isVideoPlaying }: MovieCarouselProps) => {
   const isMobile = useIsMobile();
 
-  // Remove any duplicates based on videoId and ensure we have valid videos
-  const uniqueMovies = movies.reduce((acc: Movie[], current) => {
-    const isDuplicate = acc.some(movie => movie.videoId === current.videoId);
-    if (!isDuplicate && current.videoId && acc.length < 12) {
-      acc.push(current);
-    }
-    return acc;
-  }, []);
+  // Memoize the filtered movies to prevent unnecessary re-renders
+  const uniqueMovies = useMemo(() => {
+    const seen = new Set<string>();
+    return movies.reduce((acc: Movie[], current) => {
+      if (!seen.has(current.videoId || '') && current.videoId && acc.length < 12) {
+        seen.add(current.videoId);
+        acc.push(current);
+      }
+      return acc;
+    }, []);
+  }, [movies]);
 
-  console.log(`[MovieCarousel] Original movies count: ${movies.length}`);
-  console.log(`[MovieCarousel] Unique movies count after filtering: ${uniqueMovies.length}`);
+  console.log(`[MovieCarousel] Rendering with ${uniqueMovies.length} unique movies`);
 
   return (
     <Carousel

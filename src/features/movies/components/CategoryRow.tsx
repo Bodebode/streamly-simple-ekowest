@@ -14,7 +14,7 @@ const CategoryRowComponent = ({
   updateHighlyRated,
   refetchFunction 
 }: CategoryRowProps) => {
-  const [filteredMovies, setFilteredMovies] = useState<Movie[]>(movies);
+  const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
   const { isLoading } = useRelatedVideos(selectedVideoId, title, movies);
   const isVisible = useSectionVisibility(title, filteredMovies, refetchFunction);
 
@@ -23,13 +23,18 @@ const CategoryRowComponent = ({
   }, [onVideoSelect]);
 
   useEffect(() => {
-    // Only filter out movies without videoIds
-    const validMovies = movies.filter(movie => movie.videoId);
+    // Optimize filtering by doing it once and memoizing the result
+    const validMovies = movies.filter(movie => 
+      movie.videoId && 
+      (!selectedVideoId || movie.videoId !== selectedVideoId)
+    );
     setFilteredMovies(validMovies.length > 0 ? validMovies : movies);
     
-    // Still check video availability in the background
-    checkVideoAvailability();
-  }, [movies]);
+    // Check availability in background without blocking
+    if (isVisible) {
+      checkVideoAvailability();
+    }
+  }, [movies, selectedVideoId, isVisible]);
 
   const isPlayingInThisRow = selectedVideoId && movies.some(movie => movie.videoId === selectedVideoId);
 
