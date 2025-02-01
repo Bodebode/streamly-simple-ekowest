@@ -14,6 +14,8 @@ import { transformCachedToMovie } from '@/utils/movie-transforms';
 import { CachedMovie } from '@/types/movies';
 import { useLocation } from 'react-router-dom';
 import { MainLayout } from '@/layouts/MainLayout';
+import { QueryMetricsDashboard } from '@/components/monitoring/QueryMetricsDashboard';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Index = () => {
   const { theme, setTheme } = useTheme();
@@ -55,47 +57,61 @@ const Index = () => {
           <span className="sr-only">Toggle theme</span>
         </Button>
       </div>
-      <div className="pt-16">
-        <Hero />
-        <div className="pb-8">
-          <CategoryRow 
-            title="Trending Now" 
-            movies={MOCK_MOVIES.trending}
-            selectedVideoId={selectedVideoId}
-            onVideoSelect={setSelectedVideoId}
-          />
-          <CategoryRow 
-            title="Highly Rated" 
-            movies={highlyRatedVideos ? transformCachedToMovie(highlyRatedVideos as unknown as CachedMovie[]) : MOCK_MOVIES.highlyRated}
-            selectedVideoId={selectedVideoId}
-            onVideoSelect={setSelectedVideoId}
-            refetchFunction={refetchHighlyRated}
-          />
-          <CategoryRow 
-            title="Yoruba Movies" 
-            movies={yorubaMovies || []}
-            selectedVideoId={selectedVideoId}
-            onVideoSelect={setSelectedVideoId}
-            refetchFunction={refetchYoruba}
-          />
-          <CategoryRow 
-            title="Skits" 
-            movies={skits ? transformCachedToMovie(skits as unknown as CachedMovie[]) : MOCK_MOVIES.skits}
-            selectedVideoId={selectedVideoId}
-            onVideoSelect={setSelectedVideoId}
-            refetchFunction={refetchSkits}
-          />
-          <div ref={newReleaseRef}>
-            <CategoryRow 
-              title="New Release" 
-              movies={newReleases ? transformCachedToMovie(newReleases as unknown as CachedMovie[]) : MOCK_MOVIES.highlyRated}
-              selectedVideoId={selectedVideoId}
-              onVideoSelect={setSelectedVideoId}
-              refetchFunction={refetchNewReleases}
-            />
+      
+      <Tabs defaultValue="content" className="w-full">
+        <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+          <TabsTrigger value="content">Content</TabsTrigger>
+          <TabsTrigger value="monitoring">Monitoring</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="content">
+          <div className="pt-16">
+            <Hero />
+            <div className="pb-8">
+              <CategoryRow 
+                title="Trending Now" 
+                movies={MOCK_MOVIES.trending}
+                selectedVideoId={selectedVideoId}
+                onVideoSelect={setSelectedVideoId}
+              />
+              <CategoryRow 
+                title="Highly Rated" 
+                movies={highlyRatedVideos ? transformCachedToMovie(highlyRatedVideos as unknown as CachedMovie[]) : MOCK_MOVIES.highlyRated}
+                selectedVideoId={selectedVideoId}
+                onVideoSelect={setSelectedVideoId}
+                refetchFunction={refetchHighlyRated}
+              />
+              <CategoryRow 
+                title="Yoruba Movies" 
+                movies={yorubaMovies || []}
+                selectedVideoId={selectedVideoId}
+                onVideoSelect={setSelectedVideoId}
+                refetchFunction={refetchYoruba}
+              />
+              <CategoryRow 
+                title="Skits" 
+                movies={skits ? transformCachedToMovie(skits as unknown as CachedMovie[]) : MOCK_MOVIES.skits}
+                selectedVideoId={selectedVideoId}
+                onVideoSelect={setSelectedVideoId}
+                refetchFunction={refetchSkits}
+              />
+              <div ref={newReleaseRef}>
+                <CategoryRow 
+                  title="New Release" 
+                  movies={newReleases ? transformCachedToMovie(newReleases as unknown as CachedMovie[]) : MOCK_MOVIES.highlyRated}
+                  selectedVideoId={selectedVideoId}
+                  onVideoSelect={setSelectedVideoId}
+                  refetchFunction={refetchNewReleases}
+                />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </TabsContent>
+        
+        <TabsContent value="monitoring">
+          <QueryMetricsDashboard />
+        </TabsContent>
+      </Tabs>
     </MainLayout>
   );
 };
