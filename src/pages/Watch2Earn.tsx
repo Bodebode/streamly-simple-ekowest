@@ -47,24 +47,6 @@ export const Watch2Earn = () => {
             </Card>
           </div>
 
-          <div className="bg-koya-card p-8 rounded-lg">
-            <h2 className="text-2xl font-bold mb-4">How to Earn</h2>
-            <ul className="space-y-4">
-              <li className="flex items-center gap-3">
-                <PlayCircle className="text-koya-accent" />
-                <span>Watch movies to earn points</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <Trophy className="text-koya-accent" />
-                <span>Complete movies for bonus points</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <PiggyBank className="text-koya-accent" />
-                <span>Convert points to real money</span>
-              </li>
-            </ul>
-          </div>
-
           {/* Marketing Content for Logged In Users */}
           <div className="pt-16 border-t border-gray-800">
             <div className="text-center space-y-6">
