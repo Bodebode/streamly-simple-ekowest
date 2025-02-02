@@ -1,107 +1,73 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useTheme } from 'next-themes';
-import { HeroSlide } from './hero/HeroSlide';
-import { HeroControls } from './hero/HeroControls';
-import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { useHighlyRated } from '@/hooks/use-highly-rated';
+import { useNewReleases } from '@/hooks/use-new-releases';
+import { useSkits } from '@/hooks/use-skits';
+import { useYorubaMovies } from '@/hooks/use-yoruba';
+import { CategoryRow } from '../features/movies/components/CategoryRow';
+import { MOCK_MOVIES } from '../data/mockMovies';
 
-export const Hero = () => {
-  const { theme } = useTheme();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [themeKey, setThemeKey] = useState(0);
-  const [videoUrl, setVideoUrl] = useState('');
-
-  useEffect(() => {
-    const loadVideo = async () => {
-      const fileName = theme === 'light' ? 'Ekowest_Hero_Vid_White.mp4' : 'Ekowest_Hero_Vid_Dark.mp4';
-      try {
-        const { data } = await supabase
-          .storage
-          .from('videos')
-          .getPublicUrl(fileName);
-          
-        if (!data?.publicUrl) {
-          console.error('No public URL available for hero video');
-          return;
-        }
-        
-        setVideoUrl(data.publicUrl);
-      } catch (error) {
-        console.error('Failed to load hero video:', error);
-      }
-    };
-    
-    loadVideo();
-  }, [theme]);
-
-  const slides = [
-    {
-      type: 'video' as const,
-      src: videoUrl,
-      duration: 39000,
-      id: 'hero-1'
-    },
-    {
-      type: 'image' as const,
-      src: '/videos/file-20220908-13-nwxk17.avif',
-      duration: 4000,
-      id: 'hero-2'
-    },
-    {
-      type: 'image' as const,
-      src: '/videos/Netflix-slate-e1692222322682.jpg',
-      duration: 4000,
-      id: 'hero-3'
-    }
-  ];
+const Hero = () => {
+  const { theme, setTheme } = useTheme();
+  const { data: highlyRatedVideos, isLoading: isLoadingHighlyRated } = useHighlyRated();
+  const { data: newReleases, isLoading: isLoadingNewReleases } = useNewReleases();
+  const { data: skits, isLoading: isLoadingSkits } = useSkits();
+  const { data: yorubaMovies, isLoading: isLoadingYoruba } = useYorubaMovies();
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => 
-        prevIndex === slides.length - 1 ? 0 : prevIndex + 1
-      );
-    }, slides[currentIndex].duration);
+    // Fetch data or perform any side effects here
+  }, []);
 
-    return () => clearInterval(timer);
-  }, [currentIndex, slides]);
-
-  useEffect(() => {
-    setThemeKey(prev => prev + 1);
-  }, [theme]);
-
-  const nextSlide = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === slides.length - 1 ? 0 : prevIndex + 1
-    );
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? slides.length - 1 : prevIndex - 1
-    );
+  // Update the type in the handleVideoSelect function
+  const handleVideoSelect = (videoId: string) => {
+    setSelectedVideoId(videoId);
   };
 
   return (
-    <div className="relative w-full h-[600px] overflow-hidden mb-16">
-      {slides.map((slide, index) => (
-        <HeroSlide
-          key={`${slide.id}-${themeKey}`}
-          type={slide.type}
-          src={slide.src}
-          index={index}
-          currentIndex={currentIndex}
-        />
-      ))}
-
-      <div className="absolute bottom-16 left-16 z-10">
-        <h1 className="text-4xl font-bold text-white mb-4">
-          Welcome to Ekowest TV
-        </h1>
-        <p className="text-xl text-white">
-          Experience the best of Nigerian entertainment
-        </p>
+    <div className="hero">
+      <h1 className="text-4xl font-bold">Welcome to the Movie App</h1>
+      <div className="flex gap-2">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        >
+          Toggle Theme
+        </Button>
       </div>
-
-      <HeroControls onPrevSlide={prevSlide} onNextSlide={nextSlide} />
+      <CategoryRow 
+        title="Trending Now" 
+        movies={MOCK_MOVIES.trending}
+        selectedVideoId={selectedVideoId}
+        onVideoSelect={handleVideoSelect}
+      />
+      <CategoryRow 
+        title="Highly Rated" 
+        movies={highlyRatedVideos || []}
+        selectedVideoId={selectedVideoId}
+        onVideoSelect={handleVideoSelect}
+      />
+      <CategoryRow 
+        title="Yoruba Movies" 
+        movies={yorubaMovies || []}
+        selectedVideoId={selectedVideoId}
+        onVideoSelect={handleVideoSelect}
+      />
+      <CategoryRow 
+        title="Skits" 
+        movies={skits || []}
+        selectedVideoId={selectedVideoId}
+        onVideoSelect={handleVideoSelect}
+      />
+      <CategoryRow 
+        title="New Releases" 
+        movies={newReleases || []}
+        selectedVideoId={selectedVideoId}
+        onVideoSelect={handleVideoSelect}
+      />
     </div>
   );
 };
+
+export default Hero;
