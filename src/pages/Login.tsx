@@ -1,81 +1,34 @@
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useAuthStore } from "@/stores/auth-store";
+import { useNavigate } from "react-router-dom";
+import { AuthUI } from "@/components/AuthUI";
+import { Drum } from "lucide-react";
 
 export const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-  const setAuth = useAuthStore((state) => state.setAuth);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    // Mock successful login - replace with your actual API call
-    const mockToken = "mock-jwt-token";
-    const mockUser = {
-      id: `user_${Date.now()}`, // Generate a unique ID
-      email,
-      name: email.split('@')[0]
-    };
-
-    setAuth(mockToken, mockUser);
-    
-    const from = location.state?.from?.pathname || "/";
-    navigate(from, { replace: true });
-    
-    setIsLoading(false);
-  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-koya-background py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-koya-background py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <div>
+        <div className="flex flex-col items-center">
+          <Drum className="w-12 h-12 text-koya-accent" />
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-            Sign in to your account
+            Welcome to Ekowest TV
           </h2>
+          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+            Sign in to your account to continue
+          </p>
         </div>
-        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email address"
-                className="rounded-t-md"
-                required
-                disabled={isLoading}
-              />
-            </div>
-            <div>
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                className="rounded-b-md"
-                required
-                disabled={isLoading}
-              />
-            </div>
-          </div>
+        
+        <div className="mt-8">
+          <AuthUI />
+        </div>
 
-          <div>
-            <Button 
-              type="submit" 
-              className="w-full"
-              disabled={isLoading}
-            >
-              {isLoading ? "Signing in..." : "Sign in"}
-            </Button>
+        {isLoading && (
+          <div className="flex justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-koya-accent"></div>
           </div>
-        </form>
+        )}
       </div>
     </div>
   );
