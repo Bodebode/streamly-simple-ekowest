@@ -1,8 +1,73 @@
 import { PlayCircle, Trophy, PiggyBank, Coins, DollarSign, Home } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/components/AuthProvider';
 
 export const Watch2Earn = () => {
+  const { user } = useAuth();
+
+  if (user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-koya-background to-black text-koya-text pt-20">
+        <div className="container mx-auto px-4 space-y-8">
+          <div className="flex justify-between items-center">
+            <h1 className="text-3xl font-bold">Watch2Earn Dashboard</h1>
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/" className="flex items-center gap-2">
+                <Home className="h-4 w-4" />
+                Back to Home
+              </Link>
+            </Button>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card>
+              <div className="p-6 space-y-4">
+                <Trophy className="w-12 h-12 text-yellow-500" />
+                <h3 className="text-xl font-bold">Your Points</h3>
+                <p className="text-3xl font-bold text-yellow-500">0</p>
+              </div>
+            </Card>
+
+            <Card>
+              <div className="p-6 space-y-4">
+                <Clock className="w-12 h-12 text-blue-500" />
+                <h3 className="text-xl font-bold">Watch Time</h3>
+                <p className="text-3xl font-bold text-blue-500">0 min</p>
+              </div>
+            </Card>
+
+            <Card>
+              <div className="p-6 space-y-4">
+                <DollarSign className="w-12 h-12 text-green-500" />
+                <h3 className="text-xl font-bold">Earnings</h3>
+                <p className="text-3xl font-bold text-green-500">₦0</p>
+              </div>
+            </Card>
+          </div>
+
+          <div className="bg-koya-card p-8 rounded-lg">
+            <h2 className="text-2xl font-bold mb-4">How to Earn</h2>
+            <ul className="space-y-4">
+              <li className="flex items-center gap-3">
+                <PlayCircle className="text-koya-accent" />
+                <span>Watch movies to earn points</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Trophy className="text-koya-accent" />
+                <span>Complete movies for bonus points</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <PiggyBank className="text-koya-accent" />
+                <span>Convert points to real money</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-koya-background to-black text-koya-text">
       <div className="container mx-auto px-4 py-16 space-y-16">
@@ -70,7 +135,7 @@ export const Watch2Earn = () => {
             Join thousands of smart viewers who are already earning while enjoying their favorite Nollywood content.
           </p>
           <Button size="lg" className="bg-koya-accent hover:bg-koya-accent/90">
-            <Link to="/auth">Sign Up Now</Link>
+            <Link to="/login">Sign Up Now</Link>
           </Button>
         </div>
       </div>
