@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { useHighlyRated } from '@/hooks/use-highly-rated';
@@ -8,8 +8,9 @@ import { useYorubaMovies } from '@/hooks/use-yoruba';
 import { CategoryRow } from '../features/movies/components/CategoryRow';
 import { MOCK_MOVIES } from '../data/mockMovies';
 
-const Hero = () => {
+export const Hero = () => {
   const { theme, setTheme } = useTheme();
+  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
   const { data: highlyRatedVideos, isLoading: isLoadingHighlyRated } = useHighlyRated();
   const { data: newReleases, isLoading: isLoadingNewReleases } = useNewReleases();
   const { data: skits, isLoading: isLoadingSkits } = useSkits();
@@ -19,8 +20,7 @@ const Hero = () => {
     // Fetch data or perform any side effects here
   }, []);
 
-  // Update the type in the handleVideoSelect function
-  const handleVideoSelect = (videoId: string) => {
+  const handleVideoSelect = (videoId: string | null) => {
     setSelectedVideoId(videoId);
   };
 
