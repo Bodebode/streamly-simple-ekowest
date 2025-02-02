@@ -91,76 +91,74 @@ export const Navbar = () => {
           <span className="hidden sm:inline">Ekowest TV</span>
         </Link>
         <div className="flex items-center gap-6">
-          {user && (
-            <div className="flex items-center gap-4">
-              <div className={cn(
-                "overflow-hidden transition-all duration-300 ease-in-out",
-                isSearching ? "w-64" : "w-0"
-              )}>
-                <div className="relative min-w-64">
-                  <Input
-                    placeholder="Search videos..."
-                    className="pl-3 pr-8"
-                    autoFocus={isSearching}
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      handleSearch(e.target.value);
-                    }}
-                  />
-                  {isSearching && (
-                    <button 
-                      onClick={() => setIsSearching(false)}
-                      className="absolute right-2 top-2.5"
-                    >
-                      <X className="h-4 w-4 text-muted-foreground" />
-                    </button>
-                  )}
-                </div>
-                {isSearching && searchResults.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-koya-card rounded-md shadow-lg z-50 max-h-[300px] overflow-y-auto">
-                    {isLoading ? (
-                      <div className="p-4 text-center">
-                        <span className="animate-spin inline-block mr-2">⌛</span>
-                        Searching...
-                      </div>
-                    ) : (
-                      searchResults.map((video) => (
-                        <div
-                          key={video.id.videoId}
-                          className="flex items-center gap-3 p-2 hover:bg-accent cursor-pointer"
-                          onClick={() => {
-                            navigate(`/watch/${video.id.videoId}`);
-                            setIsSearching(false);
-                            setSearchQuery('');
-                          }}
-                        >
-                          <img 
-                            src={video.snippet.thumbnails.default.url}
-                            alt={video.snippet.title}
-                            className="w-16 h-12 object-cover rounded"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate">{video.snippet.title}</p>
-                            <p className="text-xs text-muted-foreground">{video.snippet.channelTitle}</p>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                )}
-              </div>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={() => setIsSearching(true)}
-              >
-                <Search className="h-5 w-5" />
-              </Button>
-            </div>
-          )}
           {user ? (
             <>
+              <div className="flex items-center gap-4">
+                <div className={cn(
+                  "overflow-hidden transition-all duration-300 ease-in-out",
+                  isSearching ? "w-64" : "w-0"
+                )}>
+                  <div className="relative min-w-64">
+                    <Input
+                      placeholder="Search videos..."
+                      className="pl-3 pr-8"
+                      autoFocus={isSearching}
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        handleSearch(e.target.value);
+                      }}
+                    />
+                    {isSearching && (
+                      <button 
+                        onClick={() => setIsSearching(false)}
+                        className="absolute right-2 top-2.5"
+                      >
+                        <X className="h-4 w-4 text-muted-foreground" />
+                      </button>
+                    )}
+                  </div>
+                  {isSearching && searchResults.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-koya-card rounded-md shadow-lg z-50 max-h-[300px] overflow-y-auto">
+                      {isLoading ? (
+                        <div className="p-4 text-center">
+                          <span className="animate-spin inline-block mr-2">⌛</span>
+                          Searching...
+                        </div>
+                      ) : (
+                        searchResults.map((video) => (
+                          <div
+                            key={video.id.videoId}
+                            className="flex items-center gap-3 p-2 hover:bg-accent cursor-pointer"
+                            onClick={() => {
+                              navigate(`/watch/${video.id.videoId}`);
+                              setIsSearching(false);
+                              setSearchQuery('');
+                            }}
+                          >
+                            <img 
+                              src={video.snippet.thumbnails.default.url}
+                              alt={video.snippet.title}
+                              className="w-16 h-12 object-cover rounded"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium truncate">{video.snippet.title}</p>
+                              <p className="text-xs text-muted-foreground">{video.snippet.channelTitle}</p>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={() => setIsSearching(true)}
+                >
+                  <Search className="h-5 w-5" />
+                </Button>
+              </div>
               <Link to="/my-list" className="text-sm hover:underline">
                 My List
               </Link>
