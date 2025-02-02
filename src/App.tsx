@@ -14,6 +14,7 @@ import Watch from './pages/Watch';
 import { Watch2Earn } from './pages/Watch2Earn';
 import RewardsDashboard from './pages/RewardsDashboard';
 import MyList from './pages/MyList';
+import { Profile } from './pages/Profile';
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,14 @@ const App = () => {
                 <Route path="/watch2earn" element={<Watch2Earn />} />
                 <Route path="/" element={<Index />} />
                 <Route path="/watch/:videoId" element={<Watch />} />
+                <Route 
+                  path="/profile" 
+                  element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  } 
+                />
                 <Route 
                   path="/my-list" 
                   element={

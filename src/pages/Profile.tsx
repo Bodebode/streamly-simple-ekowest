@@ -48,7 +48,7 @@ export const Profile = () => {
                     Member Since
                   </p>
                   <p className="text-lg font-medium">
-                    {format(new Date(), 'MMMM dd, yyyy')}
+                    {format(new Date(user?.created_at || new Date()), 'MMMM dd, yyyy')}
                   </p>
                 </div>
               </div>
