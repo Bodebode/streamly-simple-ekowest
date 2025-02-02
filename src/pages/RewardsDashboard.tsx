@@ -64,10 +64,10 @@ export const RewardsDashboard = () => {
       icon: Star,
       features: [
         'VIP Community Pass inclusive',
-        'Direct tip to content creators',
         'Unlock exclusive content and features',
         'Go completely Ad-Free on all contents including page',
         'Special badge on your profile',
+        'Direct tip to content creators',
         'Monthly newsletter from favorite creators'
       ]
     }
