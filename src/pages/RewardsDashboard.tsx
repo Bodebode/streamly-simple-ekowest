@@ -2,9 +2,35 @@ import { useRewardsStore } from '@/stores/rewards-store';
 import { Button } from '@/components/ui/button';
 import { Trophy, Clock, Gift, Home, PlayCircle, PiggyBank, Coins, DollarSign } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useMemo } from 'react';
+
+// Exchange rates (you might want to fetch these from an API in a production environment)
+const EXCHANGE_RATES = {
+  USD: 1,
+  NGN: 1000, // 1 USD = 1000 NGN (approximate)
+  GBP: 0.8,  // 1 USD = 0.8 GBP (approximate)
+  EUR: 0.92, // 1 USD = 0.92 EUR (approximate)
+};
 
 export const RewardsDashboard = () => {
   const { points, watchTime } = useRewardsStore();
+
+  // Get user's country (in a real app, you'd get this from a geolocation service or user settings)
+  const userCountry = navigator.language || 'en-US';
+
+  const formatCurrency = (ecoins: number) => {
+    const baseUSDPrice = (ecoins / 1000) * 0.5; // 1000 coins = $0.50
+    
+    if (userCountry.includes('NG')) {
+      return `₦${(baseUSDPrice * EXCHANGE_RATES.NGN).toLocaleString()}`;
+    } else if (userCountry.includes('GB')) {
+      return `£${(baseUSDPrice * EXCHANGE_RATES.GBP).toLocaleString()}`;
+    } else if (userCountry.includes('EU')) {
+      return `€${(baseUSDPrice * EXCHANGE_RATES.EUR).toLocaleString()}`;
+    }
+    // Default to USD
+    return `$${baseUSDPrice.toLocaleString()}`;
+  };
 
   const rewards = [
     { name: 'Premium Movie Access', cost: 20000, icon: Trophy },
@@ -61,7 +87,7 @@ export const RewardsDashboard = () => {
                 <div className="flex items-center gap-3">
                   <div className="text-right">
                     <div className="font-semibold">{reward.cost.toLocaleString()} E-coins</div>
-                    <div className="text-sm text-muted-foreground">≈ ${(reward.cost / 1000).toFixed(2)}</div>
+                    <div className="text-sm text-muted-foreground">≈ {formatCurrency(reward.cost)}</div>
                   </div>
                   <Button 
                     variant="default"
