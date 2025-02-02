@@ -1,6 +1,6 @@
 import { useRewardsStore } from '@/stores/rewards-store';
 import { Button } from '@/components/ui/button';
-import { Trophy, Clock, Gift, Home, PlayCircle, PiggyBank, Coins, DollarSign, Users, Shield, Star, Check, Lock } from 'lucide-react';
+import { Trophy, Clock, Gift, Home, PlayCircle, PiggyBank, Coins, DollarSign, Users, Shield, Star, Check, Lock, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useMemo } from 'react';
 
@@ -32,7 +32,32 @@ export const RewardsDashboard = () => {
     return `$${baseUSDPrice.toLocaleString()}`;
   };
 
+  const formatBasicPrice = () => {
+    const baseGBPPrice = 4; // £4 base price
+    
+    if (userCountry.includes('NG')) {
+      return `₦${(baseGBPPrice / EXCHANGE_RATES.GBP * EXCHANGE_RATES.NGN).toLocaleString()}`;
+    } else if (userCountry.includes('GB')) {
+      return `£${baseGBPPrice.toLocaleString()}`;
+    } else if (userCountry.includes('EU')) {
+      return `€${(baseGBPPrice / EXCHANGE_RATES.GBP * EXCHANGE_RATES.EUR).toLocaleString()}`;
+    }
+    // Default to USD
+    return `$${(baseGBPPrice / EXCHANGE_RATES.GBP).toLocaleString()}`;
+  };
+
   const rewards = [
+    {
+      name: 'Standard Reward',
+      cost: 0,
+      icon: Award,
+      fixedPrice: formatBasicPrice(),
+      features: [
+        'Rewarding you for your time spent watching on Ekowest',
+        'Earn points for every minute watched',
+        'Track your watching progress and rewards'
+      ]
+    },
     { 
       name: 'Premium Movie Access', 
       cost: 20000, 
@@ -129,12 +154,18 @@ export const RewardsDashboard = () => {
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <div className="font-semibold">{reward.cost.toLocaleString()} E-coins</div>
-                    <div className="text-sm text-muted-foreground">≈ {formatCurrency(reward.cost)}</div>
+                    {reward.cost > 0 ? (
+                      <>
+                        <div className="font-semibold">{reward.cost.toLocaleString()} E-coins</div>
+                        <div className="text-sm text-muted-foreground">≈ {formatCurrency(reward.cost)}</div>
+                      </>
+                    ) : (
+                      <div className="font-semibold">{reward.fixedPrice}</div>
+                    )}
                   </div>
                   <Button 
                     variant="default"
-                    disabled={points < reward.cost}
+                    disabled={reward.cost > 0 && points < reward.cost}
                   >
                     Buy Now
                   </Button>
