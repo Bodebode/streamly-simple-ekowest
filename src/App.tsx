@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "./components/AuthProvider";
 import { useAuth } from "./components/AuthProvider";
@@ -24,6 +24,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <div>Loading...</div>;
   }
 
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
   return <>{children}</>;
 };
 
@@ -40,6 +44,8 @@ const App = () => {
                 <Route path="/login" element={<Login />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/watch2earn" element={<Watch2Earn />} />
+                <Route path="/" element={<Index />} />
+                <Route path="/watch/:videoId" element={<Watch />} />
                 <Route 
                   path="/my-list" 
                   element={
@@ -56,8 +62,6 @@ const App = () => {
                     </ProtectedRoute>
                   } 
                 />
-                <Route path="/watch/:videoId" element={<Watch />} />
-                <Route path="/" element={<Index />} />
               </Routes>
             </TooltipProvider>
           </AuthProvider>

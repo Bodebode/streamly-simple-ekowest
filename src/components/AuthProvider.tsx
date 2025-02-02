@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface AuthContextType {
   session: Session | null;
@@ -22,6 +22,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     console.log('AuthProvider: Initializing');
@@ -31,10 +32,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
-      
-      if (!session) {
-        navigate('/login');
-      }
     });
 
     const {
@@ -51,18 +48,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           title: "Welcome!",
           description: "You have successfully signed in.",
         });
+        // Redirect to home page after sign in
         navigate('/');
       } else if (event === 'SIGNED_OUT') {
         toast({
           title: "Signed out",
           description: "You have been signed out.",
         });
-        navigate('/login');
+        // Only redirect to login if on a protected route
+        if (location.pathname.includes('/my-list') || location.pathname.includes('/rewards')) {
+          navigate('/login');
+        }
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [toast, navigate]);
+  }, [toast, navigate, location]);
 
   return (
     <AuthContext.Provider value={{ session, user, loading }}>
