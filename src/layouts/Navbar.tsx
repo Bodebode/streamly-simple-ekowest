@@ -3,7 +3,7 @@ import { Drum, Coins, Search, X, LogOut, User } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { useAuthStore } from '@/stores/auth-store';
+import { useAuth } from '@/components/AuthProvider';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,14 +29,13 @@ export const Navbar = () => {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { user, clearAuth } = useAuthStore();
+  const { user } = useAuth();
   const { toast } = useToast();
   const API_KEY = 'AIzaSyDqOUX5_9QZZzrfGxWqVrqZw_R-y3hKDb8';
 
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
-      clearAuth();
       toast({
         title: "Logged out successfully",
         description: "You have been signed out of your account.",
