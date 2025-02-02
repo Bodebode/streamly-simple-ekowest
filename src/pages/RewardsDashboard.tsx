@@ -1,6 +1,6 @@
 import { useRewardsStore } from '@/stores/rewards-store';
 import { Button } from '@/components/ui/button';
-import { Trophy, Clock, Gift, Home, PlayCircle, PiggyBank, Coins, DollarSign } from 'lucide-react';
+import { Trophy, Clock, Gift, Home, PlayCircle, PiggyBank, Coins, DollarSign, Users, Shield, Star, Check, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useMemo } from 'react';
 
@@ -33,8 +33,44 @@ export const RewardsDashboard = () => {
   };
 
   const rewards = [
-    { name: 'Premium Movie Access', cost: 20000, icon: Trophy },
-    { name: 'Ad-Free Watching', cost: 30000, icon: Gift }
+    { 
+      name: 'Premium Movie Access', 
+      cost: 20000, 
+      icon: Trophy,
+      features: ['Unlock exclusive content and features']
+    },
+    { 
+      name: 'Ad-Free Watching', 
+      cost: 30000, 
+      icon: Gift,
+      features: ['Remove all ads during video playback']
+    },
+    {
+      name: 'VIP Community Pass',
+      cost: 35000,
+      icon: Shield,
+      features: [
+        'Premium Movie Access inclusive',
+        'Go Ad-Free on all contents',
+        'Unlock exclusive content and features',
+        'Exclusive chat rooms with creators',
+        'Priority customer support',
+        'Early scope upcoming content'
+      ]
+    },
+    {
+      name: 'Creator Support Package',
+      cost: 60000,
+      icon: Star,
+      features: [
+        'VIP Community Pass inclusive',
+        'Direct tip to content creators',
+        'Unlock exclusive content and features',
+        'Go completely Ad-Free on all contents including page',
+        'Special badge on your profile',
+        'Monthly newsletter from favorite creators'
+      ]
+    }
   ];
 
   return (
@@ -81,7 +117,14 @@ export const RewardsDashboard = () => {
                   <reward.icon className="h-6 w-6 text-koya-accent" />
                   <div>
                     <span className="font-medium">{reward.name}</span>
-                    <p className="text-sm text-muted-foreground">Unlock exclusive content and features</p>
+                    <ul className="mt-2 space-y-1">
+                      {reward.features.map((feature, index) => (
+                        <li key={index} className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Check className="h-4 w-4 text-koya-accent" />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
