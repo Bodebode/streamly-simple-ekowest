@@ -173,7 +173,8 @@ export const Navbar = () => {
             </>
           ) : (
             <>
-              <Link to="/watch2earn" className="text-sm hover:underline">
+              <Link to="/watch2earn" className="flex items-center gap-1 text-sm hover:underline">
+                <Coins className="h-5 w-5" />
                 Watch2Earn
               </Link>
               <Link to="/privacy" className="text-sm hover:underline">
