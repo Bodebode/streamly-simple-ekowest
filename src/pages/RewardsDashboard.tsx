@@ -69,15 +69,6 @@ export const RewardsDashboard = () => {
 
         {/* Marketing Content Section */}
         <div className="space-y-16 border-t border-gray-700 pt-16">
-          <div className="text-center space-y-6">
-            <h2 className="text-4xl md:text-6xl font-bold text-koya-accent">
-              Watch2Earn with Ekowest TV
-            </h2>
-            <p className="text-xl md:text-2xl max-w-2xl mx-auto">
-              Yes, you read that right! Get paid to watch your favorite Nollywood movies.
-            </p>
-          </div>
-
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-koya-card p-6 rounded-lg space-y-4">
               <PlayCircle className="w-12 h-12 text-koya-accent" />
