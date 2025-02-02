@@ -1,5 +1,5 @@
 export interface Movie {
-  id: string;  // Changed from number to string since Supabase uses text IDs
+  id: string;
   title: string;
   image: string;
   category: string;
@@ -24,12 +24,12 @@ export interface CategoryRowProps {
 
 export interface MovieCarouselProps {
   movies: Movie[];
-  onMovieSelect: (videoId: string | null) => void;
+  onVideoSelect: (videoId: string | null) => void;
   isVideoPlaying: boolean;
 }
 
 export interface MovieCardProps {
-  id: string;  // Changed from number to string
+  id: string;
   title: string;
   image: string;
   category: string;

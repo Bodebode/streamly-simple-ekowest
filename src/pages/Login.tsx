@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthUI } from "@/components/AuthUI";
 import { Drum } from "lucide-react";
 
-export const Login = () => {
+const Login = () => {
   const [isLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -33,3 +33,5 @@ export const Login = () => {
     </div>
   );
 };
+
+export default Login;
