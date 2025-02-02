@@ -7,9 +7,8 @@ export const RewardsDashboard = () => {
   const { points, watchTime } = useRewardsStore();
 
   const rewards = [
-    { name: 'Premium Movie Access', cost: 100, icon: Trophy },
-    { name: 'Ad-Free Watching', cost: 200, icon: Gift },
-    { name: 'Exclusive Content', cost: 500, icon: Gift }
+    { name: 'Premium Movie Access', cost: 20000, icon: Trophy },
+    { name: 'Ad-Free Watching', cost: 30000, icon: Gift }
   ];
 
   return (
@@ -48,26 +47,34 @@ export const RewardsDashboard = () => {
         </div>
 
         <div className="bg-white dark:bg-koya-card rounded-lg p-6 mb-16">
-          <h2 className="text-2xl font-semibold mb-6">Available Rewards</h2>
+          <h2 className="text-2xl font-semibold mb-6">Premium Features</h2>
           <div className="grid gap-4">
             {rewards.map((reward) => (
               <div key={reward.name} className="flex items-center justify-between p-4 border rounded-lg">
                 <div className="flex items-center gap-4">
                   <reward.icon className="h-6 w-6 text-koya-accent" />
-                  <span className="font-medium">{reward.name}</span>
+                  <div>
+                    <span className="font-medium">{reward.name}</span>
+                    <p className="text-sm text-muted-foreground">Unlock exclusive content and features</p>
+                  </div>
                 </div>
-                <Button 
-                  disabled={points < reward.cost}
-                  variant={points >= reward.cost ? "default" : "outline"}
-                >
-                  {reward.cost} Points
-                </Button>
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <div className="font-semibold">{reward.cost.toLocaleString()} E-coins</div>
+                    <div className="text-sm text-muted-foreground">≈ ${(reward.cost / 1000).toFixed(2)}</div>
+                  </div>
+                  <Button 
+                    variant="default"
+                    disabled={points < reward.cost}
+                  >
+                    Buy Now
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Marketing Content Section */}
         <div className="space-y-16 border-t border-gray-700 pt-16">
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-koya-card p-6 rounded-lg space-y-4">
