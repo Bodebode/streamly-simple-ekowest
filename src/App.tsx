@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -6,13 +7,13 @@ import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "./components/AuthProvider";
 import { useAuth } from "./components/AuthProvider";
 import Index from "./pages/Index";
-import Login from "./pages/Login";
-import MyList from "./pages/MyList";
-import Watch from "./pages/Watch";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import Watch2Earn from "./pages/Watch2Earn";
-import { RewardsDashboard } from "./pages/RewardsDashboard";
-import Profile from "./pages/Profile";
+import TechStack from "./pages/TechStack";
+import { PrivacyPolicy } from './pages/PrivacyPolicy';
+import { Login } from './pages/Login';
+import Watch from './pages/Watch';
+import { Watch2Earn } from './pages/Watch2Earn';
+import RewardsDashboard from './pages/RewardsDashboard';
+import MyList from './pages/MyList';
 
 const queryClient = new QueryClient();
 
@@ -30,27 +31,21 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-function App() {
+const App = () => {
   return (
-    <BrowserRouter>
-      <ThemeProvider attribute="class" defaultTheme="dark">
-        <QueryClientProvider client={queryClient}>
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
           <AuthProvider>
             <TooltipProvider>
+              <Toaster />
+              <Sonner />
               <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/watch2earn" element={<Watch2Earn />} />
                 <Route path="/" element={<Index />} />
                 <Route path="/watch/:videoId" element={<Watch />} />
-                <Route 
-                  path="/profile" 
-                  element={
-                    <ProtectedRoute>
-                      <Profile />
-                    </ProtectedRoute>
-                  } 
-                />
                 <Route 
                   path="/my-list" 
                   element={
@@ -68,13 +63,12 @@ function App() {
                   } 
                 />
               </Routes>
-              <Sonner />
             </TooltipProvider>
           </AuthProvider>
-        </QueryClientProvider>
-      </ThemeProvider>
-    </BrowserRouter>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
-}
+};
 
 export default App;

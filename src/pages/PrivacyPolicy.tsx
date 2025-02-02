@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const PrivacyPolicy = () => {
+export const PrivacyPolicy = () => {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="mb-6">
@@ -31,5 +31,3 @@ const PrivacyPolicy = () => {
     </div>
   );
 };
-
-export default PrivacyPolicy;
