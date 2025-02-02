@@ -32,26 +32,11 @@ export const RewardsDashboard = () => {
     return `$${baseUSDPrice.toLocaleString()}`;
   };
 
-  const formatBasicPrice = () => {
-    const baseGBPPrice = 4; // £4 base price
-    
-    if (userCountry.includes('NG')) {
-      return `₦${(baseGBPPrice / EXCHANGE_RATES.GBP * EXCHANGE_RATES.NGN).toLocaleString()}`;
-    } else if (userCountry.includes('GB')) {
-      return `£${baseGBPPrice.toLocaleString()}`;
-    } else if (userCountry.includes('EU')) {
-      return `€${(baseGBPPrice / EXCHANGE_RATES.GBP * EXCHANGE_RATES.EUR).toLocaleString()}`;
-    }
-    // Default to USD
-    return `$${(baseGBPPrice / EXCHANGE_RATES.GBP).toLocaleString()}`;
-  };
-
   const rewards = [
     {
       name: 'Standard Reward',
-      cost: 0,
+      cost: 10000,
       icon: Award,
-      fixedPrice: formatBasicPrice(),
       features: [
         'Rewarding you for your time spent watching on Ekowest',
         'Earn points for every minute watched',
@@ -92,8 +77,8 @@ export const RewardsDashboard = () => {
         'Unlock exclusive content and features',
         'Go completely Ad-Free on all contents including page',
         'Special badge on your profile',
-        'Direct tip to content creators',
-        'Monthly newsletter from favorite creators'
+        'Monthly newsletter from favorite creators',
+        'Direct tip to content creators'
       ]
     }
   ];
@@ -160,7 +145,7 @@ export const RewardsDashboard = () => {
                         <div className="text-sm text-muted-foreground">≈ {formatCurrency(reward.cost)}</div>
                       </>
                     ) : (
-                      <div className="font-semibold">{reward.fixedPrice}</div>
+                      <div className="font-semibold">Free</div>
                     )}
                   </div>
                   <Button 
