@@ -1,6 +1,6 @@
 import { useRewardsStore } from '@/stores/rewards-store';
 import { Button } from '@/components/ui/button';
-import { Trophy, Clock, Gift, Home, PlayCircle, PiggyBank, Coins, DollarSign } from 'lucide-react';
+import { Trophy, Clock, Gift, Home, PlayCircle, PiggyBank, Coins, DollarSign, MessageSquare, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useMemo } from 'react';
 
@@ -33,8 +33,32 @@ export const RewardsDashboard = () => {
   };
 
   const rewards = [
-    { name: 'Premium Movie Access', cost: 20000, icon: Trophy },
-    { name: 'Ad-Free Watching', cost: 30000, icon: Gift }
+    { 
+      name: 'VIP Community Pass', 
+      cost: 35000, 
+      icon: MessageSquare,
+      features: [
+        'Premium Movie Access inclusive',
+        'Go Ad-Free on all contents',
+        'Unlock exclusive content and features',
+        'Exclusive chat rooms with creators',
+        'Priority customer support',
+        'Early scope upcoming content'
+      ]
+    },
+    { 
+      name: 'Creator Support Package', 
+      cost: 60000, 
+      icon: Award,
+      features: [
+        'VIP Community Pass inclusive',
+        'Direct tip to content creators',
+        'Unlock exclusive content and features',
+        'Go completely Ad-Free on all contents including page',
+        'Special badge on your profile',
+        'Monthly newsletter from favorite creators'
+      ]
+    }
   ];
 
   return (
@@ -74,28 +98,38 @@ export const RewardsDashboard = () => {
 
         <div className="bg-white dark:bg-koya-card rounded-lg p-6 mb-16">
           <h2 className="text-2xl font-semibold mb-6">Premium Features</h2>
-          <div className="grid gap-4">
+          <div className="grid gap-6">
             {rewards.map((reward) => (
-              <div key={reward.name} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center gap-4">
-                  <reward.icon className="h-6 w-6 text-koya-accent" />
-                  <div>
-                    <span className="font-medium">{reward.name}</span>
-                    <p className="text-sm text-muted-foreground">Unlock exclusive content and features</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    <div className="font-semibold">{reward.cost.toLocaleString()} E-coins</div>
-                    <div className="text-sm text-muted-foreground">≈ {formatCurrency(reward.cost)}</div>
+              <div key={reward.name} className="flex flex-col p-6 border rounded-lg bg-gradient-to-br from-koya-card to-koya-card/50">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-4">
+                    <reward.icon className="h-8 w-8 text-koya-accent" />
+                    <div>
+                      <h3 className="text-xl font-semibold">{reward.name}</h3>
+                      <div className="text-lg font-medium text-koya-accent mt-1">
+                        {reward.cost.toLocaleString()} E-coins
+                        <span className="text-sm text-muted-foreground ml-2">
+                          ≈ {formatCurrency(reward.cost)}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                   <Button 
                     variant="default"
                     disabled={points < reward.cost}
+                    className="shrink-0"
                   >
                     Buy Now
                   </Button>
                 </div>
+                <ul className="space-y-2 mt-4">
+                  {reward.features.map((feature, index) => (
+                    <li key={index} className="flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-koya-accent" />
+                      <span className="text-sm">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
