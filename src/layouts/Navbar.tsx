@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { Drum, Coins, Search, X } from 'lucide-react';
+import { Drum, Coins, Search, X, LogOut, User } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { useAuthStore } from '@/stores/auth-store';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SearchResult {
   id: {
@@ -28,12 +30,26 @@ export const Navbar = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { user, clearAuth } = useAuthStore();
-
-  const handleLogout = () => {
-    clearAuth();
-    navigate('/login');
-  };
+  const { toast } = useToast();
   const API_KEY = 'AIzaSyDqOUX5_9QZZzrfGxWqVrqZw_R-y3hKDb8';
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      clearAuth();
+      toast({
+        title: "Logged out successfully",
+        description: "You have been signed out of your account.",
+      });
+      navigate('/login');
+    } catch (error) {
+      toast({
+        title: "Error logging out",
+        description: "There was a problem signing you out.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleSearch = async (query: string) => {
     if (!query.trim()) {
@@ -77,7 +93,7 @@ export const Navbar = () => {
         </Link>
         <div className="flex items-center gap-6">
           {user && (
-            <div className="flex items-center">
+            <div className="flex items-center gap-4">
               <div className={cn(
                 "overflow-hidden transition-all duration-300 ease-in-out",
                 isSearching ? "w-64" : "w-0"
@@ -102,14 +118,14 @@ export const Navbar = () => {
                     </button>
                   )}
                 </div>
-                {isSearching && (
+                {isSearching && searchResults.length > 0 && (
                   <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-koya-card rounded-md shadow-lg z-50 max-h-[300px] overflow-y-auto">
                     {isLoading ? (
                       <div className="p-4 text-center">
                         <span className="animate-spin inline-block mr-2">⌛</span>
                         Searching...
                       </div>
-                    ) : searchResults.length > 0 ? (
+                    ) : (
                       searchResults.map((video) => (
                         <div
                           key={video.id.videoId}
@@ -131,10 +147,6 @@ export const Navbar = () => {
                           </div>
                         </div>
                       ))
-                    ) : (
-                      <div className="p-4 text-center text-muted-foreground">
-                        No results found
-                      </div>
                     )}
                   </div>
                 )}
@@ -157,16 +169,21 @@ export const Navbar = () => {
                 <Coins className="h-5 w-5" />
                 Watch2Earn
               </Link>
-              <Link to="/privacy" className="text-sm hover:underline">
-                Privacy Policy
-              </Link>
               <div className="flex items-center gap-4">
-                <span className="text-sm">{user.email}</span>
+                <Link 
+                  to="/profile" 
+                  className="flex items-center gap-2 text-sm hover:underline"
+                >
+                  <User className="h-5 w-5" />
+                  <span>{user.email}</span>
+                </Link>
                 <Button 
                   variant="ghost" 
                   size="sm"
                   onClick={handleLogout}
+                  className="flex items-center gap-2"
                 >
+                  <LogOut className="h-4 w-4" />
                   Logout
                 </Button>
               </div>
