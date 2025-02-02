@@ -14,8 +14,6 @@ const EXCHANGE_RATES = {
 
 export const RewardsDashboard = () => {
   const { points, watchTime } = useRewardsStore();
-
-  // Get user's country (in a real app, you'd get this from a geolocation service or user settings)
   const userCountry = navigator.language || 'en-US';
 
   const formatCurrency = (ecoins: number) => {
@@ -122,14 +120,24 @@ export const RewardsDashboard = () => {
           <h2 className="text-2xl font-semibold mb-6">Premium Features</h2>
           <div className="grid gap-4">
             {rewards.map((reward) => (
-              <div key={reward.name} className="flex items-center justify-between p-4 border rounded-lg">
+              <div 
+                key={reward.name} 
+                className="flex items-center justify-between p-4 border rounded-lg 
+                         transition-all duration-300 ease-in-out
+                         hover:scale-[1.02] hover:shadow-lg hover:border-koya-accent
+                         hover:bg-white/5"
+              >
                 <div className="flex items-center gap-4">
-                  <reward.icon className="h-6 w-6 text-koya-accent" />
+                  <reward.icon className="h-6 w-6 text-koya-accent transition-transform duration-300 group-hover:scale-110" />
                   <div>
                     <span className="font-medium">{reward.name}</span>
                     <ul className="mt-2 space-y-1">
                       {reward.features.map((feature, index) => (
-                        <li key={index} className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <li 
+                          key={index} 
+                          className="flex items-center gap-2 text-sm text-muted-foreground
+                                   transition-opacity duration-200 hover:opacity-100"
+                        >
                           <Check className="h-4 w-4 text-koya-accent" />
                           {feature}
                         </li>
@@ -151,6 +159,7 @@ export const RewardsDashboard = () => {
                   <Button 
                     variant="default"
                     disabled={reward.cost > 0 && points < reward.cost}
+                    className="transition-all duration-300 hover:scale-105"
                   >
                     Buy Now
                   </Button>
