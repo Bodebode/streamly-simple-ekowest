@@ -36,23 +36,22 @@ export const MovieCard = ({
   useEffect(() => {
     const loadOptimizedImage = async () => {
       if (image.startsWith('http')) {
-        // If it's already a URL, use it directly
         setOptimizedImage(image);
         return;
       }
 
       try {
-        const { data: { publicUrl }, error } = await supabase
+        const { data } = await supabase
           .storage
           .from('videos')
           .getPublicUrl(image);
           
-        if (error) {
-          console.error('Error loading optimized image:', error);
+        if (!data?.publicUrl) {
+          console.error('No public URL available for image');
           return;
         }
         
-        setOptimizedImage(publicUrl);
+        setOptimizedImage(data.publicUrl);
       } catch (error) {
         console.error('Failed to load optimized image:', error);
         setOptimizedImage(image); // Fallback to original image
@@ -75,13 +74,11 @@ export const MovieCard = ({
           .single();
         
         if (error) {
-          // Only log the error, don't show toast
           console.error('Error checking movie list status:', error);
           return;
         }
         setIsInList(!!data);
       } catch (error) {
-        // Only log the error, don't show toast
         console.error('Error in movie list check:', error);
       }
     };

@@ -14,17 +14,17 @@ export const Hero = () => {
     const loadVideo = async () => {
       const fileName = theme === 'light' ? 'Ekowest_Hero_Vid_White.mp4' : 'Ekowest_Hero_Vid_Dark.mp4';
       try {
-        const { data: { publicUrl }, error } = await supabase
+        const { data } = await supabase
           .storage
           .from('videos')
           .getPublicUrl(fileName);
           
-        if (error) {
-          console.error('Error loading hero video:', error);
+        if (!data?.publicUrl) {
+          console.error('No public URL available for hero video');
           return;
         }
         
-        setVideoUrl(publicUrl);
+        setVideoUrl(data.publicUrl);
       } catch (error) {
         console.error('Failed to load hero video:', error);
       }
