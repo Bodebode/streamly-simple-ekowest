@@ -57,14 +57,7 @@ const App = () => {
                   } 
                 />
                 <Route path="/watch/:videoId" element={<Watch />} />
-                <Route 
-                  path="/" 
-                  element={
-                    <ProtectedRoute>
-                      <Index />
-                    </ProtectedRoute>
-                  } 
-                />
+                <Route path="/" element={<Index />} />
               </Routes>
             </TooltipProvider>
           </AuthProvider>
