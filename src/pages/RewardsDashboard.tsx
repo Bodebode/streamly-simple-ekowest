@@ -1,6 +1,6 @@
 import { useRewardsStore } from '@/stores/rewards-store';
 import { Button } from '@/components/ui/button';
-import { Trophy, Clock, Gift, Home } from 'lucide-react';
+import { Trophy, Clock, Gift, Home, PlayCircle, PiggyBank, Coins, DollarSign } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const RewardsDashboard = () => {
@@ -47,7 +47,7 @@ export const RewardsDashboard = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-koya-card rounded-lg p-6">
+        <div className="bg-white dark:bg-koya-card rounded-lg p-6 mb-16">
           <h2 className="text-2xl font-semibold mb-6">Available Rewards</h2>
           <div className="grid gap-4">
             {rewards.map((reward) => (
@@ -64,6 +64,53 @@ export const RewardsDashboard = () => {
                 </Button>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Marketing Content Section */}
+        <div className="space-y-16 border-t border-gray-700 pt-16">
+          <div className="text-center space-y-6">
+            <h2 className="text-4xl md:text-6xl font-bold text-koya-accent">
+              Watch2Earn with Ekowest TV
+            </h2>
+            <p className="text-xl md:text-2xl max-w-2xl mx-auto">
+              Yes, you read that right! Get paid to watch your favorite Nollywood movies.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-koya-card p-6 rounded-lg space-y-4">
+              <PlayCircle className="w-12 h-12 text-koya-accent" />
+              <h3 className="text-xl font-bold">Watch Movies</h3>
+              <p>Stream your favorite Nollywood content like you always do. Every minute counts towards your earnings.</p>
+            </div>
+            <div className="bg-koya-card p-6 rounded-lg space-y-4">
+              <Trophy className="w-12 h-12 text-koya-accent" />
+              <h3 className="text-xl font-bold">Earn Points</h3>
+              <p>Accumulate Ekowest coins based on your watch time. Bonus points for completing movies and sharing reviews!</p>
+            </div>
+            <div className="bg-koya-card p-6 rounded-lg space-y-4">
+              <PiggyBank className="w-12 h-12 text-koya-accent" />
+              <h3 className="text-xl font-bold">Get Paid</h3>
+              <p>Convert your coins to real money - Naira, Dollars, or Pounds. Withdraw straight to your bank account!</p>
+            </div>
+          </div>
+
+          <div className="bg-koya-card p-8 rounded-lg">
+            <h2 className="text-3xl font-bold mb-6">Earning Potential</h2>
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <Coins className="text-koya-accent" />
+                <p>Earn 10 coins per minute of watch time</p>
+              </div>
+              <div className="flex items-center gap-4">
+                <DollarSign className="text-koya-accent" />
+                <p>1000 coins = ₦500 / $0.50 / £0.40</p>
+              </div>
+              <div className="border-t border-gray-700 pt-4 mt-6">
+                <p className="text-lg">Watch just 2 hours daily to earn up to ₦15,000 monthly!</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
