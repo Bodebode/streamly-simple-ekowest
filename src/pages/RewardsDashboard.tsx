@@ -55,7 +55,7 @@ export const RewardsDashboard = () => {
         'Unlock exclusive content and features',
         'Exclusive chat rooms with creators',
         'Priority customer support',
-        'Early scope upcoming content'
+        'Early scoop on upcoming content and events'
       ]
     },
     {
