@@ -38,7 +38,7 @@ export const Watch2Earn = () => {
   );
 
   const MarketingContent = () => (
-    <div className="space-y-16">
+    <div className="space-y-16 mt-16">
       <div className="text-center space-y-6">
         <h2 className="text-4xl md:text-6xl font-bold text-koya-accent">
           Watch2Earn with Ekowest TV
@@ -82,6 +82,18 @@ export const Watch2Earn = () => {
           </div>
         </div>
       </div>
+
+      {!user && (
+        <div className="text-center space-y-6 py-12">
+          <h2 className="text-3xl md:text-4xl font-bold">Ready to Start Earning?</h2>
+          <p className="text-xl max-w-2xl mx-auto">
+            Join thousands of smart viewers who are already earning while enjoying their favorite Nollywood content.
+          </p>
+          <Button size="lg" className="bg-koya-accent hover:bg-koya-accent/90">
+            <Link to="/login">Sign Up Now</Link>
+          </Button>
+        </div>
+      )}
     </div>
   );
 
@@ -98,27 +110,8 @@ export const Watch2Earn = () => {
           </Button>
         </div>
 
-        {user ? (
-          <>
-            <DashboardContent />
-            <div className="pt-16 border-t border-gray-800">
-              <MarketingContent />
-            </div>
-          </>
-        ) : (
-          <>
-            <MarketingContent />
-            <div className="text-center space-y-6 py-12">
-              <h2 className="text-3xl md:text-4xl font-bold">Ready to Start Earning?</h2>
-              <p className="text-xl max-w-2xl mx-auto">
-                Join thousands of smart viewers who are already earning while enjoying their favorite Nollywood content.
-              </p>
-              <Button size="lg" className="bg-koya-accent hover:bg-koya-accent/90">
-                <Link to="/login">Sign Up Now</Link>
-              </Button>
-            </div>
-          </>
-        )}
+        {user && <DashboardContent />}
+        <MarketingContent />
       </div>
     </div>
   );
