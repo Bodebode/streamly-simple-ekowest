@@ -188,24 +188,30 @@ export const RewardsDashboard = () => {
                     </ul>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col items-end gap-3">
                   <div className="text-right">
-                    {reward.cost > 0 ? (
-                      <>
-                        <div className="font-semibold">{reward.cost.toLocaleString()} E-coins</div>
-                        <div className="text-sm text-muted-foreground">≈ {formatCurrency(reward.cost)}</div>
-                      </>
-                    ) : (
-                      <div className="font-semibold">Free</div>
-                    )}
+                    <div className="font-semibold">{reward.cost.toLocaleString()} E-coins</div>
+                    <div className="text-sm text-muted-foreground">≈ {formatCurrency(reward.cost)}</div>
                   </div>
                   <Button 
                     variant="default"
-                    disabled={reward.cost > 0 && points < reward.cost}
                     onClick={() => handlePurchase(reward)}
+                    disabled={!user || points < reward.cost}
                     className="transition-all duration-300 hover:scale-105"
                   >
-                    Buy Now
+                    {!user ? (
+                      <div className="flex items-center gap-2">
+                        <Lock className="h-4 w-4" />
+                        Login to Buy
+                      </div>
+                    ) : points < reward.cost ? (
+                      <div className="flex items-center gap-2">
+                        <Lock className="h-4 w-4" />
+                        Insufficient Points
+                      </div>
+                    ) : (
+                      'Buy Now'
+                    )}
                   </Button>
                 </div>
               </div>
