@@ -1,5 +1,5 @@
 export interface Movie {
-  id: string;  // Changed from number to string
+  id: string;
   title: string;
   image: string;
   category: string;
@@ -29,7 +29,7 @@ export interface MovieCarouselProps {
 }
 
 export interface MovieCardProps {
-  id: string;  // Changed from number to string
+  id: string;
   title: string;
   image: string;
   category: string;
