@@ -1,9 +1,4 @@
 project_id = "yuisywwlzorzdrzvjlvm"
 
-[functions.get-related-videos]
-
-[functions.get-new-releases]
-
-[functions.get-skits]
-
-[functions.check-video-availability]
+[functions.create-paypal-order]
+verify_jwt = true

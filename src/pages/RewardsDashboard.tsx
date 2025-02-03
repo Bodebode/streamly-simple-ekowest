@@ -3,6 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Trophy, Clock, Gift, Home, PlayCircle, PiggyBank, Coins, DollarSign, Users, Shield, Star, Check, Lock, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useMemo } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/stores/auth-store';
+import { toast } from 'sonner';
 
 // Exchange rates (you might want to fetch these from an API in a production environment)
 const EXCHANGE_RATES = {
@@ -14,6 +17,7 @@ const EXCHANGE_RATES = {
 
 export const RewardsDashboard = () => {
   const { points, watchTime } = useRewardsStore();
+  const { user } = useAuthStore();
   const userCountry = navigator.language || 'en-US';
 
   const formatCurrency = (ecoins: number) => {
@@ -26,13 +30,46 @@ export const RewardsDashboard = () => {
     } else if (userCountry.includes('EU')) {
       return `€${(baseUSDPrice * EXCHANGE_RATES.EUR).toLocaleString()}`;
     }
-    // Default to USD
     return `$${baseUSDPrice.toLocaleString()}`;
+  };
+
+  const handlePurchase = async (reward: any) => {
+    if (!user) {
+      toast.error('Please login to make a purchase');
+      return;
+    }
+
+    try {
+      const response = await supabase.functions.invoke('create-paypal-order', {
+        body: {
+          reward_id: reward.name,
+          amount: (reward.cost / 1000) * 0.5, // Convert E-coins to USD
+          currency: 'USD',
+        },
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
+
+      const { data: orderData } = response;
+      
+      // Redirect to PayPal checkout
+      if (orderData.links) {
+        const checkoutLink = orderData.links.find((link: any) => link.rel === 'approve');
+        if (checkoutLink) {
+          window.location.href = checkoutLink.href;
+        }
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast.error('Failed to process payment. Please try again.');
+    }
   };
 
   const rewards = [
     {
-      name: 'Standard Reward',
+      name: 'Standard_Reward',
       cost: 10000,
       icon: Award,
       features: [
@@ -159,6 +196,7 @@ export const RewardsDashboard = () => {
                   <Button 
                     variant="default"
                     disabled={reward.cost > 0 && points < reward.cost}
+                    onClick={() => handlePurchase(reward)}
                     className="transition-all duration-300 hover:scale-105"
                   >
                     Buy Now
