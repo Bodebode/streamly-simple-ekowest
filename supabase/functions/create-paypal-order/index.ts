@@ -39,8 +39,10 @@ serve(async (req) => {
 
     // Get PayPal access token
     console.log('Attempting PayPal authentication...');
+    
+    // Create credentials string and encode it
     const credentials = btoa(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET_KEY}`);
-    console.log('Using credentials (first 10 chars):', credentials.substring(0, 10));
+    console.log('Credentials prepared for authentication');
 
     const authResponse = await fetch('https://api-m.sandbox.paypal.com/v1/oauth2/token', {
       method: 'POST',
@@ -52,15 +54,17 @@ serve(async (req) => {
       body: 'grant_type=client_credentials',
     });
 
+    console.log('Auth response status:', authResponse.status);
     const authData = await authResponse.json();
-    console.log('PayPal auth response status:', authResponse.status);
     
     if (!authResponse.ok || !authData.access_token) {
       console.error('PayPal auth failed:', {
         status: authResponse.status,
         statusText: authResponse.statusText,
-        data: authData
+        data: authData,
+        credentialsLength: credentials.length // Log length of credentials for debugging
       });
+      
       return new Response(
         JSON.stringify({ 
           error: 'Failed to authenticate with PayPal',
