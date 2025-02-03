@@ -27,7 +27,7 @@ serve(async (req) => {
     const PAYPAL_SECRET_KEY = Deno.env.get('PAYPAL_SECRET_KEY');
     
     if (!PAYPAL_CLIENT_ID || !PAYPAL_SECRET_KEY) {
-      console.error('PayPal credentials not configured');
+      console.error('PayPal credentials missing');
       return new Response(
         JSON.stringify({ error: 'PayPal credentials not configured' }), 
         { 
@@ -38,11 +38,11 @@ serve(async (req) => {
     }
 
     // Get PayPal access token
-    console.log('Attempting PayPal authentication...');
+    console.log('Starting PayPal authentication...');
     
-    // Create credentials string and encode it
     const credentials = btoa(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET_KEY}`);
-    console.log('Credentials prepared for authentication');
+    console.log('Credentials length:', credentials.length);
+    console.log('Client ID length:', PAYPAL_CLIENT_ID.length);
 
     const authResponse = await fetch('https://api-m.sandbox.paypal.com/v1/oauth2/token', {
       method: 'POST',
@@ -62,7 +62,6 @@ serve(async (req) => {
         status: authResponse.status,
         statusText: authResponse.statusText,
         data: authData,
-        credentialsLength: credentials.length // Log length of credentials for debugging
       });
       
       return new Response(
