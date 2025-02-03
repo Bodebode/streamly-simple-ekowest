@@ -62,8 +62,8 @@ export const RewardsDashboard = () => {
         'Exclusive chat rooms with creators',
         'Priority customer support',
         'Special badge on your profile',
-        'Monthly newsletter from favorite creators',
         'Direct tip to content creators',
+        'Early scoop on upcoming content and events',
         'Early access to upcoming content and events'
       ]
     }
