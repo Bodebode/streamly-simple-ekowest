@@ -25,6 +25,7 @@ serve(async (req) => {
     const PAYPAL_SECRET_KEY = Deno.env.get('PAYPAL_SECRET_KEY');
     
     if (!PAYPAL_CLIENT_ID || !PAYPAL_SECRET_KEY) {
+      console.error('PayPal credentials not configured');
       throw new Error('PayPal credentials not configured');
     }
 
@@ -43,8 +44,10 @@ serve(async (req) => {
     });
 
     const authData = await authResponse.json();
+    console.log('PayPal auth response:', authData);
     
     if (!authData.access_token) {
+      console.error('Failed to get PayPal access token:', authData);
       throw new Error('Failed to get PayPal access token');
     }
 
@@ -73,6 +76,11 @@ serve(async (req) => {
 
     const orderData = await orderResponse.json();
     console.log('PayPal order created:', orderData);
+
+    if (orderData.error) {
+      console.error('PayPal order creation error:', orderData);
+      throw new Error(`PayPal order creation failed: ${orderData.error_description || orderData.message}`);
+    }
 
     return new Response(
       JSON.stringify(orderData),
