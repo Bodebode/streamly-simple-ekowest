@@ -37,25 +37,3 @@ export interface MovieCardProps {
   onMovieSelect: (videoId: string | null) => void;
   isVideoPlaying: boolean;
 }
-
-export interface CachedMovie {
-  id: string;
-  title: string;
-  image: string;
-  category: string;
-  video_id: string;
-  views?: number;
-  comments?: number;
-  cached_at?: string;
-  expires_at?: string;
-  access_count?: number;
-  is_available?: boolean;
-  like_ratio?: number;
-}
-
-export interface User {
-  id: string;
-  email?: string;
-  username?: string;
-  avatar_url?: string;
-}
