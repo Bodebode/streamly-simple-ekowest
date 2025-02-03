@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Trophy, Clock, Gift, Home, PlayCircle, PiggyBank, Coins, DollarSign, Users, Shield, Star, Check, Lock, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuthStore } from '@/stores/auth-store';
+import { useAuth } from '@/components/AuthProvider';
 import { toast } from 'sonner';
 
 interface Reward {
@@ -23,7 +23,7 @@ const EXCHANGE_RATES = {
 
 export const RewardsDashboard = () => {
   const { points, watchTime } = useRewardsStore();
-  const { user } = useAuthStore();
+  const { user, session } = useAuth();
   const userCountry = navigator.language || 'en-US';
 
   const formatCurrency = (ecoins: number) => {
@@ -40,35 +40,46 @@ export const RewardsDashboard = () => {
   };
 
   const handlePurchase = async (reward: Reward) => {
-    if (!user) {
+    if (!session || !user) {
       toast.error('Please login to make a purchase');
       return;
     }
 
     try {
-      const response = await supabase.functions.invoke('create-paypal-order', {
+      toast.loading('Processing your purchase...');
+
+      const { data, error } = await supabase.functions.invoke('create-paypal-order', {
         body: {
           reward_id: reward.name,
           amount: (reward.cost / 1000) * 0.5, // Convert E-coins to USD
           currency: 'USD',
+          user_id: user.id
         },
       });
 
-      if (response.error) {
-        throw new Error(response.error.message);
+      if (error) {
+        console.error('PayPal order creation error:', error);
+        toast.dismiss();
+        toast.error('Failed to create payment order. Please try again.');
+        return;
       }
 
-      const { data: orderData } = response;
-      
-      // Redirect to PayPal checkout
-      if (orderData.links) {
-        const checkoutLink = orderData.links.find((link: any) => link.rel === 'approve');
-        if (checkoutLink) {
-          window.location.href = checkoutLink.href;
-        }
+      if (!data?.links) {
+        toast.dismiss();
+        toast.error('Invalid payment response. Please try again.');
+        return;
+      }
+
+      const checkoutLink = data.links.find((link: any) => link.rel === 'approve');
+      if (checkoutLink) {
+        window.location.href = checkoutLink.href;
+      } else {
+        toast.dismiss();
+        toast.error('Checkout link not found. Please try again.');
       }
     } catch (error) {
       console.error('Payment error:', error);
+      toast.dismiss();
       toast.error('Failed to process payment. Please try again.');
     }
   };
@@ -200,12 +211,18 @@ export const RewardsDashboard = () => {
                     )}
                   </div>
                   <Button 
-                    variant="default"
-                    disabled={reward.cost > 0 && points < reward.cost}
+                    variant={points >= reward.cost ? "default" : "secondary"}
+                    disabled={!session || points < reward.cost}
                     onClick={() => handlePurchase(reward)}
                     className="transition-all duration-300 hover:scale-105"
                   >
-                    Buy Now
+                    {!session ? (
+                      "Login to Buy"
+                    ) : points < reward.cost ? (
+                      "Insufficient Points"
+                    ) : (
+                      "Buy Now"
+                    )}
                   </Button>
                 </div>
               </div>
