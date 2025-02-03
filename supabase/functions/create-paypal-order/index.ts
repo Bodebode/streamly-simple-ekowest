@@ -3,6 +3,7 @@ import { serve } from 'https://deno.fresh.dev/std@v9.6.1/http/server.ts';
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
 interface PayPalOrder {
@@ -21,6 +22,8 @@ serve(async (req) => {
   try {
     const { reward_id, amount, currency, user_id } = await req.json() as PayPalOrder;
     
+    console.log('Creating PayPal order:', { reward_id, amount, currency, user_id });
+    
     const PAYPAL_CLIENT_ID = Deno.env.get('PAYPAL_CLIENT_ID');
     const PAYPAL_SECRET_KEY = Deno.env.get('PAYPAL_SECRET_KEY');
     
@@ -28,8 +31,6 @@ serve(async (req) => {
       console.error('PayPal credentials not configured');
       throw new Error('PayPal credentials not configured');
     }
-
-    console.log('Creating PayPal order:', { reward_id, amount, currency, user_id });
 
     // Get PayPal access token
     const authResponse = await fetch('https://api-m.sandbox.paypal.com/v1/oauth2/token', {

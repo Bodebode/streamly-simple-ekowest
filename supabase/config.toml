@@ -1,4 +1,4 @@
 project_id = "yuisywwlzorzdrzvjlvm"
 
 [functions.create-paypal-order]
-verify_jwt = true
+verify_jwt = false
