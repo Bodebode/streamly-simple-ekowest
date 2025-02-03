@@ -1,6 +1,6 @@
 import { useRewardsStore } from '@/stores/rewards-store';
 import { Button } from '@/components/ui/button';
-import { Trophy, Clock, Gift, Home, PlayCircle, PiggyBank, Coins, DollarSign, Users, Shield, Star, Check, Lock, Award } from 'lucide-react';
+import { Trophy, Clock, Gift, Home, PlayCircle, PiggyBank, Coins, DollarSign, Users, Shield, Star, Check, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/AuthProvider';
@@ -213,29 +213,17 @@ export const RewardsDashboard = () => {
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    {reward.cost > 0 ? (
-                      <>
-                        <div className="font-semibold">{reward.cost.toLocaleString()} E-coins</div>
-                        <div className="text-sm text-muted-foreground">≈ {formatCurrency(reward.cost)}</div>
-                      </>
-                    ) : (
-                      <div className="font-semibold">Free</div>
-                    )}
+                    <div className="font-semibold">{reward.cost.toLocaleString()} E-coins</div>
+                    <div className="text-sm text-muted-foreground">≈ {formatCurrency(reward.cost)}</div>
                   </div>
                   <Button 
+                    type="button"
                     variant={points >= reward.cost ? "default" : "secondary"}
-                    disabled={!session?.user || points < reward.cost}
+                    disabled={!session?.user}
                     onClick={() => handlePurchase(reward)}
                     className="transition-all duration-300 hover:scale-105"
-                    type="button"
                   >
-                    {!session?.user ? (
-                      "Login to Buy"
-                    ) : points < reward.cost ? (
-                      "Insufficient Points"
-                    ) : (
-                      "Buy Now"
-                    )}
+                    {!session?.user ? "Login to Buy" : "Buy Now"}
                   </Button>
                 </div>
               </div>
