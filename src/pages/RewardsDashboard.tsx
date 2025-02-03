@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Trophy, Clock, Gift, Home, PlayCircle, PiggyBank, Coins, DollarSign, Users, Shield, Star, Check, Lock, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuthStore } from '@/stores/auth-store';
+import { useAuth } from '@/components/AuthProvider'; // Changed from useAuthStore
 import { toast } from 'sonner';
 
 interface Reward {
@@ -23,7 +23,7 @@ const EXCHANGE_RATES = {
 
 export const RewardsDashboard = () => {
   const { points, watchTime } = useRewardsStore();
-  const { user } = useAuthStore();
+  const { user } = useAuth(); // Changed to use useAuth hook from AuthProvider
   const userCountry = navigator.language || 'en-US';
 
   const formatCurrency = (ecoins: number) => {
@@ -199,12 +199,7 @@ export const RewardsDashboard = () => {
                     disabled={!user || points < reward.cost}
                     className="transition-all duration-300 hover:scale-105"
                   >
-                    {!user ? (
-                      <div className="flex items-center gap-2">
-                        <Lock className="h-4 w-4" />
-                        Login to Buy
-                      </div>
-                    ) : points < reward.cost ? (
+                    {points < reward.cost ? (
                       <div className="flex items-center gap-2">
                         <Lock className="h-4 w-4" />
                         Insufficient Points
