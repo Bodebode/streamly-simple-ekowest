@@ -1,5 +1,5 @@
 import { useRewardsStore } from '@/stores/rewards-store';
-import { Award, Shield, Star, Trophy } from 'lucide-react';
+import { Award, Shield, Star, Trophy, Video } from 'lucide-react';
 import { RewardsHeader } from '@/components/rewards/RewardsHeader';
 import { RewardsStats } from '@/components/rewards/RewardsStats';
 import { PremiumFeatures } from '@/components/rewards/PremiumFeatures';
@@ -46,6 +46,16 @@ export const RewardsDashboard = () => {
       cost: 20000, 
       icon: Trophy,
       features: ['Unlock exclusive content and features']
+    },
+    {
+      name: 'Ad-Free Watching',
+      cost: 30000,
+      icon: Video,
+      features: [
+        'Remove all ads during video playback',
+        'Uninterrupted viewing experience',
+        'Support content creators while enjoying ad-free content'
+      ]
     },
     {
       name: 'VIP Community Pass',
