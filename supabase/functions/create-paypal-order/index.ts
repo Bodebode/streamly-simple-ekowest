@@ -14,7 +14,6 @@ interface PayPalOrder {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -29,10 +28,7 @@ serve(async (req) => {
     
     if (!PAYPAL_CLIENT_ID || !PAYPAL_SECRET_KEY) {
       console.error('PayPal credentials not configured');
-      return new Response(
-        JSON.stringify({ error: 'PayPal credentials not configured' }), 
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      throw new Error('PayPal credentials not configured');
     }
 
     // Get PayPal access token
@@ -40,30 +36,17 @@ serve(async (req) => {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
-        'Accept-Language': 'en_US',
         'Authorization': `Basic ${btoa(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET_KEY}`)}`,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: 'grant_type=client_credentials',
     });
 
-    if (!authResponse.ok) {
-      console.error('PayPal auth failed:', await authResponse.text());
-      return new Response(
-        JSON.stringify({ error: 'Failed to authenticate with PayPal' }), 
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
     const authData = await authResponse.json();
-    console.log('PayPal auth successful, creating order');
     
-    if (!authData.access_token) {
-      console.error('No access token in PayPal response:', authData);
-      return new Response(
-        JSON.stringify({ error: 'Invalid PayPal authentication response' }), 
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    if (!authResponse.ok || !authData.access_token) {
+      console.error('PayPal auth failed:', authData);
+      throw new Error('Failed to authenticate with PayPal');
     }
 
     // Create PayPal order
@@ -72,13 +55,14 @@ serve(async (req) => {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${authData.access_token}`,
+        'PayPal-Request-Id': crypto.randomUUID(),
       },
       body: JSON.stringify({
         intent: 'CAPTURE',
         purchase_units: [{
           amount: {
             currency_code: currency,
-            value: amount.toFixed(2),
+            value: amount.toString(),
           },
           description: `Reward: ${reward_id}`,
         }],
@@ -90,20 +74,10 @@ serve(async (req) => {
     });
 
     const orderData = await orderResponse.json();
-    console.log('PayPal order response:', {
-      status: orderResponse.status,
-      data: orderData
-    });
-
+    
     if (!orderResponse.ok) {
       console.error('PayPal order creation failed:', orderData);
-      return new Response(
-        JSON.stringify({ 
-          error: 'PayPal order creation failed', 
-          details: orderData.error_description || orderData.message 
-        }), 
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      throw new Error(orderData.message || 'Failed to create PayPal order');
     }
 
     return new Response(
@@ -117,8 +91,7 @@ serve(async (req) => {
     console.error('Error processing request:', error);
     return new Response(
       JSON.stringify({ 
-        error: 'Internal server error',
-        details: error.message 
+        error: error.message || 'Internal server error',
       }),
       { 
         status: 500,
