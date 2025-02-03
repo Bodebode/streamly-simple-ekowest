@@ -32,8 +32,8 @@ export const RewardsDashboard = () => {
 
   const rewards = [
     {
-      name: 'Standard_Reward',
-      cost: 10000,
+      name: 'Standard Reward',
+      cost: 7500, // £3 equivalent
       icon: Award,
       features: [
         'Rewarding you for your time spent watching on Ekowest',
