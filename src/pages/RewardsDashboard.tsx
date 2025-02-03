@@ -43,7 +43,7 @@ export const RewardsDashboard = () => {
     },
     {
       name: 'Ad-Free Watching',
-      cost: 37500, // Adjusted to reflect £15 equivalent
+      cost: 37500, // £15 equivalent
       icon: Video,
       features: [
         'Remove all ads during video playback',
@@ -54,29 +54,17 @@ export const RewardsDashboard = () => {
       ]
     },
     {
-      name: 'VIP Community Pass',
-      cost: 35000,
-      icon: Shield,
-      features: [
-        'Premium Movie Access inclusive',
-        'Go Ad-Free on all contents',
-        'Unlock exclusive content and features',
-        'Exclusive chat rooms with creators',
-        'Priority customer support',
-        'Early scoop on upcoming content and events'
-      ]
-    },
-    {
-      name: 'Creator Support Package',
-      cost: 60000,
+      name: 'VIP Creator Package',
+      cost: 75000, // £30 equivalent
       icon: Star,
       features: [
-        'VIP Community Pass inclusive',
-        'Unlock exclusive content and features',
-        'Go completely Ad-Free on all contents including page',
+        'All Ad-Free Watching features included',
+        'Exclusive chat rooms with creators',
+        'Priority customer support',
         'Special badge on your profile',
         'Monthly newsletter from favorite creators',
-        'Direct tip to content creators'
+        'Direct tip to content creators',
+        'Early access to upcoming content and events'
       ]
     }
   ];
