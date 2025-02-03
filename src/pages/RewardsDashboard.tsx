@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Trophy, Clock, Gift, Home, PlayCircle, PiggyBank, Coins, DollarSign, Users, Shield, Star, Check, Lock, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/components/AuthProvider'; // Changed from useAuthStore
+import { useAuthStore } from '@/stores/auth-store';
 import { toast } from 'sonner';
 
 interface Reward {
@@ -23,7 +23,7 @@ const EXCHANGE_RATES = {
 
 export const RewardsDashboard = () => {
   const { points, watchTime } = useRewardsStore();
-  const { user } = useAuth(); // Changed to use useAuth hook from AuthProvider
+  const { user } = useAuthStore();
   const userCountry = navigator.language || 'en-US';
 
   const formatCurrency = (ecoins: number) => {
@@ -188,25 +188,24 @@ export const RewardsDashboard = () => {
                     </ul>
                   </div>
                 </div>
-                <div className="flex flex-col items-end gap-3">
+                <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <div className="font-semibold">{reward.cost.toLocaleString()} E-coins</div>
-                    <div className="text-sm text-muted-foreground">≈ {formatCurrency(reward.cost)}</div>
+                    {reward.cost > 0 ? (
+                      <>
+                        <div className="font-semibold">{reward.cost.toLocaleString()} E-coins</div>
+                        <div className="text-sm text-muted-foreground">≈ {formatCurrency(reward.cost)}</div>
+                      </>
+                    ) : (
+                      <div className="font-semibold">Free</div>
+                    )}
                   </div>
                   <Button 
                     variant="default"
+                    disabled={reward.cost > 0 && points < reward.cost}
                     onClick={() => handlePurchase(reward)}
-                    disabled={!user || points < reward.cost}
                     className="transition-all duration-300 hover:scale-105"
                   >
-                    {points < reward.cost ? (
-                      <div className="flex items-center gap-2">
-                        <Lock className="h-4 w-4" />
-                        Insufficient Points
-                      </div>
-                    ) : (
-                      'Buy Now'
-                    )}
+                    Buy Now
                   </Button>
                 </div>
               </div>
