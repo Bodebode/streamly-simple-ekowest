@@ -1,5 +1,5 @@
 export interface Movie {
-  id: string;
+  id: string;  // Changed from number to string to match the database schema
   title: string;
   image: string;
   category: string;

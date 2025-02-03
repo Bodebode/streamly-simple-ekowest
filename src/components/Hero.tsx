@@ -37,7 +37,7 @@ export const Hero = () => {
     {
       type: 'video' as const,
       src: videoUrl,
-      duration: 39000,
+      duration: 39000,  // Duration in milliseconds
       id: 'hero-1'
     },
     {

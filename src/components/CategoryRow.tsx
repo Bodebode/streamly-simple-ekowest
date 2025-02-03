@@ -31,16 +31,13 @@ const CategoryRowComponent = ({
   }, [onVideoSelect]);
 
   useEffect(() => {
-    // Prefetch next batch of videos
     if (filteredMovies.length < 12) {
       prefetchVideos(title);
     }
     
-    // Filter out invalid videos
     const validMovies = movies.filter(movie => movie.videoId);
     setFilteredMovies(validMovies.length > 0 ? validMovies : movies);
     
-    // Check availability in background
     checkVideoAvailability();
   }, [movies, title]);
 
