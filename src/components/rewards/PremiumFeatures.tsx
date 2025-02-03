@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/components/AuthProvider';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -103,11 +103,10 @@ export const PremiumFeatures = ({ rewards, points, formatCurrency }: PremiumFeat
               <Button 
                 type="button"
                 variant={points >= reward.cost ? "default" : "secondary"}
-                disabled={!session?.user}
                 onClick={() => handlePurchase(reward)}
                 className="transition-all duration-300 hover:scale-105"
               >
-                {!session?.user ? "Login to Buy" : "Buy Now"}
+                Buy Now
               </Button>
             </div>
           </div>
