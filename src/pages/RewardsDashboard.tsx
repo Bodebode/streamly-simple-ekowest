@@ -1,5 +1,5 @@
 import { useRewardsStore } from '@/stores/rewards-store';
-import { Award, Shield, Star, Trophy, Video } from 'lucide-react';
+import { Award, Shield, Star, Video } from 'lucide-react';
 import { RewardsHeader } from '@/components/rewards/RewardsHeader';
 import { RewardsStats } from '@/components/rewards/RewardsStats';
 import { PremiumFeatures } from '@/components/rewards/PremiumFeatures';
@@ -41,19 +41,15 @@ export const RewardsDashboard = () => {
         'Track your watching progress and rewards'
       ]
     },
-    { 
-      name: 'Premium Movie Access', 
-      cost: 20000, 
-      icon: Trophy,
-      features: ['Unlock exclusive content and features']
-    },
     {
       name: 'Ad-Free Watching',
-      cost: 30000,
+      cost: 37500, // Adjusted to reflect £15 equivalent
       icon: Video,
       features: [
         'Remove all ads during video playback',
+        'Unlock premium movie access',
         'Uninterrupted viewing experience',
+        'Access exclusive content and features',
         'Support content creators while enjoying ad-free content'
       ]
     },
