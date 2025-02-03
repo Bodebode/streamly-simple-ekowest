@@ -13,7 +13,6 @@ interface Reward {
   features: string[];
 }
 
-// Exchange rates (you might want to fetch these from an API in a production environment)
 const EXCHANGE_RATES = {
   USD: 1,
   NGN: 1000, // 1 USD = 1000 NGN (approximate)
@@ -25,6 +24,8 @@ export const RewardsDashboard = () => {
   const { points, watchTime } = useRewardsStore();
   const { user, session } = useAuth();
   const userCountry = navigator.language || 'en-US';
+
+  console.log('Auth state:', { user, session, points }); // Debug auth state
 
   const formatCurrency = (ecoins: number) => {
     const baseUSDPrice = (ecoins / 1000) * 0.5; // 1000 coins = $0.50
@@ -170,65 +171,66 @@ export const RewardsDashboard = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-koya-card rounded-lg p-6 mb-16">
-          <h2 className="text-2xl font-semibold mb-6">Premium Features</h2>
-          <div className="grid gap-4">
-            {rewards.map((reward) => (
-              <div 
-                key={reward.name} 
-                className="flex items-center justify-between p-4 border rounded-lg 
-                         transition-all duration-300 ease-in-out
-                         hover:scale-[1.02] hover:shadow-lg hover:border-koya-accent
-                         hover:bg-white/5"
-              >
-                <div className="flex items-center gap-4">
-                  <reward.icon className="h-6 w-6 text-koya-accent transition-transform duration-300 group-hover:scale-110" />
-                  <div>
-                    <span className="font-medium">{reward.name}</span>
-                    <ul className="mt-2 space-y-1">
-                      {reward.features.map((feature, index) => (
-                        <li 
-                          key={index} 
-                          className="flex items-center gap-2 text-sm text-muted-foreground
-                                   transition-opacity duration-200 hover:opacity-100"
-                        >
-                          <Check className="h-4 w-4 text-koya-accent" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    {reward.cost > 0 ? (
-                      <>
-                        <div className="font-semibold">{reward.cost.toLocaleString()} E-coins</div>
-                        <div className="text-sm text-muted-foreground">≈ {formatCurrency(reward.cost)}</div>
-                      </>
-                    ) : (
-                      <div className="font-semibold">Free</div>
-                    )}
-                  </div>
-                  <Button 
-                    variant={points >= reward.cost ? "default" : "secondary"}
-                    disabled={!session || points < reward.cost}
-                    onClick={() => handlePurchase(reward)}
-                    className="transition-all duration-300 hover:scale-105"
-                  >
-                    {!session ? (
-                      "Login to Buy"
-                    ) : points < reward.cost ? (
-                      "Insufficient Points"
-                    ) : (
-                      "Buy Now"
-                    )}
-                  </Button>
+      <div className="bg-white dark:bg-koya-card rounded-lg p-6 mb-16">
+        <h2 className="text-2xl font-semibold mb-6">Premium Features</h2>
+        <div className="grid gap-4">
+          {rewards.map((reward) => (
+            <div 
+              key={reward.name} 
+              className="flex items-center justify-between p-4 border rounded-lg 
+                       transition-all duration-300 ease-in-out
+                       hover:scale-[1.02] hover:shadow-lg hover:border-koya-accent
+                       hover:bg-white/5"
+            >
+              <div className="flex items-center gap-4">
+                <reward.icon className="h-6 w-6 text-koya-accent transition-transform duration-300 group-hover:scale-110" />
+                <div>
+                  <span className="font-medium">{reward.name}</span>
+                  <ul className="mt-2 space-y-1">
+                    {reward.features.map((feature, index) => (
+                      <li 
+                        key={index} 
+                        className="flex items-center gap-2 text-sm text-muted-foreground
+                                 transition-opacity duration-200 hover:opacity-100"
+                      >
+                        <Check className="h-4 w-4 text-koya-accent" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
-            ))}
-          </div>
+              <div className="flex items-center gap-3">
+                <div className="text-right">
+                  {reward.cost > 0 ? (
+                    <>
+                      <div className="font-semibold">{reward.cost.toLocaleString()} E-coins</div>
+                      <div className="text-sm text-muted-foreground">≈ {formatCurrency(reward.cost)}</div>
+                    </>
+                  ) : (
+                    <div className="font-semibold">Free</div>
+                  )}
+                </div>
+                <Button 
+                  variant={points >= reward.cost ? "default" : "secondary"}
+                  disabled={!session || points < reward.cost}
+                  onClick={() => handlePurchase(reward)}
+                  className="transition-all duration-300 hover:scale-105"
+                  type="button"
+                >
+                  {!session ? (
+                    "Login to Buy"
+                  ) : points < reward.cost ? (
+                    "Insufficient Points"
+                  ) : (
+                    "Buy Now"
+                  )}
+                </Button>
+              </div>
+            </div>
+          ))}
         </div>
+      </div>
 
         <div className="space-y-16 border-t border-gray-700 pt-16">
           <div className="grid md:grid-cols-3 gap-8">
