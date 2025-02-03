@@ -28,7 +28,13 @@ serve(async (req) => {
     
     if (!PAYPAL_CLIENT_ID || !PAYPAL_SECRET_KEY) {
       console.error('PayPal credentials not configured');
-      throw new Error('PayPal credentials not configured');
+      return new Response(
+        JSON.stringify({ error: 'PayPal credentials not configured' }), 
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
     }
 
     // Get PayPal access token
@@ -36,6 +42,7 @@ serve(async (req) => {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
+        'Accept-Language': 'en_US',
         'Authorization': `Basic ${btoa(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET_KEY}`)}`,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
@@ -46,8 +53,16 @@ serve(async (req) => {
     
     if (!authResponse.ok || !authData.access_token) {
       console.error('PayPal auth failed:', authData);
-      throw new Error('Failed to authenticate with PayPal');
+      return new Response(
+        JSON.stringify({ error: 'Failed to authenticate with PayPal' }), 
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
     }
+
+    console.log('PayPal auth successful, creating order');
 
     // Create PayPal order
     const orderResponse = await fetch('https://api-m.sandbox.paypal.com/v2/checkout/orders', {
@@ -62,7 +77,7 @@ serve(async (req) => {
         purchase_units: [{
           amount: {
             currency_code: currency,
-            value: amount.toString(),
+            value: amount.toFixed(2), // Ensure proper decimal formatting
           },
           description: `Reward: ${reward_id}`,
         }],
@@ -74,28 +89,39 @@ serve(async (req) => {
     });
 
     const orderData = await orderResponse.json();
+    console.log('PayPal order response:', orderData);
     
     if (!orderResponse.ok) {
       console.error('PayPal order creation failed:', orderData);
-      throw new Error(orderData.message || 'Failed to create PayPal order');
+      return new Response(
+        JSON.stringify({ 
+          error: 'PayPal order creation failed', 
+          details: orderData.error_description || orderData.message 
+        }), 
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
     }
 
     return new Response(
       JSON.stringify(orderData),
       { 
         status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       },
     );
   } catch (error) {
     console.error('Error processing request:', error);
     return new Response(
       JSON.stringify({ 
-        error: error.message || 'Internal server error',
+        error: 'Internal server error',
+        details: error.message 
       }),
       { 
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       },
     );
   }
