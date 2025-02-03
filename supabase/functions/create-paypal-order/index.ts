@@ -29,7 +29,10 @@ serve(async (req) => {
     
     if (!PAYPAL_CLIENT_ID || !PAYPAL_SECRET_KEY) {
       console.error('PayPal credentials not configured');
-      throw new Error('PayPal credentials not configured');
+      return new Response(
+        JSON.stringify({ error: 'PayPal credentials not configured' }), 
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Get PayPal access token
@@ -45,11 +48,14 @@ serve(async (req) => {
     });
 
     const authData = await authResponse.json();
-    console.log('PayPal auth response:', authData);
+    console.log('PayPal auth response status:', authResponse.status);
     
     if (!authData.access_token) {
       console.error('Failed to get PayPal access token:', authData);
-      throw new Error('Failed to get PayPal access token');
+      return new Response(
+        JSON.stringify({ error: 'Failed to authenticate with PayPal' }), 
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Create PayPal order
@@ -64,7 +70,7 @@ serve(async (req) => {
         purchase_units: [{
           amount: {
             currency_code: currency,
-            value: amount.toString(),
+            value: amount.toFixed(2), // Ensure proper decimal formatting
           },
           description: `Reward: ${reward_id}`,
         }],
@@ -76,20 +82,25 @@ serve(async (req) => {
     });
 
     const orderData = await orderResponse.json();
-    console.log('PayPal order created:', orderData);
+    console.log('PayPal order response status:', orderResponse.status);
+    console.log('PayPal order data:', orderData);
 
-    if (orderData.error) {
+    if (!orderResponse.ok) {
       console.error('PayPal order creation error:', orderData);
-      throw new Error(`PayPal order creation failed: ${orderData.error_description || orderData.message}`);
+      return new Response(
+        JSON.stringify({ 
+          error: 'PayPal order creation failed', 
+          details: orderData.error_description || orderData.message 
+        }), 
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     return new Response(
       JSON.stringify(orderData),
       { 
-        headers: { 
-          ...corsHeaders,
-          'Content-Type': 'application/json',
-        },
+        status: 200, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       },
     );
   } catch (error) {
@@ -97,11 +108,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
-        status: 400,
-        headers: { 
-          ...corsHeaders,
-          'Content-Type': 'application/json',
-        },
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       },
     );
   }
