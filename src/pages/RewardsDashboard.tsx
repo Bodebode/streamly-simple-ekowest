@@ -50,7 +50,8 @@ export const RewardsDashboard = () => {
     }
 
     try {
-      toast.loading('Processing your purchase...');
+      const toastId = toast.loading('Processing your purchase...');
+      
       console.log('Creating PayPal order for:', {
         reward_id: reward.name,
         amount: (reward.cost / 1000) * 0.5,
@@ -61,7 +62,7 @@ export const RewardsDashboard = () => {
         body: {
           reward_id: reward.name,
           amount: (reward.cost / 1000) * 0.5,
-          currency: 'USD',
+          currency: userCountry.includes('NG') ? 'NGN' : 'USD',
           user_id: session.user.id
         },
       });
@@ -70,28 +71,29 @@ export const RewardsDashboard = () => {
 
       if (error) {
         console.error('PayPal order creation error:', error);
-        toast.dismiss();
-        toast.error('Failed to create payment order. Please try again.');
+        toast.dismiss(toastId);
+        toast.error('Failed to create payment order: ' + error.message);
         return;
       }
 
-      if (!data?.links) {
-        toast.dismiss();
-        toast.error('Invalid payment response. Please try again.');
+      if (!data?.id || !data?.links) {
+        toast.dismiss(toastId);
+        toast.error('Invalid payment response received');
         return;
       }
 
-      const checkoutLink = data.links.find((link: any) => link.rel === 'approve');
-      if (checkoutLink) {
-        console.log('Redirecting to PayPal checkout:', checkoutLink.href);
-        window.location.href = checkoutLink.href;
-      } else {
-        toast.dismiss();
-        toast.error('Checkout link not found. Please try again.');
+      const approveLink = data.links.find((link: any) => link.rel === 'approve')?.href;
+      if (!approveLink) {
+        toast.dismiss(toastId);
+        toast.error('Payment link not found');
+        return;
       }
+
+      console.log('Redirecting to PayPal checkout:', approveLink);
+      toast.dismiss(toastId);
+      window.location.href = approveLink;
     } catch (error) {
       console.error('Payment error:', error);
-      toast.dismiss();
       toast.error('Failed to process payment. Please try again.');
     }
   };

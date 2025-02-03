@@ -1,5 +1,4 @@
 import { serve } from 'https://deno.fresh.dev/std@v9.6.1/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -10,6 +9,7 @@ interface PayPalOrder {
   reward_id: string;
   amount: number;
   currency: string;
+  user_id: string;
 }
 
 serve(async (req) => {
@@ -19,19 +19,41 @@ serve(async (req) => {
   }
 
   try {
-    const { reward_id, amount, currency } = await req.json() as PayPalOrder;
+    const { reward_id, amount, currency, user_id } = await req.json() as PayPalOrder;
     
     const PAYPAL_CLIENT_ID = Deno.env.get('PAYPAL_CLIENT_ID');
-    if (!PAYPAL_CLIENT_ID) {
-      throw new Error('PayPal client ID not configured');
+    const PAYPAL_SECRET_KEY = Deno.env.get('PAYPAL_SECRET_KEY');
+    
+    if (!PAYPAL_CLIENT_ID || !PAYPAL_SECRET_KEY) {
+      throw new Error('PayPal credentials not configured');
+    }
+
+    console.log('Creating PayPal order:', { reward_id, amount, currency, user_id });
+
+    // Get PayPal access token
+    const authResponse = await fetch('https://api-m.sandbox.paypal.com/v1/oauth2/token', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Accept-Language': 'en_US',
+        'Authorization': `Basic ${btoa(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET_KEY}`)}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: 'grant_type=client_credentials',
+    });
+
+    const authData = await authResponse.json();
+    
+    if (!authData.access_token) {
+      throw new Error('Failed to get PayPal access token');
     }
 
     // Create PayPal order
-    const response = await fetch('https://api-m.sandbox.paypal.com/v2/checkout/orders', {
+    const orderResponse = await fetch('https://api-m.sandbox.paypal.com/v2/checkout/orders', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Basic ${btoa(PAYPAL_CLIENT_ID + ':' + Deno.env.get('PAYPAL_SECRET_KEY'))}`,
+        'Authorization': `Bearer ${authData.access_token}`,
       },
       body: JSON.stringify({
         intent: 'CAPTURE',
@@ -40,13 +62,18 @@ serve(async (req) => {
             currency_code: currency,
             value: amount.toString(),
           },
-          description: `Reward ID: ${reward_id}`,
+          description: `Reward: ${reward_id}`,
         }],
+        application_context: {
+          return_url: `${req.headers.get('origin')}/rewards?success=true`,
+          cancel_url: `${req.headers.get('origin')}/rewards?success=false`,
+        },
       }),
     });
 
-    const orderData = await response.json();
-    
+    const orderData = await orderResponse.json();
+    console.log('PayPal order created:', orderData);
+
     return new Response(
       JSON.stringify(orderData),
       { 
