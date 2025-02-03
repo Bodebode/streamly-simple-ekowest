@@ -38,23 +38,34 @@ serve(async (req) => {
     }
 
     // Get PayPal access token
+    console.log('Attempting PayPal authentication...');
+    const credentials = btoa(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET_KEY}`);
+    console.log('Using credentials (first 10 chars):', credentials.substring(0, 10));
+
     const authResponse = await fetch('https://api-m.sandbox.paypal.com/v1/oauth2/token', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
-        'Accept-Language': 'en_US',
-        'Authorization': `Basic ${btoa(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET_KEY}`)}`,
+        'Authorization': `Basic ${credentials}`,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: 'grant_type=client_credentials',
     });
 
     const authData = await authResponse.json();
+    console.log('PayPal auth response status:', authResponse.status);
     
     if (!authResponse.ok || !authData.access_token) {
-      console.error('PayPal auth failed:', authData);
+      console.error('PayPal auth failed:', {
+        status: authResponse.status,
+        statusText: authResponse.statusText,
+        data: authData
+      });
       return new Response(
-        JSON.stringify({ error: 'Failed to authenticate with PayPal' }), 
+        JSON.stringify({ 
+          error: 'Failed to authenticate with PayPal',
+          details: authData.error_description || authData.message || 'Unknown authentication error'
+        }), 
         { 
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -77,7 +88,7 @@ serve(async (req) => {
         purchase_units: [{
           amount: {
             currency_code: currency,
-            value: amount.toFixed(2), // Ensure proper decimal formatting
+            value: amount.toFixed(2),
           },
           description: `Reward: ${reward_id}`,
         }],
