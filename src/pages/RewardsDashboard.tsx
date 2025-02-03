@@ -2,10 +2,16 @@ import { useRewardsStore } from '@/stores/rewards-store';
 import { Button } from '@/components/ui/button';
 import { Trophy, Clock, Gift, Home, PlayCircle, PiggyBank, Coins, DollarSign, Users, Shield, Star, Check, Lock, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/auth-store';
 import { toast } from 'sonner';
+
+interface Reward {
+  name: string;
+  cost: number;
+  icon: any;
+  features: string[];
+}
 
 // Exchange rates (you might want to fetch these from an API in a production environment)
 const EXCHANGE_RATES = {
@@ -33,7 +39,7 @@ export const RewardsDashboard = () => {
     return `$${baseUSDPrice.toLocaleString()}`;
   };
 
-  const handlePurchase = async (reward: any) => {
+  const handlePurchase = async (reward: Reward) => {
     if (!user) {
       toast.error('Please login to make a purchase');
       return;
