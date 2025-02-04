@@ -11,19 +11,50 @@ export const useHighlyRated = () => {
         console.log('Fetching highly rated videos...');
         const startTime = performance.now();
         
-        // Even more relaxed criteria:
-        // - Reduced minimum views to 5,000
-        // - Reduced like ratio to 0.2
-        // - Still ensure video is available
+        // Primary query with standard criteria
         const { data: cachedVideos, error: cacheError, count } = await supabase
           .from('cached_videos')
           .select('id, title, image, category, video_id, views, like_ratio, is_available', { count: 'exact' })
           .eq('category', 'Highly Rated')
           .eq('is_available', true)
-          .gt('views', 5000)  // Further reduced from 10,000
-          .gt('like_ratio', 0.2)  // Further reduced from 0.3
+          .gt('views', 5000)
+          .gt('like_ratio', 0.2)
           .order('views', { ascending: false })
-          .limit(24);  // Keep higher limit to get more results
+          .limit(24);
+
+        if (cachedVideos && cachedVideos.length >= 12) {
+          console.log(`Found ${cachedVideos.length} cached videos with standard criteria`);
+          return cachedVideos;
+        }
+
+        // First fallback with relaxed criteria
+        const { data: fallbackVideos, error: fallbackError } = await supabase
+          .from('cached_videos')
+          .select('id, title, image, category, video_id, views, like_ratio, is_available')
+          .eq('category', 'Highly Rated')
+          .eq('is_available', true)
+          .gt('views', 1000)
+          .order('views', { ascending: false })
+          .limit(24);
+
+        if (fallbackVideos && fallbackVideos.length >= 12) {
+          console.log(`Found ${fallbackVideos.length} videos with first fallback criteria`);
+          return fallbackVideos;
+        }
+
+        // Second fallback with minimum criteria
+        const { data: minimalVideos, error: minimalError } = await supabase
+          .from('cached_videos')
+          .select('id, title, image, category, video_id, views, like_ratio, is_available')
+          .eq('category', 'Highly Rated')
+          .gt('views', 100)  // Very low view requirement
+          .order('created_at', { ascending: false }) // Get newest videos first
+          .limit(24);
+
+        if (minimalVideos && minimalVideos.length > 0) {
+          console.log(`Found ${minimalVideos.length} videos with minimal criteria`);
+          return minimalVideos;
+        }
 
         const endTime = performance.now();
         const executionTime = endTime - startTime;
@@ -37,56 +68,13 @@ export const useHighlyRated = () => {
           p_user_id: (await supabase.auth.getUser()).data.user?.id
         });
 
-        if (cacheError) {
-          console.error('Error fetching from cache:', cacheError);
-          throw cacheError;
-        }
-
-        if (!cachedVideos || cachedVideos.length === 0) {
-          console.log('No cached videos found, fetching fresh data...');
-          
-          // If no cached videos, try fetching with even more relaxed criteria
-          const { data: fallbackVideos, error: fallbackError } = await supabase
-            .from('cached_videos')
-            .select('id, title, image, category, video_id, views, like_ratio, is_available')
-            .eq('category', 'Highly Rated')
-            .eq('is_available', true)
-            .gt('views', 1000)  // Even more relaxed view count
-            .order('views', { ascending: false })
-            .limit(24);
-
-          if (fallbackError) {
-            console.error('Error fetching fallback videos:', fallbackError);
-            throw fallbackError;
-          }
-
-          if (fallbackVideos && fallbackVideos.length > 0) {
-            console.log(`Found ${fallbackVideos.length} fallback videos`);
-            return fallbackVideos;
-          }
-        }
-
-        if (cachedVideos && cachedVideos.length > 0) {
-          console.log(`Found ${cachedVideos.length} cached videos in ${executionTime.toFixed(2)}ms`);
-          
-          // Update access count and cache status in the background
-          const updatePromises = cachedVideos.map(video => 
-            supabase.rpc('increment_access_count', { video_id: video.id })
-          );
-          
-          Promise.allSettled(updatePromises).then(results => {
-            results.forEach((result, index) => {
-              if (result.status === 'rejected') {
-                console.error(`Failed to update cache metrics for video ${index}:`, result.reason);
-              }
-            });
-          });
-
-          return cachedVideos;
+        if (cacheError || fallbackError || minimalError) {
+          console.error('Error fetching videos:', cacheError || fallbackError || minimalError);
+          throw cacheError || fallbackError || minimalError;
         }
 
         // Only use mock data as an absolute last resort
-        console.log('No videos found even with relaxed criteria, using mock data');
+        console.log('No videos found even with minimal criteria, using mock data');
         toast.error('Unable to fetch videos at this time');
         return MOCK_MOVIES.highlyRated;
       } catch (error) {
