@@ -89,81 +89,88 @@ const trendingMovies = [
 
 const highlyRatedMovies = [
   {
-    id: "1",
-    title: "The Matrix Code",
-    image: "https://img.youtube.com/vi/pY4L5IXFXPA/maxresdefault.jpg",
+    id: "hr1",
+    title: "The Last Kingdom",
+    image: "https://img.youtube.com/vi/UNIQUE_ID_1/maxresdefault.jpg",
     category: "Highly Rated",
-    videoId: "pY4L5IXFXPA"
+    videoId: "UNIQUE_ID_1"
   },
   {
-    id: "2",
-    title: "Digital Dreams",
-    image: "https://img.youtube.com/vi/grDl2G_3WuY/maxresdefault.jpg",
+    id: "hr2",
+    title: "Rise of Empires",
+    image: "https://img.youtube.com/vi/UNIQUE_ID_2/maxresdefault.jpg",
     category: "Highly Rated",
-    videoId: "grDl2G_3WuY"
+    videoId: "UNIQUE_ID_2"
   },
   {
-    id: "3",
-    title: "Code Runner",
-    image: "https://img.youtube.com/vi/yPnj3pjdf64/maxresdefault.jpg",
+    id: "hr3",
+    title: "The Crown",
+    image: "https://img.youtube.com/vi/UNIQUE_ID_3/maxresdefault.jpg",
     category: "Highly Rated",
-    videoId: "yPnj3pjdf64"
+    videoId: "UNIQUE_ID_3"
   },
   {
-    id: "4",
-    title: "Binary Sunset",
-    image: "https://img.youtube.com/vi/mjUH1mE3l9U/maxresdefault.jpg",
+    id: "hr4",
+    title: "Breaking Point",
+    image: "https://img.youtube.com/vi/UNIQUE_ID_4/maxresdefault.jpg",
     category: "Highly Rated",
-    videoId: "mjUH1mE3l9U"
+    videoId: "UNIQUE_ID_4"
   },
   {
-    id: "5",
-    title: "Digital Noir",
-    image: "https://img.youtube.com/vi/UPzXAvL36Ag/maxresdefault.jpg",
+    id: "hr5",
+    title: "The Great War",
+    image: "https://img.youtube.com/vi/UNIQUE_ID_5/maxresdefault.jpg",
     category: "Highly Rated",
-    videoId: "UPzXAvL36Ag"
+    videoId: "UNIQUE_ID_5"
   },
   {
-    id: "6",
-    title: "Code Warriors",
-    image: "https://img.youtube.com/vi/2wiSLBpZpME/maxresdefault.jpg",
+    id: "hr6",
+    title: "Lost Empire",
+    image: "https://img.youtube.com/vi/UNIQUE_ID_6/maxresdefault.jpg",
     category: "Highly Rated",
-    videoId: "2wiSLBpZpME"
+    videoId: "UNIQUE_ID_6"
   },
   {
-    id: "7",
-    title: "Matrix Reloaded",
-    image: "https://img.youtube.com/vi/mMM8_AFwxBE/maxresdefault.jpg",
+    id: "hr7",
+    title: "Ancient Mysteries",
+    image: "https://img.youtube.com/vi/UNIQUE_ID_7/maxresdefault.jpg",
     category: "Highly Rated",
-    videoId: "mMM8_AFwxBE"
+    videoId: "UNIQUE_ID_7"
   },
   {
-    id: "8",
-    title: "Cyber Protocol",
-    image: "https://img.youtube.com/vi/wwgEkkapi-0/maxresdefault.jpg",
+    id: "hr8",
+    title: "The Lost City",
+    image: "https://img.youtube.com/vi/UNIQUE_ID_8/maxresdefault.jpg",
     category: "Highly Rated",
-    videoId: "wwgEkkapi-0"
+    videoId: "UNIQUE_ID_8"
   },
   {
-    id: "9",
-    title: "Neural Network",
-    image: "https://img.youtube.com/vi/GoWZfsdd1yw/maxresdefault.jpg",
+    id: "hr9",
+    title: "Kingdom of Heaven",
+    image: "https://img.youtube.com/vi/UNIQUE_ID_9/maxresdefault.jpg",
     category: "Highly Rated",
-    videoId: "GoWZfsdd1yw"
+    videoId: "UNIQUE_ID_9"
   },
   {
-    id: "10",
-    title: "Digital Fortress",
-    image: "https://img.youtube.com/vi/GfF4Dz_e3P4/maxresdefault.jpg",
+    id: "hr10",
+    title: "The Warrior's Path",
+    image: "https://img.youtube.com/vi/UNIQUE_ID_10/maxresdefault.jpg",
     category: "Highly Rated",
-    videoId: "GfF4Dz_e3P4"
+    videoId: "UNIQUE_ID_10"
   },
   {
-    id: "11",
-    title: "Quantum Code",
-    image: "https://img.youtube.com/vi/Yg9z8lv1k_4/maxresdefault.jpg",
+    id: "hr11",
+    title: "Rise of Nations",
+    image: "https://img.youtube.com/vi/UNIQUE_ID_11/maxresdefault.jpg",
     category: "Highly Rated",
-    videoId: "Yg9z8lv1k_4"
+    videoId: "UNIQUE_ID_11"
+  },
+  {
+    id: "hr12",
+    title: "The Ancient World",
+    image: "https://img.youtube.com/vi/UNIQUE_ID_12/maxresdefault.jpg",
+    category: "Highly Rated",
+    videoId: "UNIQUE_ID_12"
   }
 ];
 

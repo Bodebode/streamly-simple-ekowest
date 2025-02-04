@@ -48,12 +48,36 @@ export const useHighlyRated = () => {
           .select('id, title, image, category, video_id, views, like_ratio, is_available')
           .eq('category', 'Highly Rated')
           .gt('views', 100)  // Very low view requirement
-          .order('created_at', { ascending: false }) // Get newest videos first
+          .order('cached_at', { ascending: false }) // Get newest videos first
           .limit(24);
 
         if (minimalVideos && minimalVideos.length > 0) {
           console.log(`Found ${minimalVideos.length} videos with minimal criteria`);
           return minimalVideos;
+        }
+
+        // If no videos found, trigger a refresh of the cache
+        const refreshResponse = await fetch('/api/refresh-video-cache', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ category: 'Highly Rated' })
+        });
+
+        if (!refreshResponse.ok) {
+          throw new Error('Failed to refresh video cache');
+        }
+
+        // Try one final time after cache refresh
+        const { data: refreshedVideos, error: refreshError } = await supabase
+          .from('cached_videos')
+          .select('id, title, image, category, video_id, views, is_available')
+          .eq('category', 'Highly Rated')
+          .eq('is_available', true)
+          .order('cached_at', { ascending: false })
+          .limit(24);
+
+        if (refreshedVideos && refreshedVideos.length > 0) {
+          return refreshedVideos;
         }
 
         const endTime = performance.now();
@@ -68,19 +92,33 @@ export const useHighlyRated = () => {
           p_user_id: (await supabase.auth.getUser()).data.user?.id
         });
 
-        if (cacheError || fallbackError || minimalError) {
-          console.error('Error fetching videos:', cacheError || fallbackError || minimalError);
-          throw cacheError || fallbackError || minimalError;
+        if (cacheError || fallbackError || minimalError || refreshError) {
+          console.error('Error fetching videos:', cacheError || fallbackError || minimalError || refreshError);
+          throw cacheError || fallbackError || minimalError || refreshError;
         }
 
-        // Only use mock data as an absolute last resort
-        console.log('No videos found even with minimal criteria, using mock data');
+        // Only use unique mock data as an absolute last resort
+        console.log('No videos found even with minimal criteria, using unique mock data');
         toast.error('Unable to fetch videos at this time');
-        return MOCK_MOVIES.highlyRated;
+        
+        // Filter out any mock videos that are already shown in other categories
+        const uniqueMockVideos = MOCK_MOVIES.highlyRated.filter(movie => 
+          !MOCK_MOVIES.trending.some(trending => trending.videoId === movie.videoId) &&
+          !MOCK_MOVIES.skits.some(skit => skit.videoId === movie.videoId)
+        );
+
+        return uniqueMockVideos;
       } catch (error) {
         console.error('Error in highly rated query:', error);
         toast.error('Failed to load videos');
-        return MOCK_MOVIES.highlyRated;
+        
+        // Use unique mock data for error fallback
+        const uniqueMockVideos = MOCK_MOVIES.highlyRated.filter(movie => 
+          !MOCK_MOVIES.trending.some(trending => trending.videoId === movie.videoId) &&
+          !MOCK_MOVIES.skits.some(skit => skit.videoId === movie.videoId)
+        );
+        
+        return uniqueMockVideos;
       }
     },
     staleTime: 1000 * 60 * 15, // Consider data fresh for 15 minutes
