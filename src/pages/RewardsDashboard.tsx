@@ -8,7 +8,12 @@ import { EarningPotential } from '@/components/rewards/EarningPotential';
 
 export const RewardsDashboard = () => {
   const { points, watchTime } = useRewardsStore();
-  const userCountry = navigator.language || 'en-US';
+  
+  // Check both language and timezone for more accurate location detection
+  const userLanguage = navigator.language || 'en-US';
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const isNigerianTimezone = userTimezone.includes('Lagos') || userTimezone.includes('Africa/Lagos');
+  const isNigerianLanguage = userLanguage.includes('NG') || userLanguage.includes('ng');
 
   const EXCHANGE_RATES = {
     USD: 1,
@@ -20,11 +25,12 @@ export const RewardsDashboard = () => {
   const formatCurrency = (ecoins: number) => {
     const baseUSDPrice = (ecoins / 1000) * 0.5;
     
-    if (userCountry.includes('NG')) {
+    // Prioritize Nigerian users based on either timezone or language
+    if (isNigerianTimezone || isNigerianLanguage) {
       return `₦${(baseUSDPrice * EXCHANGE_RATES.NGN).toLocaleString()}`;
-    } else if (userCountry.includes('GB')) {
+    } else if (userLanguage.includes('GB')) {
       return `£${(baseUSDPrice * EXCHANGE_RATES.GBP).toLocaleString()}`;
-    } else if (userCountry.includes('EU')) {
+    } else if (userLanguage.includes('EU')) {
       return `€${(baseUSDPrice * EXCHANGE_RATES.EUR).toLocaleString()}`;
     }
     return `$${baseUSDPrice.toLocaleString()}`;
@@ -33,7 +39,7 @@ export const RewardsDashboard = () => {
   const rewards = [
     {
       name: 'Standard Reward',
-      cost: 7500, // £3 equivalent
+      cost: 7500,
       icon: Award,
       features: [
         'Rewarding you for your time spent watching on Ekowest',
@@ -43,7 +49,7 @@ export const RewardsDashboard = () => {
     },
     {
       name: 'Ad-Free Watching',
-      cost: 37500, // £15 equivalent
+      cost: 37500,
       icon: Video,
       features: [
         'Remove all ads during video playback',
@@ -55,7 +61,7 @@ export const RewardsDashboard = () => {
     },
     {
       name: 'VIP Creator Package',
-      cost: 75000, // £30 equivalent
+      cost: 75000,
       icon: Star,
       features: [
         'All Ad-Free Watching features included',
