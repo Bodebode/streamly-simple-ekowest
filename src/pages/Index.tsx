@@ -7,7 +7,7 @@ import { useHighlyRated } from '@/hooks/use-highly-rated';
 import { useNewReleases } from '@/hooks/use-new-releases';
 import { useSkits } from '@/hooks/use-skits';
 import { useYorubaMovies } from '@/hooks/use-yoruba';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { MOCK_MOVIES } from '../data/mockMovies';
 import { usePopulateSections } from '@/hooks/use-populate-sections';
 import { transformCachedToMovie } from '@/utils/movie-transforms';
@@ -22,8 +22,6 @@ const Index = () => {
   const { data: newReleases, isLoading: isLoadingNewReleases, refetch: refetchNewReleases } = useNewReleases();
   const { data: skits, isLoading: isLoadingSkits, refetch: refetchSkits } = useSkits();
   const { data: yorubaMovies, isLoading: isLoadingYoruba, refetch: refetchYoruba } = useYorubaMovies();
-  const newReleaseRef = useRef<HTMLDivElement>(null);
-  const location = useLocation();
 
   const { isPopulating, populateAllSections } = usePopulateSections({
     refetchYoruba,
@@ -85,15 +83,13 @@ const Index = () => {
             onVideoSelect={setSelectedVideoId}
             refetchFunction={refetchSkits}
           />
-          <div ref={newReleaseRef}>
-            <CategoryRow 
-              title="New Release" 
-              movies={newReleases ? transformCachedToMovie(newReleases as unknown as CachedMovie[]) : MOCK_MOVIES.highlyRated}
-              selectedVideoId={selectedVideoId}
-              onVideoSelect={setSelectedVideoId}
-              refetchFunction={refetchNewReleases}
-            />
-          </div>
+          <CategoryRow 
+            title="New Release" 
+            movies={newReleases ? transformCachedToMovie(newReleases as unknown as CachedMovie[]) : MOCK_MOVIES.highlyRated}
+            selectedVideoId={selectedVideoId}
+            onVideoSelect={setSelectedVideoId}
+            refetchFunction={refetchNewReleases}
+          />
         </div>
       </div>
     </MainLayout>

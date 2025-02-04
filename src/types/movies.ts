@@ -1,5 +1,5 @@
 export interface Movie {
-  id: string;  // Changed from number to string to match the database schema
+  id: string;
   title: string;
   image: string;
   category: string;
@@ -36,4 +36,24 @@ export interface MovieCardProps {
   videoId?: string;
   onMovieSelect: (videoId: string | null) => void;
   isVideoPlaying: boolean;
+}
+
+export interface CachedMovie {
+  id: string;
+  title: string;
+  image: string;
+  category: string;
+  video_id: string;
+  views?: number;
+  comments?: number;
+  cached_at?: string;
+  expires_at?: string;
+  access_count?: number;
+}
+
+export interface User {
+  id: string;
+  email?: string;
+  username?: string;
+  avatar_url?: string;
 }
