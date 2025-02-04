@@ -5,6 +5,8 @@ import { useRelatedVideos } from '@/hooks/use-related-videos';
 import { checkVideoAvailability } from '@/utils/video-validation';
 import { Movie, CategoryRowProps } from '@/types/movies';
 import { useSectionVisibility } from '@/hooks/use-section-visibility';
+import { prefetchVideos } from '@/utils/cache-manager';
+import { MOCK_MOVIES } from '@/data/mockMovies';
 
 const CategoryRowComponent = ({ 
   title, 
@@ -14,7 +16,7 @@ const CategoryRowComponent = ({
   updateHighlyRated,
   refetchFunction 
 }: CategoryRowProps) => {
-  const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
+  const [filteredMovies, setFilteredMovies] = useState<Movie[]>(movies);
   const { isLoading } = useRelatedVideos(selectedVideoId, title, movies);
   const isVisible = useSectionVisibility(title, filteredMovies, refetchFunction);
 
@@ -23,20 +25,26 @@ const CategoryRowComponent = ({
   }, [onVideoSelect]);
 
   useEffect(() => {
-    // Optimize filtering by doing it once and memoizing the result
-    const validMovies = movies.filter(movie => 
-      movie.videoId && 
-      (!selectedVideoId || movie.videoId !== selectedVideoId)
-    );
-    setFilteredMovies(validMovies.length > 0 ? validMovies : movies);
-    
-    // Check availability in background without blocking
-    if (isVisible) {
-      checkVideoAvailability();
+    if (title === 'Highly Rated' && (!movies || movies.length < 12)) {
+      setFilteredMovies(MOCK_MOVIES.highlyRated);
+      return;
     }
-  }, [movies, selectedVideoId, isVisible]);
 
-  const isPlayingInThisRow = selectedVideoId && movies.some(movie => movie.videoId === selectedVideoId);
+    const validMovies = movies.filter(movie => movie.videoId);
+    if (validMovies.length > 0) {
+      setFilteredMovies(validMovies);
+    } else if (title === 'Highly Rated') {
+      setFilteredMovies(MOCK_MOVIES.highlyRated);
+    } else {
+      setFilteredMovies(movies);
+    }
+
+    if (filteredMovies.length < 12) {
+      prefetchVideos(title);
+    }
+    
+    checkVideoAvailability();
+  }, [movies, title]);
 
   if (!isVisible) {
     return null;
@@ -60,7 +68,7 @@ const CategoryRowComponent = ({
           onMovieSelect={onVideoSelect}
           isVideoPlaying={selectedVideoId !== null}
         />
-        {isPlayingInThisRow && selectedVideoId && (
+        {selectedVideoId && movies.some(movie => movie.videoId === selectedVideoId) && (
           <VideoPlayer videoId={selectedVideoId} onClose={handleCloseVideo} />
         )}
       </div>

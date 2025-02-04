@@ -29,6 +29,10 @@ const Index = () => {
     refetchSkits
   });
 
+  const transformedHighlyRated = highlyRatedVideos 
+    ? transformCachedToMovie(highlyRatedVideos as unknown as CachedMovie[])
+    : MOCK_MOVIES.highlyRated;
+
   return (
     <MainLayout showMainFooter>
       <div className="fixed bottom-4 right-4 z-50 flex gap-2">
@@ -63,7 +67,7 @@ const Index = () => {
           />
           <CategoryRow 
             title="Highly Rated" 
-            movies={highlyRatedVideos ? transformCachedToMovie(highlyRatedVideos as unknown as CachedMovie[]) : MOCK_MOVIES.highlyRated}
+            movies={transformedHighlyRated}
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
             refetchFunction={refetchHighlyRated}
