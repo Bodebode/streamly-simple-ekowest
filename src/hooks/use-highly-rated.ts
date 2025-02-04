@@ -11,16 +11,19 @@ export const useHighlyRated = () => {
         console.log('Fetching highly rated videos...');
         const startTime = performance.now();
         
-        // Optimized query with specific column selection and better indexing
+        // Relaxed criteria:
+        // - Reduced minimum views to 10,000
+        // - Reduced like ratio to 0.3
+        // - Still ensure video is available
         const { data: cachedVideos, error: cacheError, count } = await supabase
           .from('cached_videos')
           .select('id, title, image, category, video_id, views, like_ratio, is_available', { count: 'exact' })
           .eq('category', 'Highly Rated')
           .eq('is_available', true)
-          .gt('views', 50000)
-          .gt('like_ratio', 0.5)
+          .gt('views', 10000)  // Reduced from 50,000
+          .gt('like_ratio', 0.3)  // Reduced from 0.5
           .order('views', { ascending: false })
-          .limit(12);
+          .limit(24);  // Increased from 12 to get more results
 
         const endTime = performance.now();
         const executionTime = endTime - startTime;
@@ -39,6 +42,30 @@ export const useHighlyRated = () => {
           throw cacheError;
         }
 
+        if (!cachedVideos || cachedVideos.length === 0) {
+          console.log('No cached videos found, fetching fresh data...');
+          
+          // If no cached videos, try fetching with even more relaxed criteria
+          const { data: fallbackVideos, error: fallbackError } = await supabase
+            .from('cached_videos')
+            .select('id, title, image, category, video_id, views, like_ratio, is_available')
+            .eq('category', 'Highly Rated')
+            .eq('is_available', true)
+            .gt('views', 5000)  // Even more relaxed view count
+            .order('views', { ascending: false })
+            .limit(24);
+
+          if (fallbackError) {
+            console.error('Error fetching fallback videos:', fallbackError);
+            throw fallbackError;
+          }
+
+          if (fallbackVideos && fallbackVideos.length > 0) {
+            console.log(`Found ${fallbackVideos.length} fallback videos`);
+            return fallbackVideos;
+          }
+        }
+
         if (cachedVideos && cachedVideos.length > 0) {
           console.log(`Found ${cachedVideos.length} cached videos in ${executionTime.toFixed(2)}ms`);
           
@@ -47,7 +74,6 @@ export const useHighlyRated = () => {
             supabase.rpc('increment_access_count', { video_id: video.id })
           );
           
-          // Fire and forget - don't await these updates
           Promise.allSettled(updatePromises).then(results => {
             results.forEach((result, index) => {
               if (result.status === 'rejected') {
@@ -59,11 +85,13 @@ export const useHighlyRated = () => {
           return cachedVideos;
         }
 
-        console.log('No videos found, using mock data');
+        // Only use mock data as an absolute last resort
+        console.log('No videos found even with relaxed criteria, using mock data');
+        toast.error('Unable to fetch videos at this time');
         return MOCK_MOVIES.highlyRated;
       } catch (error) {
         console.error('Error in highly rated query:', error);
-        toast.error('Failed to load videos, showing placeholders');
+        toast.error('Failed to load videos');
         return MOCK_MOVIES.highlyRated;
       }
     },
