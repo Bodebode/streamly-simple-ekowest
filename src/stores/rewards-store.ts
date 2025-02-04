@@ -22,16 +22,16 @@ export const useRewardsStore = create<RewardsStore>()(
           .from('watch_sessions')
           .select('duration, points_earned')
           .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
-          .is('is_valid', true);
+          .eq('is_valid', true);
 
         if (error) {
           console.error('[RewardsStore] Error fetching watch stats:', error);
           return;
         }
 
-        // Convert seconds to minutes, rounding up to nearest minute
+        // Convert total seconds to minutes and sum up points
         const totalMinutes = sessions?.reduce((acc, session) => 
-          acc + Math.ceil((session.duration || 0) / 60), 0) || 0;
+          acc + Math.floor((session.duration || 0) / 60), 0) || 0;
           
         const totalPoints = sessions?.reduce((acc, session) => 
           acc + (session.points_earned || 0), 0) || 0;
