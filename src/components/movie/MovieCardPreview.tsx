@@ -20,7 +20,7 @@ const MovieCardPreviewComponent = ({ videoId, title, category, showTitle, onClic
     <div className="relative w-full h-full" onClick={onClick}>
       <iframe
         className="w-full h-full rounded-lg"
-        src={`https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&start=85&end=120&modestbranding=1&showinfo=0&rel=0&loop=1&playlist=${videoId}`}
+        src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&start=85&end=120&modestbranding=1&showinfo=0&rel=0&loop=1&playlist=${videoId}`}
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
       />
