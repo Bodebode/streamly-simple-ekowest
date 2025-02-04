@@ -8,9 +8,9 @@ interface VideoIframeProps {
 export const VideoIframe = ({ videoId, onError }: VideoIframeProps) => {
   return (
     <div className="relative w-full aspect-video">
-      {/* Overlay to prevent clicking the title link */}
+      {/* Overlay to prevent clicking and hide the title */}
       <div 
-        className="absolute top-0 left-0 w-full h-14 bg-transparent z-10" 
+        className="absolute top-0 left-0 w-full h-14 bg-black z-10" 
         aria-hidden="true"
       />
       <iframe
