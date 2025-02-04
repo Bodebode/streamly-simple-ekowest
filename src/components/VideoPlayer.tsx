@@ -110,15 +110,17 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
       aria-modal="true"
       aria-label="Video player"
     >
-      <VideoControls
-        isFullscreen={isFullscreen}
-        isDimmed={isDimmed}
-        onFullscreen={handleFullscreen}
-        onDimming={toggleDimming}
-        onClose={onClose}
-      />
-      <VideoErrorBoundary>
+      <div className="absolute -top-10 right-0 flex items-center gap-4">
         <WatchTimer startTime={startTime} />
+        <VideoControls
+          isFullscreen={isFullscreen}
+          isDimmed={isDimmed}
+          onFullscreen={handleFullscreen}
+          onDimming={toggleDimming}
+          onClose={onClose}
+        />
+      </div>
+      <VideoErrorBoundary>
         <VideoIframe videoId={videoId} onError={handleIframeError} />
       </VideoErrorBoundary>
       {isWatching && (
