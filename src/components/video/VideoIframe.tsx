@@ -15,7 +15,7 @@ export const VideoIframe = ({ videoId, onError }: VideoIframeProps) => {
       />
       <iframe
         className="w-full h-full"
-        src={`https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0&showinfo=0&controls=1`}
+        src={`https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0&showinfo=0&controls=1&iv_load_policy=3&fs=1&disablekb=1&playsinline=1`}
         title="Video player"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
