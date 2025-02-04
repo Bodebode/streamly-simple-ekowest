@@ -22,6 +22,7 @@ export const useWatchSession = (videoId: string | null) => {
             user_id: user.id,
             video_id: videoId,
             started_at: new Date().toISOString(),
+            duration: 0, // Initialize duration as 0
           })
           .select('id')
           .single();
@@ -48,6 +49,7 @@ export const useWatchSession = (videoId: string | null) => {
           .from('watch_sessions')
           .update({
             duration: currentDuration,
+            is_valid: true // Mark session as valid
           })
           .eq('id', sessionId);
 
@@ -70,6 +72,7 @@ export const useWatchSession = (videoId: string | null) => {
           .update({
             ended_at: new Date().toISOString(),
             duration: finalDuration,
+            is_valid: finalDuration >= 30 // Mark as valid only if watched for at least 30 seconds
           })
           .eq('id', sessionId);
 
@@ -86,8 +89,8 @@ export const useWatchSession = (videoId: string | null) => {
     if (videoId && !sessionId) {
       createSession();
       
-      // Update duration every 10 seconds
-      interval = setInterval(updateDuration, 10000);
+      // Update duration more frequently (every 5 seconds)
+      interval = setInterval(updateDuration, 5000);
     }
 
     return () => {
