@@ -16,7 +16,7 @@ export const VideoControls = ({
   onClose
 }: VideoControlsProps) => {
   return (
-    <div className="absolute -top-10 right-0 flex items-center gap-4">
+    <div className="flex items-center gap-4">
       <button
         onClick={onDimming}
         className="text-white hover:text-gray-300 transition-colors"

@@ -90,7 +90,7 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
 
   const toggleDimming = () => {
     setIsDimmed(!isDimmed);
-    document.body.style.backgroundColor = !isDimmed ? '#000' : '';
+    document.body.classList.toggle('dimmed');
   };
 
   const handleIframeError = () => {
