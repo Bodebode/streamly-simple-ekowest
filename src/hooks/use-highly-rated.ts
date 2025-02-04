@@ -11,19 +11,19 @@ export const useHighlyRated = () => {
         console.log('Fetching highly rated videos...');
         const startTime = performance.now();
         
-        // Relaxed criteria:
-        // - Reduced minimum views to 10,000
-        // - Reduced like ratio to 0.3
+        // Even more relaxed criteria:
+        // - Reduced minimum views to 5,000
+        // - Reduced like ratio to 0.2
         // - Still ensure video is available
         const { data: cachedVideos, error: cacheError, count } = await supabase
           .from('cached_videos')
           .select('id, title, image, category, video_id, views, like_ratio, is_available', { count: 'exact' })
           .eq('category', 'Highly Rated')
           .eq('is_available', true)
-          .gt('views', 10000)  // Reduced from 50,000
-          .gt('like_ratio', 0.3)  // Reduced from 0.5
+          .gt('views', 5000)  // Further reduced from 10,000
+          .gt('like_ratio', 0.2)  // Further reduced from 0.3
           .order('views', { ascending: false })
-          .limit(24);  // Increased from 12 to get more results
+          .limit(24);  // Keep higher limit to get more results
 
         const endTime = performance.now();
         const executionTime = endTime - startTime;
@@ -51,7 +51,7 @@ export const useHighlyRated = () => {
             .select('id, title, image, category, video_id, views, like_ratio, is_available')
             .eq('category', 'Highly Rated')
             .eq('is_available', true)
-            .gt('views', 5000)  // Even more relaxed view count
+            .gt('views', 1000)  // Even more relaxed view count
             .order('views', { ascending: false })
             .limit(24);
 
