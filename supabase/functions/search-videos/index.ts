@@ -25,6 +25,7 @@ serve(async (req) => {
 
     console.log('Searching YouTube for:', query)
 
+    // First get search results
     const searchResponse = await fetch(
       `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query)}&type=video&key=${YOUTUBE_API_KEY}`
     )
@@ -35,7 +36,32 @@ serve(async (req) => {
       throw new Error(`YouTube API error: ${searchResponse.status}`)
     }
 
-    const data = await searchResponse.json()
+    const searchData = await searchResponse.json()
+    const videoIds = searchData.items.map((item: any) => item.id.videoId).join(',')
+
+    // Then get video details including status.embeddable
+    const videoDetailsResponse = await fetch(
+      `https://www.googleapis.com/youtube/v3/videos?part=snippet,status&id=${videoIds}&key=${YOUTUBE_API_KEY}`
+    )
+
+    if (!videoDetailsResponse.ok) {
+      throw new Error(`Failed to get video details: ${videoDetailsResponse.status}`)
+    }
+
+    const videoDetails = await videoDetailsResponse.json()
+    
+    // Filter out non-embeddable videos and map back to search result format
+    const embeddableVideos = videoDetails.items
+      .filter((video: any) => video.status.embeddable)
+      .map((video: any) => {
+        const searchResult = searchData.items.find((item: any) => item.id.videoId === video.id)
+        return {
+          ...searchResult,
+          status: video.status
+        }
+      })
+
+    console.log(`Filtered ${searchData.items.length - embeddableVideos.length} non-embeddable videos`)
     
     // Create Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
@@ -43,14 +69,15 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey)
 
     // Cache the results
-    const videos = data.items.map((item: any) => ({
-      id: item.id.videoId,
+    const videos = embeddableVideos.map((item: any) => ({
+      id: crypto.randomUUID(),
       title: item.snippet.title,
       image: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default.url,
       category: 'search_results',
       video_id: item.id.videoId,
       cached_at: new Date().toISOString(),
       is_available: true,
+      is_embeddable: true,
       channel_metadata: {
         title: item.snippet.channelTitle,
         publishedAt: item.snippet.publishedAt
@@ -67,7 +94,7 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify(data.items),
+      JSON.stringify(embeddableVideos),
       { 
         headers: { 
           ...corsHeaders,
