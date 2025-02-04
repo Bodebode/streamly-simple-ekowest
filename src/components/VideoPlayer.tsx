@@ -60,14 +60,14 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
         if (isFullscreen) {
           document.exitFullscreen().catch(console.error);
         } else {
-          onClose();
+          handleClose();
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [isFullscreen, onClose]);
+  }, [isFullscreen]);
 
   const handleFullscreen = async () => {
     if (!document.fullscreenElement) {
@@ -91,6 +91,13 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
   const toggleDimming = () => {
     setIsDimmed(!isDimmed);
     document.body.classList.toggle('dimmed');
+  };
+
+  const handleClose = () => {
+    if (isDimmed) {
+      document.body.classList.remove('dimmed');
+    }
+    onClose();
   };
 
   const handleIframeError = () => {
@@ -117,7 +124,7 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
           isDimmed={isDimmed}
           onFullscreen={handleFullscreen}
           onDimming={toggleDimming}
-          onClose={onClose}
+          onClose={handleClose}
         />
       </div>
       <VideoErrorBoundary>
