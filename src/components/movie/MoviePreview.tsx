@@ -23,7 +23,7 @@ export const MoviePreview = ({ videoId, title, category, showTitle, onClick }: M
     if (isPlaying && points > 0 && points % 10 === 0) {
       showRewardEarned(10);
     }
-  }, [points, isPlaying]);
+  }, [points, isPlaying, showRewardEarned]);
 
   const handlePlay = () => {
     setIsPlaying(true);
@@ -43,7 +43,7 @@ export const MoviePreview = ({ videoId, title, category, showTitle, onClick }: M
         <iframe
           width="100%"
           height="100%"
-          src={`https://www.youtube.com/embed/${videoId}`}
+          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&showinfo=0&rel=0&loop=1&playlist=${videoId}`}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
         />
