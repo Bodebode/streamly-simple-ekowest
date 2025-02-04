@@ -146,7 +146,9 @@ export const PremiumFeatures = ({ rewards, points, formatCurrency }: PremiumFeat
                     <div className="font-semibold line-through text-gray-500">
                       {reward.cost.toLocaleString()} E-coins
                     </div>
-                    <div className="text-green-500 font-bold">FREE</div>
+                    <div className="text-green-500 font-bold flex items-center gap-2">
+                      FREE <span className="line-through text-sm text-gray-500">({formatCurrency(reward.cost)})</span>
+                    </div>
                   </>
                 ) : (
                   <>
