@@ -32,6 +32,8 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
       containerRef.current?.focus();
 
       console.log(`[VideoPlayer] Attempting to play video: ${videoId}`);
+      console.log('[VideoPlayer] Watch session active:', isWatching);
+      console.log('[VideoPlayer] Start time:', new Date(startTime).toISOString());
       
       fetch(`https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v=${videoId}&format=json`)
         .then(response => {
@@ -50,7 +52,7 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
         previousFocusRef.current?.focus();
       };
     }
-  }, [videoId, onClose]);
+  }, [videoId, onClose, isWatching, startTime]);
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -116,7 +118,7 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
         onClose={onClose}
       />
       <VideoErrorBoundary>
-        {isWatching && <WatchTimer startTime={startTime} />}
+        <WatchTimer startTime={startTime} />
         <VideoIframe videoId={videoId} onError={handleIframeError} />
       </VideoErrorBoundary>
       {isWatching && (
