@@ -3,6 +3,7 @@ import { Check } from 'lucide-react';
 import { useAuth } from '@/components/AuthProvider';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useState, useEffect } from 'react';
 
 interface Reward {
   name: string;
@@ -19,10 +20,45 @@ interface PremiumFeaturesProps {
 
 export const PremiumFeatures = ({ rewards, points, formatCurrency }: PremiumFeaturesProps) => {
   const { session } = useAuth();
+  const [timeLeft, setTimeLeft] = useState<{ days: number; hours: number; minutes: number }>({ 
+    days: 60, 
+    hours: 0, 
+    minutes: 0 
+  });
+
+  useEffect(() => {
+    // Set end date to 2 months from now
+    const endDate = new Date();
+    endDate.setMonth(endDate.getMonth() + 2);
+
+    const timer = setInterval(() => {
+      const now = new Date();
+      const difference = endDate.getTime() - now.getTime();
+
+      if (difference <= 0) {
+        clearInterval(timer);
+        return;
+      }
+
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+
+      setTimeLeft({ days, hours, minutes });
+    }, 60000); // Update every minute
+
+    return () => clearInterval(timer);
+  }, []);
 
   const handlePurchase = async (reward: Reward) => {
     if (!session?.user) {
       toast.error('Please login to make a purchase');
+      return;
+    }
+
+    // If it's the Standard Reward during promotion period, handle it differently
+    if (reward.name === 'Standard Reward') {
+      toast.success('Standard Reward activated! Enjoy your free trial.');
       return;
     }
 
@@ -81,6 +117,14 @@ export const PremiumFeatures = ({ rewards, points, formatCurrency }: PremiumFeat
               <reward.icon className="h-6 w-6 text-koya-accent transition-transform duration-300 group-hover:scale-110" />
               <div>
                 <span className="font-medium">{reward.name}</span>
+                {reward.name === 'Standard Reward' && (
+                  <div className="mt-1 text-sm text-green-500 font-medium">
+                    Limited Time Offer: 100% OFF! 
+                    <div className="text-xs text-gray-500">
+                      Offer ends in: {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m
+                    </div>
+                  </div>
+                )}
                 <ul className="mt-2 space-y-1">
                   {reward.features.map((feature, index) => (
                     <li 
@@ -97,16 +141,29 @@ export const PremiumFeatures = ({ rewards, points, formatCurrency }: PremiumFeat
             </div>
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <div className="font-semibold">{reward.cost.toLocaleString()} E-coins</div>
-                <div className="text-sm text-muted-foreground">≈ {formatCurrency(reward.cost)}</div>
+                {reward.name === 'Standard Reward' ? (
+                  <>
+                    <div className="font-semibold line-through text-gray-500">
+                      {reward.cost.toLocaleString()} E-coins
+                    </div>
+                    <div className="text-green-500 font-bold">FREE</div>
+                  </>
+                ) : (
+                  <>
+                    <div className="font-semibold">{reward.cost.toLocaleString()} E-coins</div>
+                    <div className="text-sm text-muted-foreground">≈ {formatCurrency(reward.cost)}</div>
+                  </>
+                )}
               </div>
               <Button 
                 type="button"
                 variant={points >= reward.cost ? "default" : "secondary"}
                 onClick={() => handlePurchase(reward)}
-                className="transition-all duration-300 hover:scale-105"
+                className={`transition-all duration-300 hover:scale-105 ${
+                  reward.name === 'Standard Reward' ? 'bg-green-500 hover:bg-green-600' : ''
+                }`}
               >
-                Buy Now
+                {reward.name === 'Standard Reward' ? 'Claim Now' : 'Buy Now'}
               </Button>
             </div>
           </div>
