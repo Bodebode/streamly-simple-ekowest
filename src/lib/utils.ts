@@ -6,6 +6,13 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function truncateTitle(title: string): string {
+  // First decode any HTML entities in the title
+  const decodedTitle = title.replace(/&amp;/g, '&')
+                           .replace(/&lt;/g, '<')
+                           .replace(/&gt;/g, '>')
+                           .replace(/&quot;/g, '"')
+                           .replace(/&#039;/g, "'");
+  
   // Define the special characters to truncate at
   const specialChars = ['-', ':', '|', '{', '}', '.', ',', '#', '||'];
   
@@ -16,7 +23,7 @@ export function truncateTitle(title: string): string {
   ).join('')}].*$`);
   
   // Remove everything after the first special character
-  const truncated = title.replace(pattern, '').trim();
+  const truncated = decodedTitle.replace(pattern, '').trim();
   
-  return truncated || title; // Return original title if truncated is empty
+  return truncated || decodedTitle; // Return original decoded title if truncated is empty
 }
