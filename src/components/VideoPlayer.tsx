@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { VideoControls } from './video/VideoControls';
 import { VideoIframe } from './video/VideoIframe';
 import { VideoErrorBoundary } from './video/VideoErrorBoundary';
+import { WatchTimer } from './video/WatchTimer';
 import { useFocusTrap } from '@/hooks/use-focus-trap';
 import { useWatchSession } from '@/hooks/use-watch-session';
 
@@ -14,6 +15,7 @@ interface VideoPlayerProps {
 export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [isDimmed, setIsDimmed] = useState<boolean>(false);
+  const [startTime, setStartTime] = useState<number>(Date.now());
   const containerRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
@@ -25,10 +27,8 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
 
   useEffect(() => {
     if (videoId) {
-      // Store the currently focused element
+      setStartTime(Date.now());
       previousFocusRef.current = document.activeElement as HTMLElement;
-      
-      // Focus the container when it opens
       containerRef.current?.focus();
 
       console.log(`[VideoPlayer] Attempting to play video: ${videoId}`);
@@ -46,7 +46,6 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
           onClose();
         });
 
-      // Cleanup function to restore focus
       return () => {
         previousFocusRef.current?.focus();
       };
@@ -117,6 +116,7 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
         onClose={onClose}
       />
       <VideoErrorBoundary>
+        {isWatching && <WatchTimer startTime={startTime} />}
         <VideoIframe videoId={videoId} onError={handleIframeError} />
       </VideoErrorBoundary>
       {isWatching && (
