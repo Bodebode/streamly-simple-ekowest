@@ -48,7 +48,7 @@ export const RewardsDashboard = () => {
       ]
     },
     {
-      name: 'Ad-Free Watching',
+      name: 'Premium Package',
       cost: 37500,
       icon: Video,
       features: [
@@ -64,7 +64,7 @@ export const RewardsDashboard = () => {
       cost: 75000,
       icon: Star,
       features: [
-        'All Ad-Free Watching features included',
+        'All Premium Package features included',
         'Exclusive chat rooms with creators',
         'Priority customer support',
         'Special badge on your profile',
