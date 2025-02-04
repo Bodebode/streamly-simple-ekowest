@@ -4,6 +4,7 @@ import { VideoControls } from './video/VideoControls';
 import { VideoIframe } from './video/VideoIframe';
 import { VideoErrorBoundary } from './video/VideoErrorBoundary';
 import { useFocusTrap } from '@/hooks/use-focus-trap';
+import { useWatchSession } from '@/hooks/use-watch-session';
 
 interface VideoPlayerProps {
   videoId: string | null;
@@ -15,6 +16,9 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
   const [isDimmed, setIsDimmed] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+
+  // Initialize watch session tracking
+  const { isWatching } = useWatchSession(videoId);
 
   // Initialize focus trap
   useFocusTrap(containerRef, isFullscreen);
@@ -115,6 +119,11 @@ export const VideoPlayer = ({ videoId, onClose }: VideoPlayerProps) => {
       <VideoErrorBoundary>
         <VideoIframe videoId={videoId} onError={handleIframeError} />
       </VideoErrorBoundary>
+      {isWatching && (
+        <div className="absolute bottom-4 right-4 bg-green-500 text-white px-2 py-1 rounded text-sm">
+          Tracking Watch Time
+        </div>
+      )}
     </div>
   );
 };

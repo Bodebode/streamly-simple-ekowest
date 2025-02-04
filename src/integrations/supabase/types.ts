@@ -407,6 +407,57 @@ export type Database = {
           },
         ]
       }
+      watch_sessions: {
+        Row: {
+          created_at: string | null
+          duration: number | null
+          ended_at: string | null
+          id: string
+          is_valid: boolean | null
+          points_earned: number | null
+          started_at: string
+          user_id: string
+          video_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          duration?: number | null
+          ended_at?: string | null
+          id?: string
+          is_valid?: boolean | null
+          points_earned?: number | null
+          started_at?: string
+          user_id: string
+          video_id: string
+        }
+        Update: {
+          created_at?: string | null
+          duration?: number | null
+          ended_at?: string | null
+          id?: string
+          is_valid?: boolean | null
+          points_earned?: number | null
+          started_at?: string
+          user_id?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "watch_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "watch_sessions_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "cached_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
