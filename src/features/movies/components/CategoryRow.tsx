@@ -25,18 +25,16 @@ const CategoryRowComponent = ({
   }, [onVideoSelect]);
 
   useEffect(() => {
-    if (title === 'Highly Rated' && (!movies || movies.length < 12)) {
-      setFilteredMovies(MOCK_MOVIES.highlyRated);
-      return;
-    }
-
+    // Only use mock data as an absolute last resort
     const validMovies = movies.filter(movie => movie.videoId);
     if (validMovies.length > 0) {
+      console.log(`[CategoryRow] ${title}: Using ${validMovies.length} valid movies from API`);
       setFilteredMovies(validMovies);
-    } else if (title === 'Highly Rated') {
-      setFilteredMovies(MOCK_MOVIES.highlyRated);
-    } else {
-      setFilteredMovies(movies);
+    } else if (title === 'Highly Rated' && (!movies || movies.length < 12)) {
+      console.log(`[CategoryRow] ${title}: No valid movies found, attempting refetch`);
+      if (refetchFunction) {
+        refetchFunction();
+      }
     }
 
     if (filteredMovies.length < 12) {
@@ -44,7 +42,7 @@ const CategoryRowComponent = ({
     }
     
     checkVideoAvailability();
-  }, [movies, title]);
+  }, [movies, title, refetchFunction, filteredMovies.length]);
 
   if (!isVisible) {
     return null;
