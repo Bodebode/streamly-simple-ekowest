@@ -49,6 +49,7 @@ export interface CachedMovie {
   cached_at?: string;
   expires_at?: string;
   access_count?: number;
+  is_available?: boolean;
 }
 
 export interface User {

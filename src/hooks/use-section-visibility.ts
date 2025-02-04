@@ -3,7 +3,7 @@ import { Movie } from '@/types/movies';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-const MINIMUM_CARDS = 6;
+const MINIMUM_CARDS = 4; // Reduced from 6 to 4 to show more sections
 
 export const useSectionVisibility = (
   title: string,
@@ -15,11 +15,11 @@ export const useSectionVisibility = (
 
   useEffect(() => {
     const checkVisibility = async () => {
-      // Count playable videos (ones with videoId)
-      const playableVideos = movies.filter(movie => movie.videoId).length;
+      // Count all videos, not just playable ones
+      const totalVideos = movies.length;
       
-      if (playableVideos < MINIMUM_CARDS && !hasAttemptedRefetch && refetchFunction) {
-        console.log(`[SectionVisibility] ${title} has only ${playableVideos} playable videos. Attempting refetch...`);
+      if (totalVideos < MINIMUM_CARDS && !hasAttemptedRefetch && refetchFunction) {
+        console.log(`[SectionVisibility] ${title} has only ${totalVideos} videos. Attempting refetch...`);
         
         try {
           await refetchFunction();
@@ -27,16 +27,9 @@ export const useSectionVisibility = (
         } catch (error) {
           console.error(`[SectionVisibility] Error refetching ${title}:`, error);
         }
-      } else if (playableVideos < MINIMUM_CARDS) {
-        console.log(`[SectionVisibility] Hiding ${title} section due to insufficient playable videos`);
+      } else if (totalVideos < MINIMUM_CARDS) {
+        console.log(`[SectionVisibility] Hiding ${title} section due to insufficient videos`);
         setIsVisible(false);
-        
-        // Notify backend about the issue
-        try {
-          await supabase.functions.invoke('check-section-counts');
-        } catch (error) {
-          console.error('[SectionVisibility] Error invoking section check:', error);
-        }
       } else {
         setIsVisible(true);
       }
