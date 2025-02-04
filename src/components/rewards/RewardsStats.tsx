@@ -1,4 +1,7 @@
 import { Trophy, Clock } from 'lucide-react';
+import { useEffect } from 'react';
+import { useRewardsStore } from '@/stores/rewards-store';
+import { supabase } from '@/integrations/supabase/client';
 
 interface RewardsStatsProps {
   points: number;
@@ -6,6 +9,33 @@ interface RewardsStatsProps {
 }
 
 export const RewardsStats = ({ points, watchTime }: RewardsStatsProps) => {
+  const fetchWatchStats = useRewardsStore(state => state.fetchWatchStats);
+
+  useEffect(() => {
+    // Initial fetch
+    fetchWatchStats();
+
+    // Subscribe to watch_sessions changes
+    const channel = supabase
+      .channel('watch_time_updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'watch_sessions'
+        },
+        () => {
+          fetchWatchStats();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchWatchStats]);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
       <div className="bg-white dark:bg-koya-card rounded-lg p-6">
