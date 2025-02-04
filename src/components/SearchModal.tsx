@@ -4,6 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Search, X, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useDebounce } from '@/hooks/use-debounce';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 export const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -13,28 +15,45 @@ export const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (isOpen) {
-      // Store the currently focused element
       previousFocusRef.current = document.activeElement as HTMLElement;
-      // Focus the search input when modal opens
       setTimeout(() => inputRef.current?.focus(), 0);
     } else {
-      // Restore focus when modal closes
       previousFocusRef.current?.focus();
     }
   }, [isOpen]);
 
   const handleSearch = async (query: string) => {
+    if (!query.trim()) {
+      setResults([]);
+      return;
+    }
+    
     setIsLoading(true);
-    // Mock search results for now
-    const mockResults = [
-      { id: { videoId: '12345' }, snippet: { title: 'Sample Video 1', channelTitle: 'Channel 1', thumbnails: { default: { url: 'https://via.placeholder.com/120x90' } } } },
-      { id: { videoId: '67890' }, snippet: { title: 'Sample Video 2', channelTitle: 'Channel 2', thumbnails: { default: { url: 'https://via.placeholder.com/120x90' } } } },
-    ];
-    setResults(mockResults);
-    setIsLoading(false);
+    try {
+      const { data, error } = await supabase.functions.invoke('search-videos', {
+        body: { query }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      setResults(data || []);
+    } catch (error) {
+      console.error('Search failed:', error);
+      toast({
+        title: "Search failed",
+        description: "There was a problem performing the search. Please try again.",
+        variant: "destructive",
+      });
+      setResults([]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {

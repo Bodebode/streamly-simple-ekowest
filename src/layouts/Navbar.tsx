@@ -31,7 +31,6 @@ export const Navbar = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
-  const API_KEY = 'AIzaSyDqOUX5_9QZZzrfGxWqVrqZw_R-y3hKDb8';
 
   const handleLogout = async () => {
     try {
@@ -58,25 +57,22 @@ export const Navbar = () => {
     
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `https://youtube.googleapis.com/youtube/v3/search?` + 
-        new URLSearchParams({
-          part: 'snippet',
-          maxResults: '5',
-          q: query,
-          type: 'video',
-          key: API_KEY
-        })
-      );
+      const { data, error } = await supabase.functions.invoke('search-videos', {
+        body: { query }
+      });
 
-      const data = await response.json();
-      if (data.error) {
-        throw new Error(data.error.message);
+      if (error) {
+        throw error;
       }
       
-      setSearchResults(data.items || []);
+      setSearchResults(data || []);
     } catch (error) {
       console.error('Search failed:', error);
+      toast({
+        title: "Search failed",
+        description: "There was a problem performing the search.",
+        variant: "destructive",
+      });
       setSearchResults([]);
     } finally {
       setIsLoading(false);
@@ -121,10 +117,7 @@ export const Navbar = () => {
                   {isSearching && searchResults.length > 0 && (
                     <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-koya-card rounded-md shadow-lg z-50 max-h-[300px] overflow-y-auto">
                       {isLoading ? (
-                        <div className="p-4 text-center">
-                          <span className="animate-spin inline-block mr-2">⌛</span>
-                          Searching...
-                        </div>
+                        <div className="p-4 text-center">Loading...</div>
                       ) : (
                         searchResults.map((video) => (
                           <div
