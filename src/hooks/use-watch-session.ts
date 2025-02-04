@@ -10,6 +10,7 @@ export const useWatchSession = (videoId: string | null) => {
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
+    let startTime: number;
 
     const createSession = async () => {
       if (!videoId || !user) return;
@@ -20,12 +21,14 @@ export const useWatchSession = (videoId: string | null) => {
           .insert({
             user_id: user.id,
             video_id: videoId,
+            started_at: new Date().toISOString(),
           })
           .select('id')
           .single();
 
         if (error) throw error;
         
+        startTime = Date.now();
         setSessionId(data.id);
         setIsWatching(true);
         console.log('[WatchSession] Created new session:', data.id);
@@ -35,21 +38,44 @@ export const useWatchSession = (videoId: string | null) => {
       }
     };
 
-    const endSession = async () => {
+    const updateDuration = async () => {
       if (!sessionId) return;
 
+      const currentDuration = Math.floor((Date.now() - startTime) / 1000);
+      
       try {
         const { error } = await supabase
           .from('watch_sessions')
           .update({
-            ended_at: new Date().toISOString(),
-            duration: Math.floor((Date.now() - startTime) / 1000),
+            duration: currentDuration,
           })
           .eq('id', sessionId);
 
         if (error) throw error;
         
-        console.log('[WatchSession] Ended session:', sessionId);
+        console.log('[WatchSession] Updated duration:', currentDuration);
+      } catch (error) {
+        console.error('[WatchSession] Error updating duration:', error);
+      }
+    };
+
+    const endSession = async () => {
+      if (!sessionId) return;
+
+      try {
+        const finalDuration = Math.floor((Date.now() - startTime) / 1000);
+        
+        const { error } = await supabase
+          .from('watch_sessions')
+          .update({
+            ended_at: new Date().toISOString(),
+            duration: finalDuration,
+          })
+          .eq('id', sessionId);
+
+        if (error) throw error;
+        
+        console.log('[WatchSession] Ended session:', sessionId, 'Duration:', finalDuration);
         setSessionId(null);
         setIsWatching(false);
       } catch (error) {
@@ -57,28 +83,11 @@ export const useWatchSession = (videoId: string | null) => {
       }
     };
 
-    const startTime = Date.now();
-
     if (videoId && !sessionId) {
       createSession();
       
-      // Set up activity check interval
-      interval = setInterval(() => {
-        // Update session duration periodically
-        if (sessionId) {
-          supabase
-            .from('watch_sessions')
-            .update({
-              duration: Math.floor((Date.now() - startTime) / 1000),
-            })
-            .eq('id', sessionId)
-            .then(({ error }) => {
-              if (error) {
-                console.error('[WatchSession] Error updating duration:', error);
-              }
-            });
-        }
-      }, 30000); // Update every 30 seconds
+      // Update duration every 10 seconds
+      interval = setInterval(updateDuration, 10000);
     }
 
     return () => {

@@ -26,6 +26,7 @@ export const RewardsStats = ({ points, watchTime }: RewardsStatsProps) => {
           table: 'watch_sessions'
         },
         () => {
+          console.log('[RewardsStats] Watch session updated, refreshing stats');
           fetchWatchStats();
         }
       )
@@ -35,6 +36,15 @@ export const RewardsStats = ({ points, watchTime }: RewardsStatsProps) => {
       supabase.removeChannel(channel);
     };
   }, [fetchWatchStats]);
+
+  const formatWatchTime = (minutes: number) => {
+    if (minutes < 60) {
+      return `${minutes} min`;
+    }
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return `${hours}h ${remainingMinutes}m`;
+  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -53,7 +63,9 @@ export const RewardsStats = ({ points, watchTime }: RewardsStatsProps) => {
           <Clock className="h-8 w-8 text-koya-accent" />
           <div>
             <h3 className="text-lg font-semibold">Watch Time</h3>
-            <p className="text-3xl font-bold text-koya-accent">{watchTime} min</p>
+            <p className="text-3xl font-bold text-koya-accent">
+              {formatWatchTime(watchTime)}
+            </p>
           </div>
         </div>
       </div>

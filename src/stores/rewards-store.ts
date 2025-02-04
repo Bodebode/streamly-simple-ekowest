@@ -34,7 +34,15 @@ export const useRewardsStore = create<RewardsStore>()(
         const totalPoints = sessions?.reduce((acc, session) => 
           acc + (session.points_earned || 0), 0) || 0;
 
-        set({ watchTime: Math.floor(totalMinutes), points: totalPoints });
+        console.log('[RewardsStore] Updated stats:', {
+          watchTime: Math.floor(totalMinutes),
+          points: totalPoints
+        });
+
+        set({ 
+          watchTime: Math.floor(totalMinutes), 
+          points: totalPoints 
+        });
       }
     }),
     {
