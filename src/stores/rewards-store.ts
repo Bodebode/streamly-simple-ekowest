@@ -25,22 +25,25 @@ export const useRewardsStore = create<RewardsStore>()(
           .is('is_valid', true);
 
         if (error) {
-          console.error('Error fetching watch stats:', error);
+          console.error('[RewardsStore] Error fetching watch stats:', error);
           return;
         }
 
+        // Convert seconds to minutes, rounding up to nearest minute
         const totalMinutes = sessions?.reduce((acc, session) => 
-          acc + (session.duration || 0) / 60, 0) || 0;
+          acc + Math.ceil((session.duration || 0) / 60), 0) || 0;
+          
         const totalPoints = sessions?.reduce((acc, session) => 
           acc + (session.points_earned || 0), 0) || 0;
 
         console.log('[RewardsStore] Updated stats:', {
-          watchTime: Math.floor(totalMinutes),
-          points: totalPoints
+          watchTime: totalMinutes,
+          points: totalPoints,
+          rawSessions: sessions
         });
 
         set({ 
-          watchTime: Math.floor(totalMinutes), 
+          watchTime: totalMinutes, 
           points: totalPoints 
         });
       }
