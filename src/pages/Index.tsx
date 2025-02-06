@@ -15,6 +15,7 @@ import { transformCachedToMovie } from '@/utils/movie-transforms';
 import { CachedMovie } from '@/types/movies';
 import { MainLayout } from '@/layouts/MainLayout';
 import { toast } from 'sonner';
+import { MOCK_MOVIES } from '@/data/mockMovies';
 
 const Index = () => {
   const { theme, setTheme } = useTheme();
@@ -89,6 +90,12 @@ const Index = () => {
       <div className="pt-16">
         <Hero />
         <div className="pb-8">
+          <CategoryRow 
+            title="Trending" 
+            movies={MOCK_MOVIES.trending}
+            selectedVideoId={selectedVideoId}
+            onVideoSelect={setSelectedVideoId}
+          />
           <CategoryRow 
             title="Highly Rated" 
             movies={transformedHighlyRated}
