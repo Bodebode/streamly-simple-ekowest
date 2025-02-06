@@ -1,3 +1,4 @@
+
 import { Hero } from '../components/Hero';
 import { CategoryRow } from '../features/movies/components/CategoryRow';
 import { Moon, Sun, RefreshCw } from 'lucide-react';
@@ -7,12 +8,13 @@ import { useHighlyRated } from '@/hooks/use-highly-rated';
 import { useNewReleases } from '@/hooks/use-new-releases';
 import { useSkits } from '@/hooks/use-skits';
 import { useYorubaMovies } from '@/hooks/use-yoruba';
-import { useState } from 'react';
-import { MOCK_MOVIES } from '../data/mockMovies';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { usePopulateSections } from '@/hooks/use-populate-sections';
 import { transformCachedToMovie } from '@/utils/movie-transforms';
 import { CachedMovie } from '@/types/movies';
 import { MainLayout } from '@/layouts/MainLayout';
+import { toast } from 'sonner';
 
 const Index = () => {
   const { theme, setTheme } = useTheme();
@@ -29,9 +31,37 @@ const Index = () => {
     refetchSkits
   });
 
+  useEffect(() => {
+    const checkContentFreshness = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('check-section-counts');
+        
+        if (error) {
+          console.error('Error checking content freshness:', error);
+          return;
+        }
+
+        if (data?.refreshed_sections?.length > 0) {
+          toast.success('Fresh content has been loaded for you!');
+          // Refetch all queries to get the new content
+          await Promise.all([
+            refetchHighlyRated(),
+            refetchNewReleases(),
+            refetchSkits(),
+            refetchYoruba()
+          ]);
+        }
+      } catch (error) {
+        console.error('Error in content freshness check:', error);
+      }
+    };
+
+    checkContentFreshness();
+  }, []); // Run once when component mounts
+
   const transformedHighlyRated = highlyRatedVideos 
     ? transformCachedToMovie(highlyRatedVideos as unknown as CachedMovie[])
-    : MOCK_MOVIES.highlyRated;
+    : [];
 
   return (
     <MainLayout showMainFooter>
@@ -60,12 +90,6 @@ const Index = () => {
         <Hero />
         <div className="pb-8">
           <CategoryRow 
-            title="Trending Now" 
-            movies={MOCK_MOVIES.trending}
-            selectedVideoId={selectedVideoId}
-            onVideoSelect={setSelectedVideoId}
-          />
-          <CategoryRow 
             title="Highly Rated" 
             movies={transformedHighlyRated}
             selectedVideoId={selectedVideoId}
@@ -81,14 +105,14 @@ const Index = () => {
           />
           <CategoryRow 
             title="Skits" 
-            movies={skits ? transformCachedToMovie(skits as unknown as CachedMovie[]) : MOCK_MOVIES.skits}
+            movies={skits ? transformCachedToMovie(skits as unknown as CachedMovie[]) : []}
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
             refetchFunction={refetchSkits}
           />
           <CategoryRow 
             title="New Release" 
-            movies={newReleases ? transformCachedToMovie(newReleases as unknown as CachedMovie[]) : MOCK_MOVIES.highlyRated}
+            movies={newReleases ? transformCachedToMovie(newReleases as unknown as CachedMovie[]) : []}
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
             refetchFunction={refetchNewReleases}
