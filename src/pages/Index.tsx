@@ -91,7 +91,7 @@ const Index = () => {
         <Hero />
         <div className="pb-8">
           <CategoryRow 
-            title="Trending" 
+            title="Trending Now" 
             movies={MOCK_MOVIES.trending}
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
