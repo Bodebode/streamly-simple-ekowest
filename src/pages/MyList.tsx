@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Navbar } from '@/layouts/Navbar';
 import { MovieCard } from '@/components/MovieCard';
