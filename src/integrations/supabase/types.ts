@@ -528,6 +528,12 @@ export type Database = {
         }
         Returns: undefined
       }
+      increment_pending_access_count: {
+        Args: {
+          video_id: string
+        }
+        Returns: undefined
+      }
       log_query_metrics: {
         Args: {
           p_query_name: string
