@@ -28,11 +28,14 @@ export type Database = {
           is_embeddable: boolean | null
           is_verified_creator: boolean | null
           language_tags: string[] | null
+          last_access_batch: string | null
           last_availability_check: string | null
           last_error: string | null
           last_retry: string | null
           like_ratio: number | null
+          pending_access_count: number | null
           published_at: string | null
+          refresh_window: number | null
           retry_count: number | null
           setting_authenticity: boolean | null
           storytelling_pattern: string | null
@@ -59,11 +62,14 @@ export type Database = {
           is_embeddable?: boolean | null
           is_verified_creator?: boolean | null
           language_tags?: string[] | null
+          last_access_batch?: string | null
           last_availability_check?: string | null
           last_error?: string | null
           last_retry?: string | null
           like_ratio?: number | null
+          pending_access_count?: number | null
           published_at?: string | null
+          refresh_window?: number | null
           retry_count?: number | null
           setting_authenticity?: boolean | null
           storytelling_pattern?: string | null
@@ -90,11 +96,14 @@ export type Database = {
           is_embeddable?: boolean | null
           is_verified_creator?: boolean | null
           language_tags?: string[] | null
+          last_access_batch?: string | null
           last_availability_check?: string | null
           last_error?: string | null
           last_retry?: string | null
           like_ratio?: number | null
+          pending_access_count?: number | null
           published_at?: string | null
+          refresh_window?: number | null
           retry_count?: number | null
           setting_authenticity?: boolean | null
           storytelling_pattern?: string | null
@@ -463,6 +472,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      batch_update_access_counts: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       cleanup_expired_videos: {
         Args: Record<PropertyKey, never>
         Returns: undefined

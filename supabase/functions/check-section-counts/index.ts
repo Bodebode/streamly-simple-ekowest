@@ -20,6 +20,11 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Get current refresh window (0-11)
+    const currentHour = new Date().getHours();
+    const currentWindow = Math.floor(currentHour / 2);
+    console.log('Current refresh window:', currentWindow);
+
     // First check if we've refreshed content recently
     const { data: lastRefresh, error: refreshError } = await supabase
       .from('query_metrics')
@@ -29,7 +34,7 @@ Deno.serve(async (req) => {
       .limit(1)
       .single();
 
-    if (refreshError && refreshError.code !== 'PGRST116') { // PGRST116 is "not found" error
+    if (refreshError && refreshError.code !== 'PGRST116') {
       console.error('Error checking last refresh:', refreshError);
       throw refreshError;
     }
@@ -37,7 +42,6 @@ Deno.serve(async (req) => {
     const now = new Date();
     const lastRefreshTime = lastRefresh?.created_at ? new Date(lastRefresh.created_at) : null;
     
-    // Check if we're within the cooldown period
     if (lastRefreshTime && (now.getTime() - new Date(lastRefreshTime).getTime() < REFRESH_COOLDOWN)) {
       console.log('Within cooldown period, skipping refresh check');
       return new Response(
@@ -53,119 +57,75 @@ Deno.serve(async (req) => {
       );
     }
 
-    const needsRefresh = !lastRefreshTime || (now.getTime() - new Date(lastRefreshTime).getTime() > CACHE_DURATION);
+    // Check counts for each category but only for the current refresh window
+    const categories = ['Highly Rated', 'Skits', 'New Release', 'Yoruba Movies'];
+    const sectionsToRefresh = [];
 
-    console.log('Last refresh:', lastRefreshTime);
-    console.log('Needs refresh:', needsRefresh);
+    for (const category of categories) {
+      const { count, error } = await supabase
+        .from('cached_videos')
+        .select('*', { count: 'exact', head: true })
+        .eq('category', category)
+        .eq('refresh_window', currentWindow)
+        .eq('is_available', true)
+        .gt('expires_at', new Date().toISOString());
 
-    if (needsRefresh) {
-      // Check if another process is currently refreshing
-      const { data: activeRefresh } = await supabase
-        .from('query_metrics')
-        .select('created_at')
-        .eq('query_name', 'content_refresh')
-        .gt('created_at', new Date(now.getTime() - REFRESH_COOLDOWN).toISOString())
-        .limit(1)
-        .single();
-
-      if (activeRefresh) {
-        console.log('Another process is currently refreshing, skipping');
-        return new Response(
-          JSON.stringify({ 
-            message: 'Content refresh in progress',
-            started_at: activeRefresh.created_at
-          }),
-          {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            status: 200,
-          }
-        );
+      if (error) {
+        console.error(`Error checking count for ${category}:`, error);
+        continue;
       }
 
-      // Log the refresh attempt
-      const { error: insertError } = await supabase
-        .from('query_metrics')
-        .insert({
-          query_name: 'content_refresh',
-          category: 'content',
-          execution_time: 0,
-          rows_affected: 0
-        });
-
-      if (insertError) {
-        console.error('Error logging refresh attempt:', insertError);
-        throw insertError;
+      console.log(`Category ${category} has ${count} videos in refresh window ${currentWindow}`);
+      
+      if (!count || count < MINIMUM_VIDEOS) {
+        console.log(`${category} needs refresh (only ${count} videos in window ${currentWindow})`);
+        sectionsToRefresh.push(category);
       }
+    }
 
-      // Check counts for each category
-      const categories = ['Highly Rated', 'Skits', 'New Release', 'Yoruba Movies'];
-      const sectionsToRefresh = [];
-
-      for (const category of categories) {
-        const { count, error } = await supabase
-          .from('cached_videos')
-          .select('*', { count: 'exact', head: true })
-          .eq('category', category)
-          .eq('is_available', true)
-          .gt('expires_at', new Date().toISOString());
-
-        if (error) {
-          console.error(`Error checking count for ${category}:`, error);
-          continue;
+    if (sectionsToRefresh.length > 0) {
+      console.log('Refreshing sections:', sectionsToRefresh);
+      
+      const refreshPromises = sectionsToRefresh.map(category => {
+        switch(category) {
+          case 'Yoruba Movies':
+            return supabase.functions.invoke('populate-yoruba');
+          case 'Highly Rated':
+            return supabase.functions.invoke('get-highly-rated');
+          case 'New Release':
+            return supabase.functions.invoke('get-new-releases');
+          case 'Skits':
+            return supabase.functions.invoke('get-skits');
+          default:
+            return Promise.resolve();
         }
+      });
 
-        console.log(`Category ${category} has ${count} videos`);
-        
-        if (!count || count < MINIMUM_VIDEOS) {
-          console.log(`${category} needs refresh (only ${count} videos)`);
-          sectionsToRefresh.push(category);
+      const results = await Promise.allSettled(refreshPromises);
+      const refreshResults = results.map((result, index) => ({
+        section: sectionsToRefresh[index],
+        status: result.status,
+        ...(result.status === 'rejected' ? { error: result.reason } : {})
+      }));
+      
+      return new Response(
+        JSON.stringify({ 
+          message: 'Content refresh completed', 
+          refreshed_sections: sectionsToRefresh,
+          results: refreshResults,
+          refresh_window: currentWindow
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
         }
-      }
-
-      if (sectionsToRefresh.length > 0) {
-        console.log('Refreshing sections:', sectionsToRefresh);
-        
-        // Use Promise.allSettled to handle multiple refresh requests
-        const refreshPromises = sectionsToRefresh.map(category => {
-          switch(category) {
-            case 'Yoruba Movies':
-              return supabase.functions.invoke('populate-yoruba');
-            case 'Highly Rated':
-              return supabase.functions.invoke('get-highly-rated');
-            case 'New Release':
-              return supabase.functions.invoke('get-new-releases');
-            case 'Skits':
-              return supabase.functions.invoke('get-skits');
-            default:
-              return Promise.resolve();
-          }
-        });
-
-        const results = await Promise.allSettled(refreshPromises);
-        const refreshResults = results.map((result, index) => ({
-          section: sectionsToRefresh[index],
-          status: result.status,
-          ...(result.status === 'rejected' ? { error: result.reason } : {})
-        }));
-        
-        return new Response(
-          JSON.stringify({ 
-            message: 'Content refresh completed', 
-            refreshed_sections: sectionsToRefresh,
-            results: refreshResults
-          }),
-          {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            status: 200,
-          }
-        );
-      }
+      );
     }
 
     return new Response(
       JSON.stringify({ 
-        message: needsRefresh ? 'Content is up to date' : 'Content was refreshed recently',
-        last_refresh: lastRefreshTime
+        message: 'Content is up to date',
+        refresh_window: currentWindow
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
