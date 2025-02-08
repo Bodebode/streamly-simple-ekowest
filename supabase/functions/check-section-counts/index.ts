@@ -9,6 +9,8 @@ const corsHeaders = {
 const MINIMUM_VIDEOS = 12;
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 const REFRESH_COOLDOWN = 5 * 60 * 1000; // 5 minutes cooldown between refresh attempts
+const MAX_REQUESTS_PER_WINDOW = 100; // Maximum requests per window
+const RATE_LIMIT_WINDOW = 3600; // Window in seconds (1 hour)
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -19,6 +21,33 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Check rate limit
+    const { data: isWithinLimit, error: rateLimitError } = await supabase
+      .rpc('check_rate_limit', {
+        p_function_name: 'check_section_counts',
+        p_max_requests: MAX_REQUESTS_PER_WINDOW,
+        p_window_seconds: RATE_LIMIT_WINDOW
+      });
+
+    if (rateLimitError) {
+      console.error('Error checking rate limit:', rateLimitError);
+      throw new Error('Failed to check rate limit');
+    }
+
+    if (!isWithinLimit) {
+      console.log('Rate limit exceeded');
+      return new Response(
+        JSON.stringify({ 
+          error: 'Rate limit exceeded',
+          message: 'Too many requests, please try again later'
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 429,
+        }
+      );
+    }
 
     // Get current refresh window (0-11)
     const currentHour = new Date().getHours();
@@ -62,6 +91,21 @@ Deno.serve(async (req) => {
     const sectionsToRefresh = [];
 
     for (const category of categories) {
+      // Check if refresh is already in progress
+      const { data: refreshStatus } = await supabase
+        .from('cached_videos')
+        .select('refresh_in_progress, last_refresh_attempt')
+        .eq('category', category)
+        .limit(1)
+        .single();
+
+      if (refreshStatus?.refresh_in_progress && 
+          refreshStatus.last_refresh_attempt && 
+          Date.now() - new Date(refreshStatus.last_refresh_attempt).getTime() < 60000) {
+        console.log(`Refresh already in progress for ${category}, skipping`);
+        continue;
+      }
+
       const { count, error } = await supabase
         .from('cached_videos')
         .select('*', { count: 'exact', head: true })
@@ -86,19 +130,37 @@ Deno.serve(async (req) => {
     if (sectionsToRefresh.length > 0) {
       console.log('Refreshing sections:', sectionsToRefresh);
       
-      const refreshPromises = sectionsToRefresh.map(category => {
-        switch(category) {
-          case 'Yoruba Movies':
-            return supabase.functions.invoke('populate-yoruba');
-          case 'Highly Rated':
-            return supabase.functions.invoke('get-highly-rated');
-          case 'New Release':
-            return supabase.functions.invoke('get-new-releases');
-          case 'Skits':
-            return supabase.functions.invoke('get-skits');
-          default:
-            return Promise.resolve();
+      const refreshPromises = sectionsToRefresh.map(async category => {
+        // Mark refresh as in progress
+        await supabase.rpc('mark_refresh_status', { 
+          p_category: category, 
+          p_status: true 
+        });
+
+        let result;
+        try {
+          switch(category) {
+            case 'Yoruba Movies':
+              result = await supabase.functions.invoke('populate-yoruba');
+              break;
+            case 'Highly Rated':
+              result = await supabase.functions.invoke('get-highly-rated');
+              break;
+            case 'New Release':
+              result = await supabase.functions.invoke('get-new-releases');
+              break;
+            case 'Skits':
+              result = await supabase.functions.invoke('get-skits');
+              break;
+          }
+        } finally {
+          // Mark refresh as complete
+          await supabase.rpc('mark_refresh_status', { 
+            p_category: category, 
+            p_status: false 
+          });
         }
+        return { category, result };
       });
 
       const results = await Promise.allSettled(refreshPromises);

@@ -9,6 +9,27 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      api_rate_limits: {
+        Row: {
+          function_name: string
+          id: string
+          request_count: number | null
+          window_start: string | null
+        }
+        Insert: {
+          function_name: string
+          id?: string
+          request_count?: number | null
+          window_start?: string | null
+        }
+        Update: {
+          function_name?: string
+          id?: string
+          request_count?: number | null
+          window_start?: string | null
+        }
+        Relationships: []
+      }
       cached_videos: {
         Row: {
           access_count: number | null
@@ -31,10 +52,12 @@ export type Database = {
           last_access_batch: string | null
           last_availability_check: string | null
           last_error: string | null
+          last_refresh_attempt: string | null
           last_retry: string | null
           like_ratio: number | null
           pending_access_count: number | null
           published_at: string | null
+          refresh_in_progress: boolean | null
           refresh_window: number | null
           retry_count: number | null
           setting_authenticity: boolean | null
@@ -65,10 +88,12 @@ export type Database = {
           last_access_batch?: string | null
           last_availability_check?: string | null
           last_error?: string | null
+          last_refresh_attempt?: string | null
           last_retry?: string | null
           like_ratio?: number | null
           pending_access_count?: number | null
           published_at?: string | null
+          refresh_in_progress?: boolean | null
           refresh_window?: number | null
           retry_count?: number | null
           setting_authenticity?: boolean | null
@@ -99,10 +124,12 @@ export type Database = {
           last_access_batch?: string | null
           last_availability_check?: string | null
           last_error?: string | null
+          last_refresh_attempt?: string | null
           last_retry?: string | null
           like_ratio?: number | null
           pending_access_count?: number | null
           published_at?: string | null
+          refresh_in_progress?: boolean | null
           refresh_window?: number | null
           retry_count?: number | null
           setting_authenticity?: boolean | null
@@ -476,6 +503,14 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      check_rate_limit: {
+        Args: {
+          p_function_name: string
+          p_max_requests: number
+          p_window_seconds: number
+        }
+        Returns: boolean
+      }
       cleanup_expired_videos: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -493,6 +528,13 @@ export type Database = {
           p_rows_affected: number
           p_category: string
           p_user_id: string
+        }
+        Returns: undefined
+      }
+      mark_refresh_status: {
+        Args: {
+          p_category: string
+          p_status: boolean
         }
         Returns: undefined
       }

@@ -1,5 +1,9 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+
+const COALESCE_WINDOW = 2000; // 2 seconds window for coalescing requests
+const pendingRequests = new Map<string, Promise<any>>();
 
 export const prefetchVideos = async (category: string) => {
   try {
@@ -27,39 +31,81 @@ export const prefetchVideos = async (category: string) => {
       return videos;
     }
 
-    // Fallback to any available videos if none found in current refresh window
-    const { data: fallbackVideos, error: fallbackError } = await supabase
+    // Check if a refresh is already in progress
+    const { data: refreshStatus } = await supabase
       .from('cached_videos')
-      .select('*')
+      .select('refresh_in_progress, last_refresh_attempt')
       .eq('category', category)
-      .eq('is_available', true)
-      .order('views', { ascending: false })
-      .limit(24);
+      .limit(1)
+      .single();
 
-    if (fallbackError) {
-      console.error(`Error fetching fallback ${category} videos:`, fallbackError);
-      return;
+    if (refreshStatus?.refresh_in_progress && 
+        refreshStatus.last_refresh_attempt && 
+        Date.now() - new Date(refreshStatus.last_refresh_attempt).getTime() < 60000) {
+      console.log(`Refresh already in progress for ${category}`);
+      return await fallbackToAnyWindow(category);
     }
 
-    if (fallbackVideos && fallbackVideos.length > 0) {
-      console.log(`Using fallback cache for ${category}, found ${fallbackVideos.length} videos`);
-      return fallbackVideos;
-    }
+    // Fallback to any available videos if none found in current refresh window
+    return await fallbackToAnyWindow(category);
   } catch (error) {
     console.error(`Error in prefetch for ${category}:`, error);
+    toast.error(`Failed to load ${category} videos`);
+  }
+};
+
+const fallbackToAnyWindow = async (category: string) => {
+  const { data: fallbackVideos, error: fallbackError } = await supabase
+    .from('cached_videos')
+    .select('*')
+    .eq('category', category)
+    .eq('is_available', true)
+    .order('views', { ascending: false })
+    .limit(24);
+
+  if (fallbackError) {
+    console.error(`Error fetching fallback ${category} videos:`, fallbackError);
+    return;
+  }
+
+  if (fallbackVideos && fallbackVideos.length > 0) {
+    console.log(`Using fallback cache for ${category}, found ${fallbackVideos.length} videos`);
+    return fallbackVideos;
   }
 };
 
 export const updateVideoCache = async (videoId: string) => {
-  try {
-    // Update pending_access_count instead of direct access_count
-    const { error } = await supabase
-      .rpc('increment_pending_access_count', { video_id: videoId });
-
-    if (error) {
-      console.error('Error updating video cache:', error);
-    }
-  } catch (error) {
-    console.error('Error in updateVideoCache:', error);
+  // Implement request coalescing for concurrent access count updates
+  const cacheKey = `update-${videoId}`;
+  
+  if (pendingRequests.has(cacheKey)) {
+    console.log(`Coalescing cache update request for video ${videoId}`);
+    return pendingRequests.get(cacheKey);
   }
+
+  const updatePromise = new Promise(async (resolve) => {
+    try {
+      // Use pending_access_count for batch updates
+      const { error } = await supabase
+        .rpc('increment_pending_access_count', { video_id: videoId });
+
+      if (error) {
+        console.error('Error updating video cache:', error);
+        toast.error('Failed to update video stats');
+      }
+
+      // Remove from pending requests after COALESCE_WINDOW
+      setTimeout(() => {
+        pendingRequests.delete(cacheKey);
+      }, COALESCE_WINDOW);
+
+      resolve(true);
+    } catch (error) {
+      console.error('Error in updateVideoCache:', error);
+      resolve(false);
+    }
+  });
+
+  pendingRequests.set(cacheKey, updatePromise);
+  return updatePromise;
 };
