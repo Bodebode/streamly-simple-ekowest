@@ -100,6 +100,9 @@ const Index = () => {
     ? transformCachedToMovie(highlyRatedVideos as unknown as CachedMovie[])
     : [];
 
+  const transformedNollywoodSeries = transformCachedToMovie(nollywoodSeries);
+  console.log('Transformed Nollywood series:', transformedNollywoodSeries.length, 'items');
+
   return (
     <MainLayout showMainFooter>
       <div className="fixed bottom-4 right-4 z-50 flex gap-2">
@@ -138,6 +141,7 @@ const Index = () => {
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
             refetchFunction={refetchHighlyRated}
+            isLoading={isLoadingHighlyRated}
           />
           <CategoryRow 
             title="Yoruba Movies" 
@@ -145,10 +149,11 @@ const Index = () => {
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
             refetchFunction={refetchYoruba}
+            isLoading={isLoadingYoruba}
           />
           <CategoryRow 
             title="Nollywood Series" 
-            movies={transformCachedToMovie(nollywoodSeries)}
+            movies={transformedNollywoodSeries}
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
             isLoading={isLoadingSeries}
@@ -159,6 +164,7 @@ const Index = () => {
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
             refetchFunction={refetchSkits}
+            isLoading={isLoadingSkits}
           />
           <CategoryRow 
             title="New Release" 
@@ -166,6 +172,7 @@ const Index = () => {
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
             refetchFunction={refetchNewReleases}
+            isLoading={isLoadingNewReleases}
           />
         </div>
       </div>
