@@ -16,7 +16,6 @@ import { CachedMovie } from '@/types/movies';
 import { MainLayout } from '@/layouts/MainLayout';
 import { toast } from 'sonner';
 import { MOCK_MOVIES } from '@/data/mockMovies';
-import { NOLLYWOOD_SERIES_CRITERIA } from '@/constants/nollywood-criteria';
 
 const Index = () => {
   const { theme, setTheme } = useTheme();
@@ -25,8 +24,6 @@ const Index = () => {
   const { data: newReleases, isLoading: isLoadingNewReleases, refetch: refetchNewReleases } = useNewReleases();
   const { data: skits, isLoading: isLoadingSkits, refetch: refetchSkits } = useSkits();
   const { data: yorubaMovies, isLoading: isLoadingYoruba, refetch: refetchYoruba } = useYorubaMovies();
-  const [nollywoodSeries, setNollywoodSeries] = useState<CachedMovie[]>([]);
-  const [isLoadingSeries, setIsLoadingSeries] = useState(true);
 
   const { isPopulating, populateAllSections } = usePopulateSections({
     refetchYoruba,
@@ -34,40 +31,6 @@ const Index = () => {
     refetchNewReleases,
     refetchSkits
   });
-
-  useEffect(() => {
-    const fetchNollywoodSeries = async () => {
-      setIsLoadingSeries(true);
-      try {
-        console.log('Fetching Nollywood series with criteria:', NOLLYWOOD_SERIES_CRITERIA);
-        const { data: series, error } = await supabase
-          .from('cached_videos')
-          .select('*')
-          .eq('category', NOLLYWOOD_SERIES_CRITERIA.category)
-          .eq('is_available', NOLLYWOOD_SERIES_CRITERIA.isAvailable)
-          .eq('is_embeddable', NOLLYWOOD_SERIES_CRITERIA.isEmbeddable)
-          .gte('views', NOLLYWOOD_SERIES_CRITERIA.minViews)
-          .gte('duration', NOLLYWOOD_SERIES_CRITERIA.minDuration)
-          .limit(NOLLYWOOD_SERIES_CRITERIA.limit);
-
-        if (error) {
-          console.error('Error fetching Nollywood series:', error);
-          toast.error('Failed to load Nollywood series');
-          return;
-        }
-
-        console.log('Fetched Nollywood series:', series?.length || 0, 'items');
-        setNollywoodSeries(series || []);
-      } catch (error) {
-        console.error('Error in fetchNollywoodSeries:', error);
-        toast.error('Failed to load Nollywood series');
-      } finally {
-        setIsLoadingSeries(false);
-      }
-    };
-
-    fetchNollywoodSeries();
-  }, []);
 
   useEffect(() => {
     const checkContentFreshness = async () => {
@@ -81,6 +44,7 @@ const Index = () => {
 
         if (data?.refreshed_sections?.length > 0) {
           toast.success('Fresh content has been loaded for you!');
+          // Refetch all queries to get the new content
           await Promise.all([
             refetchHighlyRated(),
             refetchNewReleases(),
@@ -94,16 +58,11 @@ const Index = () => {
     };
 
     checkContentFreshness();
-  }, [refetchHighlyRated, refetchNewReleases, refetchSkits, refetchYoruba]);
+  }, []); // Run once when component mounts
 
   const transformedHighlyRated = highlyRatedVideos 
     ? transformCachedToMovie(highlyRatedVideos as unknown as CachedMovie[])
     : [];
-
-  const transformedNollywoodSeries = nollywoodSeries 
-    ? transformCachedToMovie(nollywoodSeries)
-    : [];
-  console.log('Transformed Nollywood series:', transformedNollywoodSeries.length, 'items');
 
   return (
     <MainLayout showMainFooter>
@@ -143,7 +102,6 @@ const Index = () => {
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
             refetchFunction={refetchHighlyRated}
-            isLoading={isLoadingHighlyRated}
           />
           <CategoryRow 
             title="Yoruba Movies" 
@@ -151,7 +109,6 @@ const Index = () => {
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
             refetchFunction={refetchYoruba}
-            isLoading={isLoadingYoruba}
           />
           <CategoryRow 
             title="Skits" 
@@ -159,7 +116,6 @@ const Index = () => {
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
             refetchFunction={refetchSkits}
-            isLoading={isLoadingSkits}
           />
           <CategoryRow 
             title="New Release" 
@@ -167,14 +123,6 @@ const Index = () => {
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
             refetchFunction={refetchNewReleases}
-            isLoading={isLoadingNewReleases}
-          />
-          <CategoryRow 
-            title="Nollywood Series" 
-            movies={transformedNollywoodSeries}
-            selectedVideoId={selectedVideoId}
-            onVideoSelect={setSelectedVideoId}
-            isLoading={isLoadingSeries}
           />
         </div>
       </div>

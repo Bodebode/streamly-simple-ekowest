@@ -559,15 +559,6 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
-      validate_series_criteria: {
-        Args: {
-          p_duration: number
-          p_views: number
-          p_content_tags: string[]
-          p_is_embeddable?: boolean
-        }
-        Returns: boolean
-      }
       validate_yoruba_criteria: {
         Args: {
           p_duration: number

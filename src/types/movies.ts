@@ -21,7 +21,6 @@ export interface CategoryRowProps {
   onVideoSelect: (videoId: string | null) => void;
   updateHighlyRated?: (movies: Movie[]) => void;
   refetchFunction?: () => Promise<any>;
-  isLoading?: boolean;
 }
 
 export interface MovieCarouselProps {
