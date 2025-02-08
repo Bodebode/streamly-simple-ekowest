@@ -16,6 +16,7 @@ import { CachedMovie } from '@/types/movies';
 import { MainLayout } from '@/layouts/MainLayout';
 import { toast } from 'sonner';
 import { MOCK_MOVIES } from '@/data/mockMovies';
+import { NOLLYWOOD_SERIES_CRITERIA } from '@/constants/nollywood-criteria';
 
 const Index = () => {
   const { theme, setTheme } = useTheme();
@@ -24,6 +25,7 @@ const Index = () => {
   const { data: newReleases, isLoading: isLoadingNewReleases, refetch: refetchNewReleases } = useNewReleases();
   const { data: skits, isLoading: isLoadingSkits, refetch: refetchSkits } = useSkits();
   const { data: yorubaMovies, isLoading: isLoadingYoruba, refetch: refetchYoruba } = useYorubaMovies();
+  const [nollywoodSeries, setNollywoodSeries] = useState<CachedMovie[]>([]);
 
   const { isPopulating, populateAllSections } = usePopulateSections({
     refetchYoruba,
@@ -31,6 +33,29 @@ const Index = () => {
     refetchNewReleases,
     refetchSkits
   });
+
+  useEffect(() => {
+    const fetchNollywoodSeries = async () => {
+      const { data: series, error } = await supabase
+        .from('cached_videos')
+        .select('*')
+        .eq('category', NOLLYWOOD_SERIES_CRITERIA.category)
+        .eq('is_available', NOLLYWOOD_SERIES_CRITERIA.isAvailable)
+        .eq('is_embeddable', NOLLYWOOD_SERIES_CRITERIA.isEmbeddable)
+        .gte('views', NOLLYWOOD_SERIES_CRITERIA.minViews)
+        .gte('duration', NOLLYWOOD_SERIES_CRITERIA.minDuration)
+        .limit(NOLLYWOOD_SERIES_CRITERIA.limit);
+
+      if (error) {
+        console.error('Error fetching Nollywood series:', error);
+        return;
+      }
+
+      setNollywoodSeries(series || []);
+    };
+
+    fetchNollywoodSeries();
+  }, []);
 
   useEffect(() => {
     const checkContentFreshness = async () => {
@@ -44,7 +69,6 @@ const Index = () => {
 
         if (data?.refreshed_sections?.length > 0) {
           toast.success('Fresh content has been loaded for you!');
-          // Refetch all queries to get the new content
           await Promise.all([
             refetchHighlyRated(),
             refetchNewReleases(),
@@ -58,7 +82,7 @@ const Index = () => {
     };
 
     checkContentFreshness();
-  }, []); // Run once when component mounts
+  }, []);
 
   const transformedHighlyRated = highlyRatedVideos 
     ? transformCachedToMovie(highlyRatedVideos as unknown as CachedMovie[])
@@ -109,6 +133,12 @@ const Index = () => {
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
             refetchFunction={refetchYoruba}
+          />
+          <CategoryRow 
+            title="Nollywood Series" 
+            movies={transformCachedToMovie(nollywoodSeries)}
+            selectedVideoId={selectedVideoId}
+            onVideoSelect={setSelectedVideoId}
           />
           <CategoryRow 
             title="Skits" 
