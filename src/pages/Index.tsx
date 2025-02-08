@@ -26,6 +26,7 @@ const Index = () => {
   const { data: skits, isLoading: isLoadingSkits, refetch: refetchSkits } = useSkits();
   const { data: yorubaMovies, isLoading: isLoadingYoruba, refetch: refetchYoruba } = useYorubaMovies();
   const [nollywoodSeries, setNollywoodSeries] = useState<CachedMovie[]>([]);
+  const [isLoadingSeries, setIsLoadingSeries] = useState(true);
 
   const { isPopulating, populateAllSections } = usePopulateSections({
     refetchYoruba,
@@ -36,22 +37,33 @@ const Index = () => {
 
   useEffect(() => {
     const fetchNollywoodSeries = async () => {
-      const { data: series, error } = await supabase
-        .from('cached_videos')
-        .select('*')
-        .eq('category', NOLLYWOOD_SERIES_CRITERIA.category)
-        .eq('is_available', NOLLYWOOD_SERIES_CRITERIA.isAvailable)
-        .eq('is_embeddable', NOLLYWOOD_SERIES_CRITERIA.isEmbeddable)
-        .gte('views', NOLLYWOOD_SERIES_CRITERIA.minViews)
-        .gte('duration', NOLLYWOOD_SERIES_CRITERIA.minDuration)
-        .limit(NOLLYWOOD_SERIES_CRITERIA.limit);
+      setIsLoadingSeries(true);
+      try {
+        console.log('Fetching Nollywood series with criteria:', NOLLYWOOD_SERIES_CRITERIA);
+        const { data: series, error } = await supabase
+          .from('cached_videos')
+          .select('*')
+          .eq('category', NOLLYWOOD_SERIES_CRITERIA.category)
+          .eq('is_available', NOLLYWOOD_SERIES_CRITERIA.isAvailable)
+          .eq('is_embeddable', NOLLYWOOD_SERIES_CRITERIA.isEmbeddable)
+          .gte('views', NOLLYWOOD_SERIES_CRITERIA.minViews)
+          .gte('duration', NOLLYWOOD_SERIES_CRITERIA.minDuration)
+          .limit(NOLLYWOOD_SERIES_CRITERIA.limit);
 
-      if (error) {
-        console.error('Error fetching Nollywood series:', error);
-        return;
+        if (error) {
+          console.error('Error fetching Nollywood series:', error);
+          toast.error('Failed to load Nollywood series');
+          return;
+        }
+
+        console.log('Fetched Nollywood series:', series?.length || 0, 'items');
+        setNollywoodSeries(series || []);
+      } catch (error) {
+        console.error('Error in fetchNollywoodSeries:', error);
+        toast.error('Failed to load Nollywood series');
+      } finally {
+        setIsLoadingSeries(false);
       }
-
-      setNollywoodSeries(series || []);
     };
 
     fetchNollywoodSeries();
@@ -82,7 +94,7 @@ const Index = () => {
     };
 
     checkContentFreshness();
-  }, []);
+  }, [refetchHighlyRated, refetchNewReleases, refetchSkits, refetchYoruba]);
 
   const transformedHighlyRated = highlyRatedVideos 
     ? transformCachedToMovie(highlyRatedVideos as unknown as CachedMovie[])
@@ -139,6 +151,7 @@ const Index = () => {
             movies={transformCachedToMovie(nollywoodSeries)}
             selectedVideoId={selectedVideoId}
             onVideoSelect={setSelectedVideoId}
+            isLoading={isLoadingSeries}
           />
           <CategoryRow 
             title="Skits" 
@@ -161,3 +174,4 @@ const Index = () => {
 };
 
 export default Index;
+
