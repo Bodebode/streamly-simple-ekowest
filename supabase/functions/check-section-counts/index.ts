@@ -1,4 +1,3 @@
-
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
@@ -11,6 +10,17 @@ const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 const REFRESH_COOLDOWN = 5 * 60 * 1000; // 5 minutes cooldown between refresh attempts
 const MAX_REQUESTS_PER_WINDOW = 100; // Maximum requests per window
 const RATE_LIMIT_WINDOW = 3600; // Window in seconds (1 hour)
+const API_KEYS = [
+  Deno.env.get('YOUTUBE_API_KEY'),
+  Deno.env.get('YOUTUBE_API_KEY_SECONDARY')
+];
+
+let currentKeyIndex = 0;
+
+const getNextApiKey = () => {
+  currentKeyIndex = (currentKeyIndex + 1) % API_KEYS.length;
+  return API_KEYS[currentKeyIndex];
+};
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -139,18 +149,31 @@ Deno.serve(async (req) => {
 
         let result;
         try {
+          const apiKey = getNextApiKey();
+          if (!apiKey) {
+            throw new Error('No valid YouTube API key available');
+          }
+
           switch(category) {
             case 'Yoruba Movies':
-              result = await supabase.functions.invoke('populate-yoruba');
+              result = await supabase.functions.invoke('populate-yoruba', {
+                body: { apiKey }
+              });
               break;
             case 'Highly Rated':
-              result = await supabase.functions.invoke('get-highly-rated');
+              result = await supabase.functions.invoke('get-highly-rated', {
+                body: { apiKey }
+              });
               break;
             case 'New Release':
-              result = await supabase.functions.invoke('get-new-releases');
+              result = await supabase.functions.invoke('get-new-releases', {
+                body: { apiKey }
+              });
               break;
             case 'Skits':
-              result = await supabase.functions.invoke('get-skits');
+              result = await supabase.functions.invoke('get-skits', {
+                body: { apiKey }
+              });
               break;
           }
         } finally {
