@@ -499,10 +499,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      batch_update_access_counts: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      batch_update_access_counts:
+        | {
+            Args: Record<PropertyKey, never>
+            Returns: undefined
+          }
+        | {
+            Args: {
+              video_ids: string[]
+            }
+            Returns: undefined
+          }
       check_rate_limit: {
         Args: {
           p_function_name: string
