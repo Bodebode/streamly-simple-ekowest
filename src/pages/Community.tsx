@@ -1,9 +1,9 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/layouts/MainLayout';
 import { CreatePost } from '@/components/community/CreatePost';
-import { PostsList } from '@/components/community/PostsList';
+import { PostsList, PostsListRef } from '@/components/community/PostsList';
 import { useAuth } from '@/components/AuthProvider';
 import { useToast } from '@/hooks/use-toast';
 
@@ -11,7 +11,7 @@ export const Community = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [postsList, setPostsList] = useState<any>(null);
+  const postsListRef = useRef<PostsListRef>(null);
 
   useEffect(() => {
     if (!user) {
@@ -22,11 +22,6 @@ export const Community = () => {
       });
     }
   }, [user, navigate, toast]);
-
-  // Store the PostsList ref when it's rendered
-  const handlePostsListMount = (ref: any) => {
-    setPostsList(ref);
-  };
 
   if (!user) return null;
 
@@ -42,8 +37,8 @@ export const Community = () => {
               Join the conversation about African cinema, share your thoughts, and connect with fellow enthusiasts.
             </p>
           </div>
-          <CreatePost onNewPost={(post) => postsList?.handleNewPost(post)} />
-          <PostsList ref={handlePostsListMount} />
+          <CreatePost onNewPost={(post) => postsListRef.current?.handleNewPost(post)} />
+          <PostsList ref={postsListRef} />
         </div>
       </div>
     </MainLayout>
@@ -51,3 +46,4 @@ export const Community = () => {
 };
 
 export default Community;
+

@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -25,7 +25,11 @@ interface PostData {
   } | null;
 }
 
-export const PostsList = () => {
+export interface PostsListRef {
+  handleNewPost: (post: PostData) => void;
+}
+
+export const PostsList = forwardRef<PostsListRef>((_, ref) => {
   const [posts, setPosts] = useState<PostData[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
@@ -84,6 +88,11 @@ export const PostsList = () => {
     setPosts(currentPosts => [newPost, ...currentPosts]);
   };
 
+  // Expose the handleNewPost method via ref
+  useImperativeHandle(ref, () => ({
+    handleNewPost
+  }));
+
   const handleDelete = async (postId: string) => {
     try {
       const { error } = await supabase
@@ -139,4 +148,7 @@ export const PostsList = () => {
       ))}
     </div>
   );
-};
+});
+
+PostsList.displayName = 'PostsList';
+
