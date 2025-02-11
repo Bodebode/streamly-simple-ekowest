@@ -41,6 +41,9 @@ export const MovieCardActions = ({ id, userId, isInList, isLoading }: MovieCardA
     }
   };
 
+  // Only render the button if we have a userId (user is logged in)
+  if (!userId) return null;
+
   return (
     <button
       onClick={toggleMyList}
