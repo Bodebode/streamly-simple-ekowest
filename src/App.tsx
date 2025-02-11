@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,6 +16,7 @@ import { Watch2Earn } from './pages/Watch2Earn';
 import RewardsDashboard from './pages/RewardsDashboard';
 import MyList from './pages/MyList';
 import { Profile } from './pages/Profile';
+import Auth from './pages/Auth';
 
 const queryClient = new QueryClient();
 
@@ -26,7 +28,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/auth" replace />;
   }
 
   return <>{children}</>;
@@ -42,7 +44,8 @@ const App = () => {
               <Toaster />
               <Sonner />
               <Routes>
-                <Route path="/login" element={<Login />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/login" element={<Navigate to="/auth" replace />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/watch2earn" element={<Watch2Earn />} />
                 <Route path="/" element={<Index />} />

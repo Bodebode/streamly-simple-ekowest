@@ -1,3 +1,4 @@
+
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,7 +24,7 @@ export const AuthUI = () => {
             input: 'auth-input',
           },
         }}
-        providers={['google']}
+        providers={['google', 'twitter']}
         redirectTo={`${window.location.origin}/auth/callback`}
       />
     </div>
