@@ -6,13 +6,12 @@ import { CreatePost } from '@/components/community/CreatePost';
 import { PostsList } from '@/components/community/PostsList';
 import { useAuth } from '@/components/AuthProvider';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 
 export const Community = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(true);
+  const [postsList, setPostsList] = useState<any>(null);
 
   useEffect(() => {
     if (!user) {
@@ -23,6 +22,11 @@ export const Community = () => {
       });
     }
   }, [user, navigate, toast]);
+
+  // Store the PostsList ref when it's rendered
+  const handlePostsListMount = (ref: any) => {
+    setPostsList(ref);
+  };
 
   if (!user) return null;
 
@@ -38,8 +42,8 @@ export const Community = () => {
               Join the conversation about African cinema, share your thoughts, and connect with fellow enthusiasts.
             </p>
           </div>
-          <CreatePost />
-          <PostsList />
+          <CreatePost onNewPost={(post) => postsList?.handleNewPost(post)} />
+          <PostsList ref={handlePostsListMount} />
         </div>
       </div>
     </MainLayout>

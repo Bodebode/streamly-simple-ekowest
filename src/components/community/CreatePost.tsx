@@ -23,7 +23,11 @@ const CATEGORIES = [
   'Other'
 ];
 
-export const CreatePost = () => {
+interface CreatePostProps {
+  onNewPost?: (post: any) => void;
+}
+
+export const CreatePost = ({ onNewPost }: CreatePostProps) => {
   const [content, setContent] = useState('');
   const [category, setCategory] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,14 +46,33 @@ export const CreatePost = () => {
         category: category || 'General',
       };
 
+      // Create an optimistic post with temporary ID and user profile data
+      const optimisticPost = {
+        ...postData,
+        id: crypto.randomUUID(),
+        created_at: new Date().toISOString(),
+        likes_count: 0,
+        replies_count: 0,
+        profiles: {
+          username: user?.user_metadata?.username || user?.email,
+          avatar_url: user?.user_metadata?.avatar_url,
+        }
+      };
+
+      // Call onNewPost immediately for instant UI update
+      onNewPost?.(optimisticPost);
+
+      // Clear the form
+      setContent('');
+      setCategory('');
+
+      // Then perform the actual database insert
       const { error } = await supabase
         .from('posts')
         .insert([postData]);
 
       if (error) throw error;
 
-      setContent('');
-      setCategory('');
       toast({
         title: "Post created",
         description: "Your post has been shared with the community.",
