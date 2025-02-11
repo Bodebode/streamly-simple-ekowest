@@ -67,12 +67,38 @@ export const PostsList = () => {
     const channel = supabase
       .channel('public:posts')
       .on('postgres_changes', { 
-        event: '*', 
+        event: 'INSERT', 
+        schema: 'public', 
+        table: 'posts' 
+      }, async (payload) => {
+        console.log('New post received:', payload);
+        // Fetch the complete post data including profile information
+        const { data, error } = await supabase
+          .from('posts')
+          .select(`
+            *,
+            profiles:user_id (
+              username,
+              avatar_url,
+              bio,
+              location,
+              website
+            )
+          `)
+          .eq('id', payload.new.id)
+          .single();
+
+        if (!error && data) {
+          // Add the new post to the beginning of the list
+          setPosts(currentPosts => [data, ...currentPosts]);
+        }
+      })
+      .on('postgres_changes', { 
+        event: 'DELETE', 
         schema: 'public', 
         table: 'posts' 
       }, (payload) => {
-        console.log('Realtime update received:', payload);
-        fetchPosts(); // Refresh posts when any change occurs
+        setPosts(currentPosts => currentPosts.filter(post => post.id !== payload.old.id));
       })
       .subscribe();
 
@@ -137,4 +163,3 @@ export const PostsList = () => {
     </div>
   );
 };
-
