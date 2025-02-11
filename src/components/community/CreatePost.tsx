@@ -3,10 +3,9 @@ import { useState } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { PenLine, Loader2, X } from 'lucide-react';
+import { PenLine, Loader2 } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -27,22 +26,9 @@ const CATEGORIES = [
 export const CreatePost = () => {
   const [content, setContent] = useState('');
   const [category, setCategory] = useState<string>('');
-  const [tag, setTag] = useState('');
-  const [tags, setTags] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
-
-  const handleAddTag = () => {
-    if (tag.trim() && !tags.includes(tag.trim()) && tags.length < 5) {
-      setTags([...tags, tag.trim()]);
-      setTag('');
-    }
-  };
-
-  const handleRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter(t => t !== tagToRemove));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +40,6 @@ export const CreatePost = () => {
         content: content.trim(),
         user_id: user?.id,
         category: category || 'General',
-        tags: tags.length > 0 ? tags : null,
       };
 
       const { error } = await supabase
@@ -65,7 +50,6 @@ export const CreatePost = () => {
 
       setContent('');
       setCategory('');
-      setTags([]);
       toast({
         title: "Post created",
         description: "Your post has been shared with the community.",
@@ -90,11 +74,11 @@ export const CreatePost = () => {
               placeholder="Share your thoughts about African cinema..."
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="min-h-[80px] resize-none bg-background" // Reduced from 120px to 80px
+              className="min-h-[80px] resize-none bg-background"
             />
           </div>
         </div>
-        <div className="flex gap-4">
+        <div className="flex justify-between items-center">
           <Select value={category} onValueChange={setCategory}>
             <SelectTrigger className="w-[200px]">
               <SelectValue placeholder="Select category" />
@@ -107,62 +91,19 @@ export const CreatePost = () => {
               ))}
             </SelectContent>
           </Select>
-          <div className="flex-1 flex gap-2">
-            <Input
-              placeholder="Add tags (press Enter)"
-              value={tag}
-              onChange={(e) => setTag(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleAddTag();
-                }
-              }}
-              className="flex-1"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleAddTag}
-              disabled={!tag.trim() || tags.length >= 5}
-            >
-              Add Tag
-            </Button>
-          </div>
+          <Button 
+            type="submit" 
+            disabled={isSubmitting || !content.trim()}
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+          >
+            {isSubmitting ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : (
+              <PenLine className="h-4 w-4 mr-2" />
+            )}
+            Post
+          </Button>
         </div>
-        {tags.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {tags.map((t, index) => (
-              <span
-                key={index}
-                className="px-2 py-1 text-sm rounded-full bg-primary/10 text-primary flex items-center gap-1"
-              >
-                {t}
-                <button
-                  type="button"
-                  onClick={() => handleRemoveTag(t)}
-                  className="hover:text-destructive"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-      <div className="flex justify-end">
-        <Button 
-          type="submit" 
-          disabled={isSubmitting || !content.trim()}
-          className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-        >
-          {isSubmitting ? (
-            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-          ) : (
-            <PenLine className="h-4 w-4 mr-2" />
-          )}
-          Post
-        </Button>
       </div>
     </form>
   );
