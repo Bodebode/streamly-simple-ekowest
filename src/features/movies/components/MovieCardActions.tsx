@@ -45,10 +45,11 @@ export const MovieCardActions = ({ id, userId, isInList, isLoading }: MovieCardA
     <button
       onClick={toggleMyList}
       disabled={isLoading}
-      className={`absolute top-2 right-2 z-10 p-1.5 rounded-full 
+      className="absolute top-2 right-2 z-10 p-1.5 rounded-full 
         transition-all duration-200 
-        ${isInList ? 'bg-green-500 hover:bg-green-600' : 'bg-black/50 hover:bg-black/70'}
-        ${isLoading ? 'cursor-not-allowed opacity-50' : 'opacity-100'}`}
+        bg-black/50 hover:bg-black/70
+        disabled:opacity-50 disabled:cursor-not-allowed"
+      aria-label={isInList ? 'Remove from My List' : 'Add to My List'}
     >
       {isInList ? (
         <Check className="w-4 h-4 text-white" />

@@ -14,7 +14,7 @@ interface MovieCardProps {
   image: string;
   category: string;
   videoId?: string;
-  onMovieSelect: (videoId: string) => void;
+  onMovieSelect: (videoId: string | null) => void;
   isVideoPlaying: boolean;
 }
 
