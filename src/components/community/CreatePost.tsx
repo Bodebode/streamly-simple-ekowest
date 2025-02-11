@@ -78,9 +78,9 @@ export const CreatePost = () => {
             />
           </div>
         </div>
-        <div className="flex justify-between items-center">
+        <div className="flex justify-end items-center gap-4">
           <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger className="w-[200px]">
+            <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select category" />
             </SelectTrigger>
             <SelectContent>
