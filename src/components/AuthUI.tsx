@@ -24,7 +24,6 @@ export const AuthUI = () => {
             input: 'auth-input',
           },
         }}
-        providers={['google', 'twitter']}
         redirectTo={`${window.location.origin}/auth/callback`}
       />
     </div>
