@@ -1,3 +1,4 @@
+
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { useState, memo, useCallback, useEffect } from 'react';
 import { MovieCarousel } from '@/components/movie/MovieCarousel';
