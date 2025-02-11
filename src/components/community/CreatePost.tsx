@@ -50,14 +50,16 @@ export const CreatePost = () => {
 
     setIsSubmitting(true);
     try {
+      const postData = {
+        content: content.trim(),
+        user_id: user?.id,
+        category: category || 'General',
+        tags: tags.length > 0 ? tags : null,
+      };
+
       const { error } = await supabase
         .from('posts')
-        .insert([{ 
-          content: content.trim(), 
-          user_id: user?.id,
-          category: category || 'General',
-          tags: tags.length > 0 ? tags : null
-        }]);
+        .insert([postData]);
 
       if (error) throw error;
 

@@ -96,8 +96,9 @@ export const PostsList = () => {
         event: '*', 
         schema: 'public', 
         table: 'posts' 
-      }, () => {
-        fetchPosts();
+      }, (payload) => {
+        console.log('Realtime update received:', payload);
+        fetchPosts(); // Refresh posts when any change occurs
       })
       .subscribe();
 
@@ -115,6 +116,8 @@ export const PostsList = () => {
 
       if (error) throw error;
 
+      setPosts(posts.filter(post => post.id !== postId));
+      
       toast({
         title: "Post deleted",
         description: "Your post has been removed.",
