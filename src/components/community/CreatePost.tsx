@@ -90,7 +90,7 @@ export const CreatePost = () => {
               placeholder="Share your thoughts about African cinema..."
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="min-h-[120px] resize-none bg-background"
+              className="min-h-[80px] resize-none bg-background" // Reduced from 120px to 80px
             />
           </div>
         </div>
