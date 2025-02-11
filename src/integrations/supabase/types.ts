@@ -309,32 +309,38 @@ export type Database = {
       }
       posts: {
         Row: {
+          category: string | null
           content: string
           created_at: string
           id: string
           is_edited: boolean | null
           likes_count: number | null
           replies_count: number | null
+          tags: string[] | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          category?: string | null
           content: string
           created_at?: string
           id?: string
           is_edited?: boolean | null
           likes_count?: number | null
           replies_count?: number | null
+          tags?: string[] | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          category?: string | null
           content?: string
           created_at?: string
           id?: string
           is_edited?: boolean | null
           likes_count?: number | null
           replies_count?: number | null
+          tags?: string[] | null
           updated_at?: string
           user_id?: string
         }
@@ -351,21 +357,30 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          bio: string | null
           created_at: string
           id: string
+          location: string | null
           username: string | null
+          website: string | null
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string
           id: string
+          location?: string | null
           username?: string | null
+          website?: string | null
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string
           id?: string
+          location?: string | null
           username?: string | null
+          website?: string | null
         }
         Relationships: []
       }

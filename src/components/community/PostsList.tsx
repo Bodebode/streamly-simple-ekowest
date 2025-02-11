@@ -5,7 +5,13 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Post } from './Post';
 import { Skeleton } from '@/components/ui/skeleton';
-import { MessageSquare, ThumbsUp } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface PostData {
   id: string;
@@ -14,30 +20,58 @@ interface PostData {
   user_id: string;
   likes_count: number;
   replies_count: number;
+  category?: string;
+  tags?: string[];
+  is_edited?: boolean;
   profiles: {
     username: string;
     avatar_url: string | null;
+    bio?: string;
+    location?: string;
+    website?: string;
   } | null;
 }
+
+type SortOption = 'newest' | 'oldest' | 'most_liked' | 'most_commented';
 
 export const PostsList = () => {
   const [posts, setPosts] = useState<PostData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sortBy, setSortBy] = useState<SortOption>('newest');
   const { user } = useAuth();
   const { toast } = useToast();
 
   const fetchPosts = async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('posts')
         .select(`
           *,
           profiles:user_id (
             username,
-            avatar_url
+            avatar_url,
+            bio,
+            location,
+            website
           )
-        `)
-        .order('created_at', { ascending: false });
+        `);
+
+      switch (sortBy) {
+        case 'newest':
+          query = query.order('created_at', { ascending: false });
+          break;
+        case 'oldest':
+          query = query.order('created_at', { ascending: true });
+          break;
+        case 'most_liked':
+          query = query.order('likes_count', { ascending: false });
+          break;
+        case 'most_commented':
+          query = query.order('replies_count', { ascending: false });
+          break;
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       setPosts(data || []);
@@ -70,7 +104,7 @@ export const PostsList = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [sortBy]);
 
   const handleDelete = async (postId: string) => {
     try {
@@ -115,6 +149,22 @@ export const PostsList = () => {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-end">
+        <Select
+          value={sortBy}
+          onValueChange={(value) => setSortBy(value as SortOption)}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="newest">Newest first</SelectItem>
+            <SelectItem value="oldest">Oldest first</SelectItem>
+            <SelectItem value="most_liked">Most liked</SelectItem>
+            <SelectItem value="most_commented">Most commented</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
       {posts.map((post) => (
         <Post
           key={post.id}
