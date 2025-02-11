@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Drum, Coins, Search, X, LogOut, User } from 'lucide-react';
+import { Drum, Coins, Search, X, LogOut, User, MessageSquare } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -154,6 +154,10 @@ export const Navbar = () => {
               </div>
               <Link to="/my-list" className="text-sm hover:underline">
                 My List
+              </Link>
+              <Link to="/community" className="flex items-center gap-1 text-sm hover:underline">
+                <MessageSquare className="h-5 w-5" />
+                Community
               </Link>
               <Link to="/rewards" className="flex items-center gap-1 text-sm hover:underline">
                 <Coins className="h-5 w-5" />
