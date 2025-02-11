@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 import { MovieCardPreview } from './MovieCardPreview';
 import { MovieCardBase } from './MovieCardBase';
-import { MovieCardActions } from './MovieCardActions';
 import { useMovieCardPreview } from './MovieCardPreviewHandler';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/auth-store';
@@ -30,8 +29,6 @@ export const MovieCard = ({
   const [isHovered, setIsHovered] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [showTitle, setShowTitle] = useState(true);
-  const [isInList, setIsInList] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuthStore();
 
   const { handleMouseEnter, handleMouseLeave, clearTimers } = useMovieCardPreview({
@@ -40,33 +37,6 @@ export const MovieCard = ({
     onPreviewChange: setShowPreview,
     onTitleChange: setShowTitle
   });
-
-  useEffect(() => {
-    const checkIfInList = async () => {
-      if (!user?.id) return;
-      
-      try {
-        const { data, error } = await supabase
-          .from('user_movie_lists')
-          .select('movie_id')
-          .eq('user_id', user.id)
-          .eq('movie_id', id)
-          .single();
-        
-        if (error) {
-          console.error('Error checking movie list status:', error);
-          return;
-        }
-        setIsInList(!!data);
-      } catch (error) {
-        console.error('Error in movie list check:', error);
-      }
-    };
-
-    if (user?.id) {
-      checkIfInList();
-    }
-  }, [user?.id, id]);
 
   useEffect(() => {
     if (isVideoPlaying) {
@@ -102,13 +72,6 @@ export const MovieCard = ({
       }}
       onClick={handleClick}
     >
-      <MovieCardActions
-        id={id}
-        userId={user?.id}
-        isInList={isInList}
-        isLoading={isLoading}
-      />
-      
       {showPreview && videoId && !isVideoPlaying ? (
         <MovieCardPreview
           videoId={videoId}
