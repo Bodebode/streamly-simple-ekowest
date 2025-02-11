@@ -24,6 +24,7 @@ export const AuthUI = () => {
             input: 'auth-input',
           },
         }}
+        providers={[]}
         redirectTo={`${window.location.origin}/auth/callback`}
       />
     </div>
