@@ -45,17 +45,27 @@ export const MovieCard = ({
     const checkIfInList = async () => {
       if (!user?.id) return;
       
-      const { data } = await supabase
-        .from('user_movie_lists')
-        .select('movie_id')
-        .eq('user_id', user.id)
-        .eq('movie_id', id)
-        .single();
-      
-      setIsInList(!!data);
+      try {
+        const { data, error } = await supabase
+          .from('user_movie_lists')
+          .select('movie_id')
+          .eq('user_id', user.id)
+          .eq('movie_id', id)
+          .single();
+        
+        if (error) {
+          console.error('Error checking movie list status:', error);
+          return;
+        }
+        setIsInList(!!data);
+      } catch (error) {
+        console.error('Error in movie list check:', error);
+      }
     };
 
-    checkIfInList();
+    if (user?.id) {
+      checkIfInList();
+    }
   }, [user?.id, id]);
 
   useEffect(() => {
@@ -92,14 +102,12 @@ export const MovieCard = ({
       }}
       onClick={handleClick}
     >
-      {user && (
-        <MovieCardActions
-          id={id}
-          userId={user.id}
-          isInList={isInList}
-          isLoading={isLoading}
-        />
-      )}
+      <MovieCardActions
+        id={id}
+        userId={user?.id}
+        isInList={isInList}
+        isLoading={isLoading}
+      />
       
       {showPreview && videoId && !isVideoPlaying ? (
         <MovieCardPreview

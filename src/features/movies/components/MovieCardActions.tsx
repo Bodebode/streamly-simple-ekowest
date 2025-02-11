@@ -48,7 +48,7 @@ export const MovieCardActions = ({ id, userId, isInList, isLoading }: MovieCardA
       className={`absolute top-2 right-2 z-10 p-1.5 rounded-full 
         transition-all duration-200 
         ${isInList ? 'bg-green-500 hover:bg-green-600' : 'bg-black/50 hover:bg-black/70'}
-        ${isLoading ? 'cursor-not-allowed' : ''}`}
+        ${isLoading ? 'cursor-not-allowed opacity-50' : 'opacity-100'}`}
     >
       {isInList ? (
         <Check className="w-4 h-4 text-white" />

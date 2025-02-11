@@ -35,7 +35,7 @@ export interface MovieCardProps {
   image: string;
   category: string;
   videoId?: string;
-  onMovieSelect: (videoId: string | null) => void;
+  onMovieSelect: (videoId: string) => void;
   isVideoPlaying: boolean;
 }
 
