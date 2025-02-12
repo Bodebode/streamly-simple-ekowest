@@ -228,10 +228,10 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
   };
 
   return (
-    <div className="bg-card rounded-lg p-4 space-y-3 transition-all duration-200 hover:shadow-lg">
+    <div className="bg-card rounded-lg p-3 space-y-2 transition-all duration-200 hover:shadow-lg">
       <div className="flex items-start justify-between">
-        <div className="flex items-center space-x-4">
-          <Avatar className="h-12 w-12">
+        <div className="flex items-center space-x-3">
+          <Avatar className="h-10 w-10">
             <AvatarImage src={post.profiles?.avatar_url || undefined} />
             <AvatarFallback>
               {post.profiles?.username?.charAt(0).toUpperCase() || 'U'}
@@ -241,7 +241,7 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
             <h3 className="font-semibold text-foreground">
               {post.profiles?.username || 'Anonymous'}
             </h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
               {post.is_edited && ' (edited)'}
             </p>
@@ -250,7 +250,7 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
         {isOwner && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -276,9 +276,9 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
           <Textarea
             value={editContent}
             onChange={(e) => setEditContent(e.target.value)}
-            className="min-h-[120px]"
+            className="min-h-[100px]"
           />
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-1.5">
             <Button
               variant="outline"
               size="sm"
@@ -299,7 +299,7 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
           </div>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2">
           <p className="text-foreground whitespace-pre-wrap">{post.content}</p>
           {post.image_url && (
             <div className="relative group">
@@ -316,11 +316,11 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
       )}
 
       {post.tags && post.tags.length > 0 && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {post.tags.map((tag, index) => (
             <span
               key={index}
-              className="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary"
+              className="px-2 py-0.5 text-xs rounded-full bg-primary/10 text-primary"
             >
               {tag}
             </span>
@@ -328,34 +328,34 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
         </div>
       )}
 
-      <div className="flex items-center space-x-2 pt-1">
+      <div className="flex items-center space-x-1.5">
         <Button
           variant="ghost"
           size="sm"
           className={cn(
-            "space-x-1",
+            "h-7 px-2 space-x-1",
             isLiked && "text-pink-500 hover:text-pink-600"
           )}
           onClick={handleLike}
         >
-          <ThumbsUp className="h-4 w-4" />
-          <span>{post.likes_count || 0}</span>
+          <ThumbsUp className="h-3.5 w-3.5" />
+          <span className="text-sm">{post.likes_count || 0}</span>
         </Button>
         <Button 
           variant="ghost" 
-          size="sm" 
-          className="space-x-1"
+          size="sm"
+          className="h-7 px-2 space-x-1"
           onClick={() => setShowReplies(!showReplies)}
         >
-          <MessageSquare className="h-4 w-4" />
-          <span>{post.replies_count || 0}</span>
+          <MessageSquare className="h-3.5 w-3.5" />
+          <span className="text-sm">{post.replies_count || 0}</span>
         </Button>
       </div>
 
       {showReplies && (
-        <div className="space-y-4 mt-2">
+        <div className="space-y-3 mt-1.5">
           {isLoadingReplies ? (
-            <div className="text-center text-muted-foreground">
+            <div className="text-center text-muted-foreground text-sm">
               Loading replies...
             </div>
           ) : (
@@ -369,28 +369,29 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
                   onUpdate={handleUpdateReply}
                 />
               ))}
-              <div className="flex items-start gap-4 pt-2">
-                <Avatar className="h-8 w-8">
+              <div className="flex items-start gap-3 pt-1.5">
+                <Avatar className="h-7 w-7">
                   <AvatarImage src={currentUser?.user_metadata?.avatar_url} />
                   <AvatarFallback>
                     {currentUser?.email?.charAt(0).toUpperCase() || 'U'}
                   </AvatarFallback>
                 </Avatar>
-                <div className="flex-1 space-y-2">
+                <div className="flex-1 space-y-1.5">
                   <Textarea
                     ref={replyInputRef}
                     placeholder="Write a reply..."
                     value={newReply}
                     onChange={(e) => setNewReply(e.target.value)}
-                    className="min-h-[80px]"
+                    className="min-h-[60px]"
                   />
                   <div className="flex justify-end">
                     <Button
                       size="sm"
+                      className="h-7 px-2"
                       onClick={handleReply}
                       disabled={!newReply.trim()}
                     >
-                      <Send className="h-4 w-4 mr-2" />
+                      <Send className="h-3.5 w-3.5 mr-1.5" />
                       Reply
                     </Button>
                   </div>
