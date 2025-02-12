@@ -313,6 +313,7 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          image_url: string | null
           is_edited: boolean | null
           likes_count: number | null
           replies_count: number | null
@@ -325,6 +326,7 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          image_url?: string | null
           is_edited?: boolean | null
           likes_count?: number | null
           replies_count?: number | null
@@ -337,6 +339,7 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          image_url?: string | null
           is_edited?: boolean | null
           likes_count?: number | null
           replies_count?: number | null
