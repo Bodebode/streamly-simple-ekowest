@@ -1,15 +1,21 @@
-import { useState, useRef } from 'react';
+
+import { useState, useRef, useEffect } from 'react';
+import { formatDistanceToNow } from 'date-fns';
 import { User } from '@supabase/supabase-js';
-import { Send } from 'lucide-react';
+import { MessageSquare, ThumbsUp, MoreVertical, Trash2, Edit, Send } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Reply } from './Reply';
-import { PostHeader } from './PostHeader';
-import { PostContent } from './PostContent';
-import { PostActions } from './PostActions';
 
 interface PostProps {
   post: {
@@ -223,27 +229,91 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
 
   return (
     <div className="bg-card rounded-lg p-6 space-y-4 transition-all duration-200 hover:shadow-lg">
-      <PostHeader
-        profile={post.profiles}
-        createdAt={post.created_at}
-        isEdited={post.is_edited || false}
-        isOwner={isOwner}
-        onEdit={() => setIsEditing(true)}
-        onDelete={() => onDelete(post.id)}
-      />
+      <div className="flex items-start justify-between">
+        <div className="flex items-center space-x-4">
+          <Avatar className="h-12 w-12">
+            <AvatarImage src={post.profiles?.avatar_url || undefined} />
+            <AvatarFallback>
+              {post.profiles?.username?.charAt(0).toUpperCase() || 'U'}
+            </AvatarFallback>
+          </Avatar>
+          <div>
+            <h3 className="font-semibold text-foreground">
+              {post.profiles?.username || 'Anonymous'}
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+              {post.is_edited && ' (edited)'}
+            </p>
+          </div>
+        </div>
+        {isOwner && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setIsEditing(true)}>
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="text-destructive focus:text-destructive"
+                onClick={() => onDelete(post.id)}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </div>
 
-      <PostContent
-        content={post.content}
-        imageUrl={post.image_url}
-        isEditing={isEditing}
-        editContent={editContent}
-        onEditContentChange={setEditContent}
-        onCancelEdit={() => {
-          setIsEditing(false);
-          setEditContent(post.content);
-        }}
-        onSaveEdit={handleUpdate}
-      />
+      {isEditing ? (
+        <div className="space-y-2">
+          <Textarea
+            value={editContent}
+            onChange={(e) => setEditContent(e.target.value)}
+            className="min-h-[120px]"
+          />
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setIsEditing(false);
+                setEditContent(post.content);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleUpdate}
+              disabled={!editContent.trim() || editContent === post.content}
+            >
+              Save
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <p className="text-foreground whitespace-pre-wrap">{post.content}</p>
+          {post.image_url && (
+            <div className="relative group">
+              <img 
+                src={post.image_url} 
+                alt="Post attachment" 
+                className="rounded-lg max-h-96 w-auto object-contain"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg" />
+            </div>
+          )}
+        </div>
+      )}
 
       {post.tags && post.tags.length > 0 && (
         <div className="flex flex-wrap gap-2">
@@ -258,13 +328,29 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
         </div>
       )}
 
-      <PostActions
-        likesCount={post.likes_count}
-        repliesCount={post.replies_count}
-        isLiked={isLiked}
-        onLike={handleLike}
-        onToggleReplies={() => setShowReplies(!showReplies)}
-      />
+      <div className="flex items-center space-x-4 pt-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          className={cn(
+            "space-x-2",
+            isLiked && "text-pink-500 hover:text-pink-600"
+          )}
+          onClick={handleLike}
+        >
+          <ThumbsUp className="h-4 w-4" />
+          <span>{post.likes_count || 0}</span>
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="space-x-2"
+          onClick={() => setShowReplies(!showReplies)}
+        >
+          <MessageSquare className="h-4 w-4" />
+          <span>{post.replies_count || 0}</span>
+        </Button>
+      </div>
 
       {showReplies && (
         <div className="space-y-4 mt-4">
