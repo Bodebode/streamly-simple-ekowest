@@ -118,7 +118,7 @@ export const PostsList = forwardRef<PostsListRef>((_, ref) => {
 
   if (loading) {
     return (
-      <div className="space-y-3">
+      <div className="space-y-2">
         {[...Array(3)].map((_, i) => (
           <div key={i} className="bg-card rounded-lg p-6 space-y-4">
             <div className="flex items-center space-x-4">
@@ -136,7 +136,7 @@ export const PostsList = forwardRef<PostsListRef>((_, ref) => {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {posts.map((post) => (
         <Post
           key={post.id}
