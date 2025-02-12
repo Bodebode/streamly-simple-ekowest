@@ -302,13 +302,14 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
         <div className="space-y-4">
           <p className="text-foreground whitespace-pre-wrap">{post.content}</p>
           {post.image_url && (
-            <div className="relative">
+            <div className="relative group">
               <img 
                 src={post.image_url} 
                 alt="Post attachment" 
                 className="rounded-lg max-h-96 w-auto object-contain"
                 loading="lazy"
               />
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg" />
             </div>
           )}
         </div>

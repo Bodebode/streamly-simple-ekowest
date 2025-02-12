@@ -1,6 +1,6 @@
 
 export interface Movie {
-  id: string;
+  id: number;
   title: string;
   image: string;
   category: string;
@@ -30,7 +30,7 @@ export interface MovieCarouselProps {
 }
 
 export interface MovieCardProps {
-  id: string;
+  id: number;
   title: string;
   image: string;
   category: string;
