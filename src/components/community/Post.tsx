@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { User } from '@supabase/supabase-js';
@@ -227,18 +228,18 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
   };
 
   return (
-    <div className="bg-card rounded-lg p-4 space-y-2 transition-all duration-200 hover:shadow-md border border-border/50 hover:border-border">
+    <div className="bg-card rounded-lg p-4 space-y-2 transition-all duration-200 hover:shadow-xl border border-border/50 hover:border-border hover:scale-[1.01]">
       <div className="flex items-start justify-between">
         <div className="flex items-center space-x-3">
           <Avatar className="h-10 w-10">
             <AvatarImage src={post.profiles?.avatar_url || undefined} />
             <AvatarFallback>
-              {post.profiles?.username?.charAt(0).toUpperCase() || 'U'}
+              {post.profiles?.username?.charAt(0).toUpperCase() || currentUser?.email?.charAt(0).toUpperCase() || 'U'}
             </AvatarFallback>
           </Avatar>
           <div>
             <h3 className="font-semibold text-foreground">
-              {post.profiles?.username || 'Anonymous'}
+              {post.profiles?.username || currentUser?.email || 'User'}
             </h3>
             <p className="text-xs text-muted-foreground">
               {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
