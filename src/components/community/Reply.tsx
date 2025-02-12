@@ -41,10 +41,10 @@ export const Reply = ({ reply, currentUser, onDelete, onUpdate }: ReplyProps) =>
   };
 
   return (
-    <div className="pl-12 pt-4 border-l border-border">
+    <div className="pl-8 pt-2 border-l border-border">
       <div className="flex items-start justify-between">
-        <div className="flex items-center space-x-4">
-          <Avatar className="h-8 w-8">
+        <div className="flex items-center space-x-2">
+          <Avatar className="h-6 w-6">
             <AvatarImage src={reply.profiles?.avatar_url || undefined} />
             <AvatarFallback>
               {reply.profiles?.username?.charAt(0).toUpperCase() || 'U'}
@@ -63,20 +63,20 @@ export const Reply = ({ reply, currentUser, onDelete, onUpdate }: ReplyProps) =>
         {isOwner && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm">
-                <MoreVertical className="h-4 w-4" />
+              <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                <MoreVertical className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => setIsEditing(true)}>
-                <Edit className="h-4 w-4 mr-2" />
+                <Edit className="h-3 w-3 mr-1.5" />
                 Edit
               </DropdownMenuItem>
               <DropdownMenuItem 
                 className="text-destructive focus:text-destructive"
                 onClick={() => onDelete(reply.id)}
               >
-                <Trash2 className="h-4 w-4 mr-2" />
+                <Trash2 className="h-3 w-3 mr-1.5" />
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -84,16 +84,17 @@ export const Reply = ({ reply, currentUser, onDelete, onUpdate }: ReplyProps) =>
         )}
       </div>
       {isEditing ? (
-        <div className="mt-2 space-y-2">
+        <div className="mt-1.5 space-y-1.5">
           <Textarea
             value={editContent}
             onChange={(e) => setEditContent(e.target.value)}
-            className="min-h-[80px]"
+            className="min-h-[60px]"
           />
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-1.5">
             <Button
               variant="outline"
               size="sm"
+              className="h-6 px-2 text-xs"
               onClick={() => {
                 setIsEditing(false);
                 setEditContent(reply.content);
@@ -103,6 +104,7 @@ export const Reply = ({ reply, currentUser, onDelete, onUpdate }: ReplyProps) =>
             </Button>
             <Button
               size="sm"
+              className="h-6 px-2 text-xs"
               onClick={handleUpdate}
               disabled={!editContent.trim() || editContent === reply.content}
             >
@@ -111,7 +113,7 @@ export const Reply = ({ reply, currentUser, onDelete, onUpdate }: ReplyProps) =>
           </div>
         </div>
       ) : (
-        <p className="mt-2 text-sm text-foreground">{reply.content}</p>
+        <p className="mt-1 text-sm text-foreground">{reply.content}</p>
       )}
     </div>
   );
