@@ -28,6 +28,7 @@ interface PostProps {
     category?: string;
     tags?: string[];
     is_edited?: boolean;
+    image_url?: string | null;
     profiles: {
       username: string;
       avatar_url: string | null;
@@ -298,7 +299,19 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
           </div>
         </div>
       ) : (
-        <p className="text-foreground whitespace-pre-wrap">{post.content}</p>
+        <div className="space-y-4">
+          <p className="text-foreground whitespace-pre-wrap">{post.content}</p>
+          {post.image_url && (
+            <div className="relative">
+              <img 
+                src={post.image_url} 
+                alt="Post attachment" 
+                className="rounded-lg max-h-96 w-auto object-contain"
+                loading="lazy"
+              />
+            </div>
+          )}
+        </div>
       )}
 
       {post.tags && post.tags.length > 0 && (
