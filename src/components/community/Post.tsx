@@ -228,7 +228,7 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
   };
 
   return (
-    <div className="bg-card rounded-lg p-6 space-y-4 transition-all duration-200 hover:shadow-lg">
+    <div className="bg-card rounded-lg p-4 space-y-3 transition-all duration-200 hover:shadow-lg">
       <div className="flex items-start justify-between">
         <div className="flex items-center space-x-4">
           <Avatar className="h-12 w-12">
@@ -299,7 +299,7 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
           </div>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           <p className="text-foreground whitespace-pre-wrap">{post.content}</p>
           {post.image_url && (
             <div className="relative group">
@@ -328,12 +328,12 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
         </div>
       )}
 
-      <div className="flex items-center space-x-4 pt-2">
+      <div className="flex items-center space-x-2 pt-1">
         <Button
           variant="ghost"
           size="sm"
           className={cn(
-            "space-x-2",
+            "space-x-1",
             isLiked && "text-pink-500 hover:text-pink-600"
           )}
           onClick={handleLike}
@@ -344,7 +344,7 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
         <Button 
           variant="ghost" 
           size="sm" 
-          className="space-x-2"
+          className="space-x-1"
           onClick={() => setShowReplies(!showReplies)}
         >
           <MessageSquare className="h-4 w-4" />
@@ -353,7 +353,7 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
       </div>
 
       {showReplies && (
-        <div className="space-y-4 mt-4">
+        <div className="space-y-4 mt-2">
           {isLoadingReplies ? (
             <div className="text-center text-muted-foreground">
               Loading replies...
@@ -369,7 +369,7 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
                   onUpdate={handleUpdateReply}
                 />
               ))}
-              <div className="flex items-start gap-4 pt-4">
+              <div className="flex items-start gap-4 pt-2">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={currentUser?.user_metadata?.avatar_url} />
                   <AvatarFallback>
