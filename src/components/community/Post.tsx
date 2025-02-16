@@ -249,12 +249,21 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setIsEditing(true)}>
+            <DropdownMenuContent 
+              align="end" 
+              className="w-[160px] p-1.5"
+            >
+              <DropdownMenuItem 
+                onClick={() => setIsEditing(true)}
+                className="py-1.5"
+              >
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={togglePin}>
+              <DropdownMenuItem 
+                onClick={togglePin}
+                className="py-1.5"
+              >
                 {isPinned ? (
                   <>
                     <PinOff className="h-4 w-4 mr-2" />
@@ -268,7 +277,7 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
                 )}
               </DropdownMenuItem>
               <DropdownMenuItem 
-                className="text-destructive focus:text-destructive"
+                className="text-destructive focus:text-destructive py-1.5"
                 onClick={() => onDelete(post.id)}
               >
                 <Trash2 className="h-4 w-4 mr-2" />
