@@ -1,61 +1,46 @@
-import { useTheme } from 'next-themes';
-import { useEffect, useRef, useState } from 'react';
 
-interface HeroSlideProps {
-  type: 'video' | 'image';
-  src: string;
-  index: number;
-  currentIndex: number;
-  key: number;
+import { useTheme } from 'next-themes';
+
+export interface HeroSlideProps {
+  type?: 'video' | 'image';
+  title: string;
+  image: string;
+  category: string;
+  videoId?: string;
+  onVideoSelect: (videoId: string | null) => void;
+  isPlaying: boolean;
 }
 
-export const HeroSlide = ({ type, src, index, currentIndex, key }: HeroSlideProps) => {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    if (type === 'video' && index === currentIndex && !isLoaded) {
-      setIsLoaded(true);
-    }
-  }, [type, index, currentIndex, isLoaded]);
-
-  const handleVideoLoad = () => {
-    if (videoRef.current) {
-      videoRef.current.play().catch(error => {
-        console.log('Video autoplay failed:', error);
-      });
-    }
-  };
+export const HeroSlide = ({ 
+  title,
+  image,
+  category,
+  videoId,
+  onVideoSelect,
+  isPlaying
+}: HeroSlideProps) => {
+  const { theme } = useTheme();
 
   return (
-    <div
-      key={`${index}-${key}`}
-      className={`absolute w-full h-full transition-opacity duration-500 ease-in-out ${
-        index === currentIndex ? 'opacity-100' : 'opacity-0'
-      }`}
-    >
-      {type === 'image' ? (
-        <img
-          src={src}
-          alt={`Hero Slide ${index + 1}`}
-          className="w-full h-full object-cover"
-          loading="lazy"
-        />
-      ) : (
-        (index === currentIndex || isLoaded) && (
-          <video
-            ref={videoRef}
-            key={key}
-            autoPlay
-            loop
-            muted
-            className="w-full h-full object-cover"
-            onLoadedData={handleVideoLoad}
+    <div className="relative w-full h-full">
+      <img
+        src={image}
+        alt={title}
+        className="w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+      <div className="absolute bottom-0 left-0 p-8 text-white">
+        <h1 className="text-4xl font-bold mb-2">{title}</h1>
+        <p className="text-lg mb-4">{category}</p>
+        {videoId && (
+          <button
+            onClick={() => onVideoSelect(isPlaying ? null : videoId)}
+            className="bg-white/20 hover:bg-white/30 text-white px-6 py-2 rounded-full transition-colors"
           >
-            <source src={src} type="video/mp4" />
-          </video>
-        )
-      )}
+            {isPlaying ? 'Stop Playing' : 'Play Now'}
+          </button>
+        )}
+      </div>
     </div>
   );
 };
