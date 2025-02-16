@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Drum, Coins, Search, X, LogOut, User, MessageSquare } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
@@ -24,45 +23,14 @@ interface SearchResult {
   };
 }
 
-interface ProfileData {
-  display_name: string | null;
-  username: string | null;
-}
-
 export const Navbar = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [profileData, setProfileData] = useState<ProfileData>({ display_name: null, username: null });
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
-
-  useEffect(() => {
-    if (user) {
-      fetchProfileData();
-    }
-  }, [user]);
-
-  const fetchProfileData = async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('display_name, username')
-        .eq('id', user.id)
-        .single();
-
-      if (error) throw error;
-      if (data) {
-        setProfileData(data);
-      }
-    } catch (error) {
-      console.error('Error fetching profile data:', error);
-    }
-  };
 
   const handleLogout = async () => {
     try {
@@ -110,8 +78,6 @@ export const Navbar = () => {
       setIsLoading(false);
     }
   };
-
-  const displayName = profileData.display_name || profileData.username || 'User';
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-white dark:bg-koya-card border-b">
@@ -203,7 +169,7 @@ export const Navbar = () => {
                   className="flex items-center gap-2 text-sm hover:underline"
                 >
                   <User className="h-5 w-5" />
-                  <span>{displayName}</span>
+                  <span>{user.email}</span>
                 </Link>
                 <Button 
                   variant="ghost" 
