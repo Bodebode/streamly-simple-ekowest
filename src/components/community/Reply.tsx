@@ -42,18 +42,16 @@ export const Reply = ({ reply, currentUser, onDelete, onUpdate }: ReplyProps) =>
   const isOwner = currentUser?.id === reply.user_id;
   const { toast } = useToast();
 
-  // Enhanced debug logging
+  // Debug logging
   useEffect(() => {
-    console.log('Reply component mounted/updated:', {
-      reply_id: reply.id,
+    console.log('Reply component state:', {
       isPinned,
       reply_is_pinned: reply.is_pinned,
       isOwner,
       currentUser_id: currentUser?.id,
-      reply_user_id: reply.user_id,
-      dropdown_should_show: isOwner === true
+      reply_user_id: reply.user_id
     });
-  }, [isPinned, reply.is_pinned, isOwner, currentUser?.id, reply.user_id, reply.id]);
+  }, [isPinned, reply.is_pinned, isOwner, currentUser?.id, reply.user_id]);
 
   const handleUpdate = () => {
     onUpdate(reply.id, editContent);
@@ -61,12 +59,7 @@ export const Reply = ({ reply, currentUser, onDelete, onUpdate }: ReplyProps) =>
   };
 
   const togglePin = async () => {
-    console.log('Toggle pin clicked:', {
-      currentState: isPinned,
-      replyId: reply.id,
-      userId: currentUser?.id
-    });
-    
+    console.log('Toggle pin clicked, current state:', isPinned);
     try {
       const { error } = await supabase
         .from('post_replies')
@@ -94,13 +87,6 @@ export const Reply = ({ reply, currentUser, onDelete, onUpdate }: ReplyProps) =>
     if (!avatarPath) return null;
     return getStorageUrl('avatars', avatarPath);
   };
-
-  // Log whenever the dropdown menu is rendered
-  useEffect(() => {
-    if (isOwner) {
-      console.log('Dropdown menu should be visible for reply:', reply.id);
-    }
-  }, [isOwner, reply.id]);
 
   return (
     <div className={`pl-8 pt-2 border-l border-border ${isPinned ? 'bg-muted/30' : ''}`}>
@@ -130,12 +116,7 @@ export const Reply = ({ reply, currentUser, onDelete, onUpdate }: ReplyProps) =>
         {isOwner && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-6 w-6 p-0"
-                onClick={() => console.log('Dropdown trigger clicked')}
-              >
+              <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
                 <MoreVertical className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
