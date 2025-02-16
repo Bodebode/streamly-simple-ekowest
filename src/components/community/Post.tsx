@@ -252,18 +252,25 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
             <DropdownMenuContent 
               align="end" 
               className="w-[160px] p-1.5 -mt-2"
-              sideOffset={5}
+              sideOffset={-5}
             >
               <DropdownMenuItem 
+                className="text-destructive focus:text-destructive py-1"
+                onClick={() => onDelete(post.id)}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete
+              </DropdownMenuItem>
+              <DropdownMenuItem 
                 onClick={() => setIsEditing(true)}
-                className="py-1.5"
+                className="py-1"
               >
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={togglePin}
-                className="py-1.5"
+                className="py-1"
               >
                 {isPinned ? (
                   <>
@@ -276,13 +283,6 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
                     Pin
                   </>
                 )}
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                className="text-destructive focus:text-destructive py-1.5"
-                onClick={() => onDelete(post.id)}
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
