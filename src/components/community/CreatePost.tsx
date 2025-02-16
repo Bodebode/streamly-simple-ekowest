@@ -40,7 +40,7 @@ export const CreatePost = ({ onNewPost }: CreatePostProps) => {
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      if (file.size > 5 * 1024 * 1024) {
         toast({
           title: "Error",
           description: "Image size should be less than 5MB",
@@ -75,8 +75,16 @@ export const CreatePost = ({ onNewPost }: CreatePostProps) => {
 
     setIsSubmitting(true);
     try {
-      let imageUrl = null;
+      // First, fetch the user's profile data
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('username, avatar_url, display_name')
+        .eq('id', user?.id)
+        .single();
 
+      if (profileError) throw profileError;
+
+      let imageUrl = null;
       if (selectedImage) {
         const fileExt = selectedImage.name.split('.').pop();
         const filePath = `${crypto.randomUUID()}.${fileExt}`;
@@ -94,15 +102,6 @@ export const CreatePost = ({ onNewPost }: CreatePostProps) => {
         imageUrl = publicUrl;
       }
 
-      // Fetch the user's profile data first
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('username, avatar_url, display_name')
-        .eq('id', user?.id)
-        .single();
-
-      if (profileError) throw profileError;
-
       const postData = {
         content: content.trim(),
         user_id: user?.id,
@@ -110,7 +109,7 @@ export const CreatePost = ({ onNewPost }: CreatePostProps) => {
         image_url: imageUrl,
       };
 
-      // Create an optimistic post with the fetched profile data
+      // Create optimistic post with the fetched profile data
       const optimisticPost = {
         ...postData,
         id: crypto.randomUUID(),
@@ -120,11 +119,11 @@ export const CreatePost = ({ onNewPost }: CreatePostProps) => {
         profiles: {
           username: profileData.username,
           display_name: profileData.display_name,
-          avatar_url: profileData.avatar_url,
+          avatar_url: profileData.avatar_url
         }
       };
 
-      // Call onNewPost immediately for instant UI update
+      // Call onNewPost before the actual insert
       onNewPost?.(optimisticPost);
 
       // Clear the form
@@ -132,7 +131,7 @@ export const CreatePost = ({ onNewPost }: CreatePostProps) => {
       setCategory('');
       removeImage();
 
-      // Then perform the actual database insert
+      // Perform the actual database insert
       const { error } = await supabase
         .from('posts')
         .insert([postData]);
@@ -140,7 +139,7 @@ export const CreatePost = ({ onNewPost }: CreatePostProps) => {
       if (error) throw error;
 
       toast({
-        title: "Post created",
+        title: "Success",
         description: "Your post has been shared with the community.",
       });
     } catch (error) {
