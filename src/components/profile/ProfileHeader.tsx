@@ -94,7 +94,7 @@ export const ProfileHeader = ({ user, handleFileUpload, uploading }: ProfileHead
 
   const getAvatarUrl = () => {
     if (!profileData.avatar_url) return null;
-    return `${supabase.storageClient.from('avatars').getPublicUrl(profileData.avatar_url).data.publicUrl}`;
+    return getStorageUrl('avatars', profileData.avatar_url);
   };
 
   return (
