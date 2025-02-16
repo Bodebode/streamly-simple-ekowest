@@ -109,7 +109,7 @@ export const CreatePost = ({ onNewPost }: CreatePostProps) => {
         image_url: imageUrl,
       };
 
-      // Create optimistic post with the fetched profile data
+      // Create optimistic post with the correct profile data
       const optimisticPost = {
         ...postData,
         id: crypto.randomUUID(),
@@ -119,7 +119,7 @@ export const CreatePost = ({ onNewPost }: CreatePostProps) => {
         profiles: {
           username: profileData.username,
           display_name: profileData.display_name,
-          avatar_url: profileData.avatar_url
+          avatar_url: profileData.avatar_url,
         }
       };
 
