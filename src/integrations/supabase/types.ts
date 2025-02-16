@@ -268,6 +268,7 @@ export type Database = {
           created_at: string
           id: string
           is_edited: boolean | null
+          is_pinned: boolean | null
           post_id: string | null
           updated_at: string
           user_id: string | null
@@ -277,6 +278,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_edited?: boolean | null
+          is_pinned?: boolean | null
           post_id?: string | null
           updated_at?: string
           user_id?: string | null
@@ -286,6 +288,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_edited?: boolean | null
+          is_pinned?: boolean | null
           post_id?: string | null
           updated_at?: string
           user_id?: string | null
