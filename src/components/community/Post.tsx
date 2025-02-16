@@ -234,12 +234,12 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
           <Avatar className="h-10 w-10">
             <AvatarImage src={post.profiles?.avatar_url || undefined} />
             <AvatarFallback>
-              {post.profiles?.username?.charAt(0).toUpperCase() || currentUser?.email?.charAt(0).toUpperCase() || 'U'}
+              {post.profiles?.username?.charAt(0).toUpperCase() || 'U'}
             </AvatarFallback>
           </Avatar>
           <div>
             <h3 className="font-semibold text-foreground">
-              {post.profiles?.username || currentUser?.email || 'User'}
+              {post.profiles?.username || 'User'}
             </h3>
             <p className="text-xs text-muted-foreground">
               {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
