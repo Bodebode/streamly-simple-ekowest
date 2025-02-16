@@ -31,6 +31,7 @@ interface PostProps {
     image_url?: string | null;
     profiles: {
       username: string;
+      display_name?: string;
       avatar_url: string | null;
       bio?: string;
       location?: string;
@@ -234,15 +235,15 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
           <Avatar className="h-10 w-10">
             <AvatarImage src={post.profiles?.avatar_url || undefined} />
             <AvatarFallback>
-              {post.profiles?.username?.charAt(0).toUpperCase() || 'U'}
+              {(post.profiles?.display_name?.[0] || post.profiles?.username?.[0] || 'U').toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
             <h3 className="font-semibold text-foreground">
-              {post.profiles?.username || 'User'}
+              {post.profiles?.display_name || post.profiles?.username || 'User'}
             </h3>
             <p className="text-xs text-muted-foreground">
-              {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+              @{post.profiles?.username || 'user'} · {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
               {post.is_edited && ' (edited)'}
             </p>
           </div>
