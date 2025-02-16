@@ -38,7 +38,7 @@ interface ReplyProps {
 export const Reply = ({ reply, currentUser, onDelete, onUpdate }: ReplyProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(reply.content);
-  const [isPinned, setIsPinned] = useState(reply.is_pinned || false);
+  const [isPinned, setIsPinned] = useState(Boolean(reply.is_pinned));
   const isOwner = currentUser?.id === reply.user_id;
   const { toast } = useToast();
 
@@ -107,29 +107,29 @@ export const Reply = ({ reply, currentUser, onDelete, onUpdate }: ReplyProps) =>
                 <MoreVertical className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setIsEditing(true)}>
-                <Edit className="h-4 w-4 mr-2" />
+            <DropdownMenuContent align="end" className="w-[150px]">
+              <DropdownMenuItem onClick={() => setIsEditing(true)} className="gap-2">
+                <Edit className="h-4 w-4" />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={togglePin}>
+              <DropdownMenuItem onClick={togglePin} className="gap-2">
                 {isPinned ? (
                   <>
-                    <PinOff className="h-4 w-4 mr-2" />
+                    <PinOff className="h-4 w-4" />
                     Unpin
                   </>
                 ) : (
                   <>
-                    <Pin className="h-4 w-4 mr-2" />
+                    <Pin className="h-4 w-4" />
                     Pin
                   </>
                 )}
               </DropdownMenuItem>
               <DropdownMenuItem 
-                className="text-destructive focus:text-destructive"
+                className="text-destructive focus:text-destructive gap-2"
                 onClick={() => onDelete(reply.id)}
               >
-                <Trash2 className="h-4 w-4 mr-2" />
+                <Trash2 className="h-4 w-4" />
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
