@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { User } from '@supabase/supabase-js';
 import { MoreVertical, Trash2, Edit, Pin, PinOff } from 'lucide-react';
@@ -42,12 +42,24 @@ export const Reply = ({ reply, currentUser, onDelete, onUpdate }: ReplyProps) =>
   const isOwner = currentUser?.id === reply.user_id;
   const { toast } = useToast();
 
+  // Debug logging
+  useEffect(() => {
+    console.log('Reply component state:', {
+      isPinned,
+      reply_is_pinned: reply.is_pinned,
+      isOwner,
+      currentUser_id: currentUser?.id,
+      reply_user_id: reply.user_id
+    });
+  }, [isPinned, reply.is_pinned, isOwner, currentUser?.id, reply.user_id]);
+
   const handleUpdate = () => {
     onUpdate(reply.id, editContent);
     setIsEditing(false);
   };
 
   const togglePin = async () => {
+    console.log('Toggle pin clicked, current state:', isPinned);
     try {
       const { error } = await supabase
         .from('post_replies')
@@ -62,6 +74,7 @@ export const Reply = ({ reply, currentUser, onDelete, onUpdate }: ReplyProps) =>
         description: isPinned ? "The reply has been unpinned." : "The reply has been pinned to the top.",
       });
     } catch (error) {
+      console.error('Error toggling pin:', error);
       toast({
         title: "Error",
         description: "Failed to update pin status. Please try again.",
@@ -108,29 +121,29 @@ export const Reply = ({ reply, currentUser, onDelete, onUpdate }: ReplyProps) =>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[150px]">
-              <DropdownMenuItem onClick={() => setIsEditing(true)} className="gap-2">
+              <DropdownMenuItem onClick={() => setIsEditing(true)} className="flex items-center gap-2">
                 <Edit className="h-4 w-4" />
-                Edit
+                <span>Edit</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={togglePin} className="gap-2">
+              <DropdownMenuItem onClick={togglePin} className="flex items-center gap-2">
                 {isPinned ? (
                   <>
                     <PinOff className="h-4 w-4" />
-                    Unpin
+                    <span>Unpin</span>
                   </>
                 ) : (
                   <>
                     <Pin className="h-4 w-4" />
-                    Pin
+                    <span>Pin</span>
                   </>
                 )}
               </DropdownMenuItem>
               <DropdownMenuItem 
-                className="text-destructive focus:text-destructive gap-2"
+                className="flex items-center gap-2 text-destructive focus:text-destructive"
                 onClick={() => onDelete(reply.id)}
               >
                 <Trash2 className="h-4 w-4" />
-                Delete
+                <span>Delete</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
