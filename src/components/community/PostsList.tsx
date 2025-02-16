@@ -16,6 +16,7 @@ interface PostData {
   category?: string;
   tags?: string[];
   is_edited?: boolean;
+  is_pinned?: boolean;
   profiles: {
     username: string;
     display_name?: string;
@@ -36,6 +37,16 @@ export const PostsList = forwardRef<PostsListRef>((_, ref) => {
   const { user } = useAuth();
   const { toast } = useToast();
 
+  const sortPosts = (postsToSort: PostData[]) => {
+    return [...postsToSort].sort((a, b) => {
+      // First sort by pinned status (pinned posts first)
+      if (a.is_pinned && !b.is_pinned) return -1;
+      if (!a.is_pinned && b.is_pinned) return 1;
+      // Then sort by creation date (newest first)
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+  };
+
   const fetchPosts = async () => {
     try {
       const { data, error } = await supabase
@@ -54,7 +65,7 @@ export const PostsList = forwardRef<PostsListRef>((_, ref) => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setPosts(data || []);
+      setPosts(sortPosts(data || []));
     } catch (error) {
       toast({
         title: "Error",
@@ -95,7 +106,7 @@ export const PostsList = forwardRef<PostsListRef>((_, ref) => {
           .single();
 
         if (!error && postData) {
-          setPosts(currentPosts => [postData, ...currentPosts]);
+          setPosts(currentPosts => sortPosts([postData, ...currentPosts]));
         }
       })
       .on('postgres_changes', { 
@@ -105,6 +116,21 @@ export const PostsList = forwardRef<PostsListRef>((_, ref) => {
       }, (payload) => {
         setPosts(currentPosts => currentPosts.filter(post => post.id !== payload.old.id));
       })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'posts'
+      }, async (payload) => {
+        // If a post is pinned/unpinned, re-sort the list
+        if ('is_pinned' in payload.new) {
+          setPosts(currentPosts => {
+            const updatedPosts = currentPosts.map(post => 
+              post.id === payload.new.id ? { ...post, ...payload.new } : post
+            );
+            return sortPosts(updatedPosts);
+          });
+        }
+      })
       .subscribe();
 
     return () => {
@@ -113,28 +139,7 @@ export const PostsList = forwardRef<PostsListRef>((_, ref) => {
   }, []);
 
   const handleNewPost = async (newPost: PostData) => {
-    // Fetch the complete post data including profile information
-    const { data: postData, error } = await supabase
-      .from('posts')
-      .select(`
-        *,
-        profiles:user_id (
-          username,
-          display_name,
-          avatar_url,
-          bio,
-          location,
-          website
-        )
-      `)
-      .eq('id', newPost.id)
-      .single();
-
-    if (!error && postData) {
-      setPosts(currentPosts => [postData, ...currentPosts]);
-    } else {
-      setPosts(currentPosts => [newPost, ...currentPosts]);
-    }
+    setPosts(currentPosts => sortPosts([newPost, ...currentPosts]));
   };
 
   useImperativeHandle(ref, () => ({
