@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { User } from '@supabase/supabase-js';
@@ -65,8 +66,7 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
           *,
           profiles:user_id (
             username,
-            avatar_url,
-            display_name
+            avatar_url
           )
         `)
         .eq('post_id', post.id)
@@ -149,9 +149,10 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
     if (!newReply.trim()) return;
 
     try {
+      // First get the current user's profile
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('username, avatar_url, display_name')
+        .select('username, avatar_url')
         .eq('id', currentUser?.id)
         .single();
 
@@ -167,16 +168,13 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
 
       if (error) throw error;
 
+      // Add optimistic reply
       setReplies([...replies, {
         id: crypto.randomUUID(),
         content: newReply.trim(),
         created_at: new Date().toISOString(),
         user_id: currentUser?.id,
-        profiles: {
-          username: profileData.username,
-          display_name: profileData.display_name,
-          avatar_url: profileData.avatar_url
-        }
+        profiles: profileData
       }]);
 
       setNewReply('');

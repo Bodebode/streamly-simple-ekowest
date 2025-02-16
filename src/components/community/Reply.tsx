@@ -22,7 +22,6 @@ interface ReplyProps {
     is_edited: boolean;
     profiles: {
       username: string;
-      display_name?: string;
       avatar_url: string | null;
     } | null;
   };
@@ -41,22 +40,27 @@ export const Reply = ({ reply, currentUser, onDelete, onUpdate }: ReplyProps) =>
     setIsEditing(false);
   };
 
+  const getAvatarUrl = (avatarPath: string | null) => {
+    if (!avatarPath) return null;
+    return getStorageUrl('avatars', avatarPath);
+  };
+
   return (
     <div className="pl-8 pt-2 border-l border-border">
       <div className="flex items-start justify-between">
         <div className="flex items-center space-x-2">
           <Avatar className="h-6 w-6">
-            <AvatarImage src={getStorageUrl('avatars', reply.profiles?.avatar_url) || undefined} />
+            <AvatarImage src={getAvatarUrl(reply.profiles?.avatar_url) || undefined} />
             <AvatarFallback>
-              {(reply.profiles?.display_name?.[0] || reply.profiles?.username?.[0] || 'U').toUpperCase()}
+              {reply.profiles?.username?.charAt(0).toUpperCase() || 'U'}
             </AvatarFallback>
           </Avatar>
           <div>
             <h4 className="text-sm font-semibold">
-              {reply.profiles?.display_name || reply.profiles?.username || 'Anonymous'}
+              {reply.profiles?.username || 'Anonymous'}
             </h4>
             <p className="text-xs text-muted-foreground">
-              @{reply.profiles?.username || 'anonymous'} · {formatDistanceToNow(new Date(reply.created_at), { addSuffix: true })}
+              {formatDistanceToNow(new Date(reply.created_at), { addSuffix: true })}
               {reply.is_edited && ' (edited)'}
             </p>
           </div>
