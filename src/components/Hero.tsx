@@ -1,108 +1,78 @@
 
 import { useState, useEffect } from 'react';
-import { useTheme } from 'next-themes';
-import { HeroSlide } from './hero/HeroSlide';
-import { HeroControls } from './hero/HeroControls';
-import { supabase } from '@/integrations/supabase/client';
+import HeroSlide from './hero/HeroSlide';
+import HeroControls from './hero/HeroControls';
+import { Movie } from '@/types/movies';
 
-export const Hero = () => {
-  const { theme } = useTheme();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [themeKey, setThemeKey] = useState(0);
-  const [videoUrl, setVideoUrl] = useState('');
+interface HeroProps {
+  movies: Movie[];
+}
+
+export const Hero = ({ movies }: HeroProps) => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadVideo = async () => {
-      const fileName = theme === 'light' ? 'Ekowest_Hero_Vid_White.mp4' : 'Ekowest_Hero_Vid_Dark.mp4';
-      try {
-        const { data } = await supabase
-          .storage
-          .from('videos')
-          .getPublicUrl(fileName);
-          
-        if (!data?.publicUrl) {
-          console.error('No public URL available for hero video');
-          return;
-        }
-        
-        setVideoUrl(data.publicUrl);
-      } catch (error) {
-        console.error('Failed to load hero video:', error);
+    let interval: NodeJS.Timeout;
+
+    if (isPlaying && !selectedVideoId) {
+      interval = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % movies.length);
+      }, 5000);
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
       }
     };
-    
-    loadVideo();
-  }, [theme]);
+  }, [isPlaying, movies.length, selectedVideoId]);
 
-  const slides = [
-    {
-      type: 'video' as const,
-      src: videoUrl,
-      duration: 39000,  // Duration in milliseconds
-      id: 'hero-1'
-    },
-    {
-      type: 'image' as const,
-      src: '/videos/file-20220908-13-nwxk17.avif',
-      duration: 4000,
-      id: 'hero-2'
-    },
-    {
-      type: 'image' as const,
-      src: '/videos/Netflix-slate-e1692222322682.jpg',
-      duration: 4000,
-      id: 'hero-3'
-    }
-  ];
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => 
-        prevIndex === slides.length - 1 ? 0 : prevIndex + 1
-      );
-    }, slides[currentIndex].duration);
-
-    return () => clearInterval(timer);
-  }, [currentIndex, slides]);
-
-  useEffect(() => {
-    setThemeKey(prev => prev + 1);
-  }, [theme]);
-
-  const nextSlide = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === slides.length - 1 ? 0 : prevIndex + 1
-    );
+  const handlePrevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + movies.length) % movies.length);
   };
 
-  const prevSlide = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? slides.length - 1 : prevIndex - 1
-    );
+  const handleNextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % movies.length);
   };
+
+  const handlePlayPause = () => {
+    setIsPlaying((prev) => !prev);
+  };
+
+  const handleVideoSelect = (videoId: string | null) => {
+    setSelectedVideoId(videoId);
+    setIsPlaying(false);
+  };
+
+  if (!movies.length) {
+    return null;
+  }
+
+  const currentMovie = movies[currentSlide];
 
   return (
-    <div className="relative w-full h-[600px] overflow-hidden mb-16">
-      {slides.map((slide, index) => (
-        <HeroSlide
-          key={`${slide.id}-${themeKey}`}
-          type={slide.type}
-          src={slide.src}
-          index={index}
-          currentIndex={currentIndex}
-        />
-      ))}
-
-      <div className="absolute bottom-16 left-16 z-10">
-        <h1 className="text-4xl font-bold text-white mb-4">
-          Welcome to Ekowest TV
-        </h1>
-        <p className="text-xl text-white">
-          Experience the best of Nigerian entertainment
-        </p>
-      </div>
-
-      <HeroControls onPrevSlide={prevSlide} onNextSlide={nextSlide} />
+    <div className="relative w-full h-[75vh] overflow-hidden">
+      <HeroSlide
+        id={currentMovie.id}
+        title={currentMovie.title}
+        image={currentMovie.image}
+        category={currentMovie.category}
+        videoId={currentMovie.videoId}
+        onVideoSelect={handleVideoSelect}
+        isPlaying={selectedVideoId === currentMovie.videoId}
+      />
+      <HeroControls
+        onPrev={handlePrevSlide}
+        onNext={handleNextSlide}
+        isPlaying={isPlaying}
+        onPlayPause={handlePlayPause}
+        currentSlide={currentSlide + 1}
+        totalSlides={movies.length}
+      />
     </div>
   );
 };
+
+export default Hero;
