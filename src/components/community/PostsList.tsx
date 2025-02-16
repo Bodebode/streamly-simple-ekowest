@@ -17,6 +17,7 @@ interface PostData {
   tags?: string[];
   is_edited?: boolean;
   is_pinned?: boolean;
+  image_url?: string;
   profiles: {
     username: string;
     display_name?: string;
@@ -37,13 +38,16 @@ export const PostsList = forwardRef<PostsListRef>((_, ref) => {
   const { user } = useAuth();
   const { toast } = useToast();
 
+  // Updated sort function to ensure pinned posts always stay at top
   const sortPosts = (postsToSort: PostData[]) => {
     return [...postsToSort].sort((a, b) => {
       // First sort by pinned status (pinned posts first)
-      if (a.is_pinned && !b.is_pinned) return -1;
-      if (!a.is_pinned && b.is_pinned) return 1;
-      // Then sort by creation date (newest first)
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      if ((a.is_pinned && b.is_pinned) || (!a.is_pinned && !b.is_pinned)) {
+        // If both are pinned or both are not pinned, sort by date
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+      // Put pinned posts first
+      return a.is_pinned ? -1 : 1;
     });
   };
 
@@ -62,7 +66,8 @@ export const PostsList = forwardRef<PostsListRef>((_, ref) => {
             website
           )
         `)
-        .order('created_at', { ascending: false });
+        .order('is_pinned', { ascending: false }) // First order by pinned status
+        .order('created_at', { ascending: false }); // Then by creation date
 
       if (error) throw error;
       setPosts(sortPosts(data || []));
@@ -114,18 +119,34 @@ export const PostsList = forwardRef<PostsListRef>((_, ref) => {
         schema: 'public', 
         table: 'posts' 
       }, (payload) => {
-        setPosts(currentPosts => currentPosts.filter(post => post.id !== payload.old.id));
+        setPosts(currentPosts => sortPosts(currentPosts.filter(post => post.id !== payload.old.id)));
       })
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
         table: 'posts'
       }, async (payload) => {
-        // If a post is pinned/unpinned, re-sort the list
-        if ('is_pinned' in payload.new) {
+        // Re-fetch the updated post to get the complete data
+        const { data: updatedPost, error } = await supabase
+          .from('posts')
+          .select(`
+            *,
+            profiles:user_id (
+              username,
+              display_name,
+              avatar_url,
+              bio,
+              location,
+              website
+            )
+          `)
+          .eq('id', payload.new.id)
+          .single();
+
+        if (!error && updatedPost) {
           setPosts(currentPosts => {
             const updatedPosts = currentPosts.map(post => 
-              post.id === payload.new.id ? { ...post, ...payload.new } : post
+              post.id === updatedPost.id ? updatedPost : post
             );
             return sortPosts(updatedPosts);
           });
@@ -155,7 +176,7 @@ export const PostsList = forwardRef<PostsListRef>((_, ref) => {
 
       if (error) throw error;
 
-      setPosts(posts.filter(post => post.id !== postId));
+      setPosts(currentPosts => sortPosts(currentPosts.filter(post => post.id !== postId)));
       
       toast({
         title: "Post deleted",
