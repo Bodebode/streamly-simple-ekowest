@@ -318,6 +318,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_edited: boolean | null
+          is_pinned: boolean | null
           likes_count: number | null
           replies_count: number | null
           tags: string[] | null
@@ -331,6 +332,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_edited?: boolean | null
+          is_pinned?: boolean | null
           likes_count?: number | null
           replies_count?: number | null
           tags?: string[] | null
@@ -344,6 +346,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_edited?: boolean | null
+          is_pinned?: boolean | null
           likes_count?: number | null
           replies_count?: number | null
           tags?: string[] | null

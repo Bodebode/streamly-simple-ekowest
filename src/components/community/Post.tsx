@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { User } from '@supabase/supabase-js';
-import { MessageSquare, ThumbsUp, MoreVertical, Trash2, Edit, Send } from 'lucide-react';
+import { MessageSquare, ThumbsUp, MoreVertical, Trash2, Edit, Send, Pin, PinOff } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -28,6 +28,7 @@ interface PostProps {
     category?: string;
     tags?: string[];
     is_edited?: boolean;
+    is_pinned?: boolean;
     image_url?: string | null;
     profiles: {
       username: string;
@@ -50,6 +51,7 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
   const [replies, setReplies] = useState<any[]>([]);
   const [newReply, setNewReply] = useState('');
   const [isLoadingReplies, setIsLoadingReplies] = useState(false);
+  const [isPinned, setIsPinned] = useState(post.is_pinned || false);
   const { toast } = useToast();
   const isOwner = currentUser?.id === post.user_id;
   const replyInputRef = useRef<HTMLTextAreaElement>(null);
@@ -145,11 +147,33 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
     }
   };
 
+  const togglePin = async () => {
+    try {
+      const { error } = await supabase
+        .from('posts')
+        .update({ is_pinned: !isPinned })
+        .eq('id', post.id);
+
+      if (error) throw error;
+
+      setIsPinned(!isPinned);
+      toast({
+        title: isPinned ? "Post unpinned" : "Post pinned",
+        description: isPinned ? "The post has been unpinned." : "The post has been pinned to the top.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update pin status.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleReply = async () => {
     if (!newReply.trim()) return;
 
     try {
-      // First get the current user's profile
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('username, avatar_url')
@@ -168,7 +192,6 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
 
       if (error) throw error;
 
-      // Add optimistic reply
       setReplies([...replies, {
         id: crypto.randomUUID(),
         content: newReply.trim(),
@@ -192,7 +215,10 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
   };
 
   return (
-    <div className="bg-card rounded-lg p-4 space-y-2 transition-all duration-200 hover:shadow-xl border border-border/50 hover:border-border hover:scale-[1.01]">
+    <div className={cn(
+      "bg-card rounded-lg p-4 space-y-2 transition-all duration-200 hover:shadow-xl border border-border/50 hover:border-border hover:scale-[1.01]",
+      isPinned && "bg-muted/30"
+    )}>
       <div className="flex items-start justify-between">
         <div className="flex items-center space-x-3">
           <Avatar className="h-10 w-10">
@@ -202,9 +228,14 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
             </AvatarFallback>
           </Avatar>
           <div>
-            <h3 className="font-semibold text-foreground">
-              {post.profiles?.display_name || post.profiles?.username || 'Anonymous'}
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-foreground">
+                {post.profiles?.display_name || post.profiles?.username || 'Anonymous'}
+              </h3>
+              {isPinned && (
+                <Pin className="h-3 w-3 text-muted-foreground" />
+              )}
+            </div>
             <p className="text-xs text-muted-foreground">
               @{post.profiles?.username || 'anonymous'} · {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
               {post.is_edited && ' (edited)'}
@@ -222,6 +253,19 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
               <DropdownMenuItem onClick={() => setIsEditing(true)}>
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={togglePin}>
+                {isPinned ? (
+                  <>
+                    <PinOff className="h-4 w-4 mr-2" />
+                    Unpin
+                  </>
+                ) : (
+                  <>
+                    <Pin className="h-4 w-4 mr-2" />
+                    Pin
+                  </>
+                )}
               </DropdownMenuItem>
               <DropdownMenuItem 
                 className="text-destructive focus:text-destructive"
