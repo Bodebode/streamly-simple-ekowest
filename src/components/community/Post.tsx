@@ -245,13 +245,13 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
         {isOwner && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 -mt-2">
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 -mt-3">
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent 
               align="end" 
-              className="w-[160px] p-1.5 -mt-2"
+              className="w-[160px] p-1.5 mt-1"
               sideOffset={-5}
             >
               <DropdownMenuItem 
