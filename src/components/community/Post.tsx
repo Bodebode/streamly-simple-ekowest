@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { User } from '@supabase/supabase-js';
@@ -16,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Reply } from './Reply';
+import { getStorageUrl } from '@/utils/supabase-url';
 
 interface PostProps {
   post: {
@@ -228,12 +228,17 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
     }
   };
 
+  const getAvatarUrl = (avatarPath: string | null) => {
+    if (!avatarPath) return null;
+    return getStorageUrl('avatars', avatarPath);
+  };
+
   return (
     <div className="bg-card rounded-lg p-4 space-y-2 transition-all duration-200 hover:shadow-xl border border-border/50 hover:border-border hover:scale-[1.01]">
       <div className="flex items-start justify-between">
         <div className="flex items-center space-x-3">
           <Avatar className="h-10 w-10">
-            <AvatarImage src={post.profiles?.avatar_url || undefined} />
+            <AvatarImage src={getAvatarUrl(post.profiles?.avatar_url) || undefined} />
             <AvatarFallback>
               {(post.profiles?.display_name?.[0] || post.profiles?.username?.[0] || 'U').toUpperCase()}
             </AvatarFallback>

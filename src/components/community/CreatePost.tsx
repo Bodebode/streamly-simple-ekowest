@@ -94,6 +94,15 @@ export const CreatePost = ({ onNewPost }: CreatePostProps) => {
         imageUrl = publicUrl;
       }
 
+      // Fetch the user's profile data first
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('username, avatar_url, display_name')
+        .eq('id', user?.id)
+        .single();
+
+      if (profileError) throw profileError;
+
       const postData = {
         content: content.trim(),
         user_id: user?.id,
@@ -101,7 +110,7 @@ export const CreatePost = ({ onNewPost }: CreatePostProps) => {
         image_url: imageUrl,
       };
 
-      // Create an optimistic post with temporary ID and user profile data
+      // Create an optimistic post with the fetched profile data
       const optimisticPost = {
         ...postData,
         id: crypto.randomUUID(),
@@ -109,8 +118,9 @@ export const CreatePost = ({ onNewPost }: CreatePostProps) => {
         likes_count: 0,
         replies_count: 0,
         profiles: {
-          username: user?.user_metadata?.username || user?.email,
-          avatar_url: user?.user_metadata?.avatar_url,
+          username: profileData.username,
+          display_name: profileData.display_name,
+          avatar_url: profileData.avatar_url,
         }
       };
 
