@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
-import { Drum, Coins, Search, X, LogOut, User, MessageSquare } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Drum, Coins, Search, X, LogOut, User, MessageSquare, Home } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { useAuth } from '@/components/AuthProvider';
@@ -38,6 +37,7 @@ export const Navbar = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
+  const location = useLocation();
 
   useEffect(() => {
     if (user) {
@@ -111,8 +111,8 @@ export const Navbar = () => {
     }
   };
 
-  // Use display_name -> username -> email priority
   const displayName = profileData?.display_name || profileData?.username || user?.email || 'User';
+  const isHome = location.pathname === '/';
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-white dark:bg-koya-card border-b">
@@ -187,6 +187,12 @@ export const Navbar = () => {
                   <Search className="h-5 w-5" />
                 </Button>
               </div>
+              {!isHome && (
+                <Link to="/" className="flex items-center gap-1 text-sm hover:underline">
+                  <Home className="h-5 w-5" />
+                  Home
+                </Link>
+              )}
               <Link to="/my-list" className="text-sm hover:underline">
                 My List
               </Link>
