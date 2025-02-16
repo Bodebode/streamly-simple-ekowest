@@ -73,6 +73,32 @@ export const PostsList = forwardRef<PostsListRef>((_, ref) => {
     const channel = supabase
       .channel('public:posts')
       .on('postgres_changes', { 
+        event: 'INSERT', 
+        schema: 'public', 
+        table: 'posts' 
+      }, async (payload) => {
+        // Fetch the complete post data including profile information
+        const { data: postData, error } = await supabase
+          .from('posts')
+          .select(`
+            *,
+            profiles:user_id (
+              username,
+              display_name,
+              avatar_url,
+              bio,
+              location,
+              website
+            )
+          `)
+          .eq('id', payload.new.id)
+          .single();
+
+        if (!error && postData) {
+          setPosts(currentPosts => [postData, ...currentPosts]);
+        }
+      })
+      .on('postgres_changes', { 
         event: 'DELETE', 
         schema: 'public', 
         table: 'posts' 
@@ -86,8 +112,29 @@ export const PostsList = forwardRef<PostsListRef>((_, ref) => {
     };
   }, []);
 
-  const handleNewPost = (newPost: PostData) => {
-    setPosts(currentPosts => [newPost, ...currentPosts]);
+  const handleNewPost = async (newPost: PostData) => {
+    // Fetch the complete post data including profile information
+    const { data: postData, error } = await supabase
+      .from('posts')
+      .select(`
+        *,
+        profiles:user_id (
+          username,
+          display_name,
+          avatar_url,
+          bio,
+          location,
+          website
+        )
+      `)
+      .eq('id', newPost.id)
+      .single();
+
+    if (!error && postData) {
+      setPosts(currentPosts => [postData, ...currentPosts]);
+    } else {
+      setPosts(currentPosts => [newPost, ...currentPosts]);
+    }
   };
 
   useImperativeHandle(ref, () => ({
