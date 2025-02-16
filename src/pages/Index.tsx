@@ -88,7 +88,7 @@ const Index = () => {
         </Button>
       </div>
       <div className="pt-16">
-        <Hero />
+        <Hero movies={transformedHighlyRated.length > 0 ? transformedHighlyRated : MOCK_MOVIES.trending} />
         <div className="pb-8">
           <CategoryRow 
             title="Trending Now" 

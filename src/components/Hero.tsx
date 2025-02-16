@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import HeroSlide from './hero/HeroSlide';
-import HeroControls from './hero/HeroControls';
+import { HeroSlide } from './hero/HeroSlide';
+import { HeroControls } from './hero/HeroControls';
 import { Movie } from '@/types/movies';
 
 interface HeroProps {
