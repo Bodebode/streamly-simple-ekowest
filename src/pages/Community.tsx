@@ -1,9 +1,8 @@
 
-import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/layouts/MainLayout';
 import { CreatePost } from '@/components/community/CreatePost';
-import { PostsList, PostsListRef } from '@/components/community/PostsList';
+import { PostsList } from '@/components/community/PostsList';
 import { useAuth } from '@/components/AuthProvider';
 import { useToast } from '@/hooks/use-toast';
 
@@ -11,7 +10,6 @@ export const Community = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const postsListRef = useRef<PostsListRef>(null);
 
   useEffect(() => {
     if (!user) {
@@ -38,8 +36,7 @@ export const Community = () => {
                 Join the conversation about African cinema, share your thoughts, and connect with fellow enthusiasts.
               </p>
             </div>
-            <CreatePost onNewPost={(post) => postsListRef.current?.handleNewPost(post)} />
-            <PostsList ref={postsListRef} />
+            <PostsList currentUser={user} />
           </div>
         </div>
       </div>
