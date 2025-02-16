@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface ProfileData {
   username: string | null;
@@ -91,6 +92,11 @@ export const ProfileHeader = ({ user, handleFileUpload, uploading }: ProfileHead
     }
   };
 
+  const getAvatarUrl = () => {
+    if (!profileData.avatar_url) return null;
+    return `${supabase.storageClient.from('avatars').getPublicUrl(profileData.avatar_url).data.publicUrl}`;
+  };
+
   return (
     <>
       <Button 
@@ -104,17 +110,16 @@ export const ProfileHeader = ({ user, handleFileUpload, uploading }: ProfileHead
 
       <div className="flex flex-col md:flex-row gap-8">
         <div className="flex-shrink-0 relative">
-          <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-            {profileData.avatar_url ? (
-              <img 
-                src={getStorageUrl('avatars', profileData.avatar_url)}
-                alt="Profile"
-                className="w-full h-full object-cover"
-              />
-            ) : (
+          <Avatar className="w-32 h-32">
+            <AvatarImage 
+              src={getAvatarUrl() || undefined}
+              alt="Profile picture"
+              className="object-cover"
+            />
+            <AvatarFallback>
               <User className="w-16 h-16 text-gray-400" />
-            )}
-          </div>
+            </AvatarFallback>
+          </Avatar>
           <label 
             htmlFor="avatar-upload" 
             className="absolute bottom-0 right-0 p-2 bg-white dark:bg-gray-800 rounded-full shadow-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
