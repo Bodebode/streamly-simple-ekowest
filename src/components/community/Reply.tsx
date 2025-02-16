@@ -109,18 +109,18 @@ export const Reply = ({ reply, currentUser, onDelete, onUpdate }: ReplyProps) =>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => setIsEditing(true)}>
-                <Edit className="h-3 w-3 mr-1.5" />
+                <Edit className="h-4 w-4 mr-2" />
                 Edit
               </DropdownMenuItem>
               <DropdownMenuItem onClick={togglePin}>
                 {isPinned ? (
                   <>
-                    <PinOff className="h-3 w-3 mr-1.5" />
+                    <PinOff className="h-4 w-4 mr-2" />
                     Unpin
                   </>
                 ) : (
                   <>
-                    <Pin className="h-3 w-3 mr-1.5" />
+                    <Pin className="h-4 w-4 mr-2" />
                     Pin
                   </>
                 )}
@@ -129,7 +129,7 @@ export const Reply = ({ reply, currentUser, onDelete, onUpdate }: ReplyProps) =>
                 className="text-destructive focus:text-destructive"
                 onClick={() => onDelete(reply.id)}
               >
-                <Trash2 className="h-3 w-3 mr-1.5" />
+                <Trash2 className="h-4 w-4 mr-2" />
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
