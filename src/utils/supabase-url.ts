@@ -1,5 +1,12 @@
 
+import { supabase } from '@/integrations/supabase/client';
+
 export const getStorageUrl = (bucket: string, path: string | null) => {
   if (!path) return null;
-  return `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`;
+  
+  const { data } = supabase.storage
+    .from(bucket)
+    .getPublicUrl(path);
+    
+  return data.publicUrl;
 };

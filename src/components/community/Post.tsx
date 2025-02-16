@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { User } from '@supabase/supabase-js';
@@ -148,6 +149,15 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
     if (!newReply.trim()) return;
 
     try {
+      // First get the current user's profile
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('username, avatar_url')
+        .eq('id', currentUser?.id)
+        .single();
+
+      if (profileError) throw profileError;
+
       const { error } = await supabase
         .from('post_replies')
         .insert([{
@@ -158,8 +168,16 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
 
       if (error) throw error;
 
+      // Add optimistic reply
+      setReplies([...replies, {
+        id: crypto.randomUUID(),
+        content: newReply.trim(),
+        created_at: new Date().toISOString(),
+        user_id: currentUser?.id,
+        profiles: profileData
+      }]);
+
       setNewReply('');
-      fetchReplies();
       toast({
         title: "Success",
         description: "Reply added successfully.",
@@ -173,82 +191,22 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
     }
   };
 
-  const handleDeleteReply = async (replyId: string) => {
-    try {
-      const { error } = await supabase
-        .from('post_replies')
-        .delete()
-        .eq('id', replyId);
-
-      if (error) throw error;
-
-      setReplies(replies.filter(reply => reply.id !== replyId));
-      toast({
-        title: "Success",
-        description: "Reply deleted successfully.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete reply.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleUpdateReply = async (replyId: string, content: string) => {
-    try {
-      const { error } = await supabase
-        .from('post_replies')
-        .update({ 
-          content,
-          is_edited: true,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', replyId);
-
-      if (error) throw error;
-
-      setReplies(replies.map(reply => 
-        reply.id === replyId 
-          ? { ...reply, content, is_edited: true } 
-          : reply
-      ));
-
-      toast({
-        title: "Success",
-        description: "Reply updated successfully.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update reply.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const getAvatarUrl = (avatarPath: string | null) => {
-    if (!avatarPath) return null;
-    return getStorageUrl('avatars', avatarPath);
-  };
-
   return (
     <div className="bg-card rounded-lg p-4 space-y-2 transition-all duration-200 hover:shadow-xl border border-border/50 hover:border-border hover:scale-[1.01]">
       <div className="flex items-start justify-between">
         <div className="flex items-center space-x-3">
           <Avatar className="h-10 w-10">
-            <AvatarImage src={getAvatarUrl(post.profiles?.avatar_url) || undefined} />
+            <AvatarImage src={post.profiles?.avatar_url ? getStorageUrl('avatars', post.profiles.avatar_url) : undefined} />
             <AvatarFallback>
               {(post.profiles?.display_name?.[0] || post.profiles?.username?.[0] || 'U').toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
             <h3 className="font-semibold text-foreground">
-              {post.profiles?.display_name || post.profiles?.username || 'User'}
+              {post.profiles?.display_name || post.profiles?.username || 'Anonymous'}
             </h3>
             <p className="text-xs text-muted-foreground">
-              @{post.profiles?.username || 'user'} · {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+              @{post.profiles?.username || 'anonymous'} · {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
               {post.is_edited && ' (edited)'}
             </p>
           </div>
@@ -321,19 +279,6 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
         </div>
       )}
 
-      {post.tags && post.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {post.tags.map((tag, index) => (
-            <span
-              key={index}
-              className="px-2 py-0.5 text-xs rounded-full bg-primary/10 text-primary"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-      )}
-
       <div className="flex items-center space-x-1.5">
         <Button
           variant="ghost"
@@ -371,8 +316,8 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
                   key={reply.id}
                   reply={reply}
                   currentUser={currentUser}
-                  onDelete={handleDeleteReply}
-                  onUpdate={handleUpdateReply}
+                  onDelete={() => handleReply}
+                  onUpdate={() => {}}
                 />
               ))}
               <div className="flex items-start gap-3 pt-1.5">
