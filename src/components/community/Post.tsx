@@ -149,7 +149,6 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
     if (!newReply.trim()) return;
 
     try {
-      // First get the current user's profile
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('username, avatar_url, display_name')
@@ -168,7 +167,6 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
 
       if (error) throw error;
 
-      // Add optimistic reply with display_name
       setReplies([...replies, {
         id: crypto.randomUUID(),
         content: newReply.trim(),
