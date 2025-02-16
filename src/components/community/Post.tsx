@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { User } from '@supabase/supabase-js';
@@ -66,6 +65,7 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
           *,
           profiles:user_id (
             username,
+            display_name,
             avatar_url
           )
         `)

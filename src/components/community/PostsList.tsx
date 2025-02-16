@@ -18,6 +18,7 @@ interface PostData {
   is_edited?: boolean;
   profiles: {
     username: string;
+    display_name?: string;
     avatar_url: string | null;
     bio?: string;
     location?: string;
@@ -43,6 +44,7 @@ export const PostsList = forwardRef<PostsListRef>((_, ref) => {
           *,
           profiles:user_id (
             username,
+            display_name,
             avatar_url,
             bio,
             location,

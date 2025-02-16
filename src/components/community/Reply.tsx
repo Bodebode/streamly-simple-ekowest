@@ -22,6 +22,7 @@ interface ReplyProps {
     is_edited: boolean;
     profiles: {
       username: string;
+      display_name?: string;
       avatar_url: string | null;
     } | null;
   };
@@ -52,15 +53,15 @@ export const Reply = ({ reply, currentUser, onDelete, onUpdate }: ReplyProps) =>
           <Avatar className="h-6 w-6">
             <AvatarImage src={getAvatarUrl(reply.profiles?.avatar_url) || undefined} />
             <AvatarFallback>
-              {reply.profiles?.username?.charAt(0).toUpperCase() || 'U'}
+              {(reply.profiles?.display_name?.[0] || reply.profiles?.username?.[0] || 'U').toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
             <h4 className="text-sm font-semibold">
-              {reply.profiles?.username || 'Anonymous'}
+              {reply.profiles?.display_name || reply.profiles?.username || 'Anonymous'}
             </h4>
             <p className="text-xs text-muted-foreground">
-              {formatDistanceToNow(new Date(reply.created_at), { addSuffix: true })}
+              @{reply.profiles?.username || 'anonymous'} · {formatDistanceToNow(new Date(reply.created_at), { addSuffix: true })}
               {reply.is_edited && ' (edited)'}
             </p>
           </div>
