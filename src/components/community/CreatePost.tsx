@@ -6,22 +6,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { PenLine, Loader2, ImagePlus, X } from 'lucide-react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-const CATEGORIES = [
-  'General',
-  'Reviews',
-  'Recommendations',
-  'News',
-  'Discussion',
-  'Other'
-];
 
 interface CreatePostProps {
   onNewPost?: (post: any) => void;
@@ -29,7 +13,6 @@ interface CreatePostProps {
 
 export const CreatePost = ({ onNewPost }: CreatePostProps) => {
   const [content, setContent] = useState('');
-  const [category, setCategory] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -105,7 +88,7 @@ export const CreatePost = ({ onNewPost }: CreatePostProps) => {
       const postData = {
         content: content.trim(),
         user_id: user?.id,
-        category: category || 'General',
+        category: 'General',
         image_url: imageUrl,
       };
 
@@ -128,7 +111,6 @@ export const CreatePost = ({ onNewPost }: CreatePostProps) => {
 
       // Clear the form
       setContent('');
-      setCategory('');
       removeImage();
 
       // Perform the actual database insert
@@ -201,18 +183,6 @@ export const CreatePost = ({ onNewPost }: CreatePostProps) => {
           >
             <ImagePlus className="h-4 w-4" />
           </Button>
-          <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent>
-              {CATEGORIES.map((cat) => (
-                <SelectItem key={cat} value={cat}>
-                  {cat}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
           <Button 
             type="submit" 
             disabled={isSubmitting || (!content.trim() && !selectedImage)}
