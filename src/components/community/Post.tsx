@@ -216,7 +216,7 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
 
   return (
     <div className={cn(
-      "bg-card rounded-lg p-4 space-y-2 transition-all duration-200 hover:shadow-xl border border-border/50 hover:border-border hover:scale-[1.01]",
+      "bg-card rounded-lg p-4 space-y-2 transition-all duration-200 hover:shadow-xl border border-border/50 hover:border-border hover:scale-[1.01] relative",
       isPinned && "bg-muted/30"
     )}>
       <div className="flex items-start justify-between">
@@ -251,7 +251,8 @@ export const Post = ({ post, currentUser, onDelete }: PostProps) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent 
               align="end" 
-              className="w-[160px] p-1.5"
+              className="w-[160px] p-1.5 -mt-2"
+              sideOffset={5}
             >
               <DropdownMenuItem 
                 onClick={() => setIsEditing(true)}
