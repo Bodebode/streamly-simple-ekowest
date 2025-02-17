@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+
+import { useState } from 'react';
 import { Drum, Coins, Search, X, LogOut, User, MessageSquare, Home } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '../components/ui/button';
@@ -7,6 +8,7 @@ import { useAuth } from '@/components/AuthProvider';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/stores/auth-store';
 
 interface SearchResult {
   id: {
@@ -23,46 +25,16 @@ interface SearchResult {
   };
 }
 
-interface ProfileData {
-  display_name: string | null;
-  username: string | null;
-}
-
 export const Navbar = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
   const location = useLocation();
-
-  useEffect(() => {
-    if (user) {
-      fetchProfileData();
-    }
-  }, [user]);
-
-  const fetchProfileData = async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('display_name, username')
-        .eq('id', user.id)
-        .single();
-
-      if (error) throw error;
-      if (data) {
-        setProfileData(data);
-      }
-    } catch (error) {
-      console.error('Error fetching profile data:', error);
-    }
-  };
+  const profileData = useAuthStore((state) => state.profileData);
 
   const handleLogout = async () => {
     try {
